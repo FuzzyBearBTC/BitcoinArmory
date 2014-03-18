@@ -57,8 +57,8 @@ import optparse
 parser = optparse.OptionParser(usage="%prog [options]\n")
 parser.add_option("--settings",        dest="settingsPath",default='DEFAULT', type="str",          help="load Armory with a specific settings file")
 parser.add_option("--datadir",         dest="datadir",     default='DEFAULT', type="str",          help="Change the directory that Armory calls home")
-parser.add_option("--satoshi-datadir", dest="satoshiHome", default='DEFAULT', type='str',          help="The Bitcoin-Qt/bitcoind home directory")
-parser.add_option("--satoshi-port",    dest="satoshiPort", default='DEFAULT', type="str",          help="For Bitcoin-Qt instances operating on a non-standard port")
+parser.add_option("--satoshi-datadir", dest="satoshiHome", default='DEFAULT', type='str',          help="The ppcoin-qt/ppcoind home directory")
+parser.add_option("--satoshi-port",    dest="satoshiPort", default='DEFAULT', type="str",          help="For ppcoin-qt instances operating on a non-standard port")
 parser.add_option("--dbdir",           dest="leveldbDir",  default='DEFAULT', type='str',          help="Location to store blocks database (defaults to --datadir)")
 parser.add_option("--rpcport",         dest="rpcport",     default='DEFAULT', type="str",          help="RPC port for running armoryd.py")
 parser.add_option("--testnet",         dest="testnet",     default=False,     action="store_true", help="Use the testnet protocol")
@@ -217,7 +217,7 @@ else:
    print '***Cannot determine default directory locations'
 
 
-# Allow user to override default bitcoin-qt/bitcoind home directory
+# Allow user to override default ppcoin-qt/ppcoind home directory
 if not CLI_OPTIONS.satoshiHome.lower()=='default':
    success = True
    if USE_TESTNET:
@@ -364,7 +364,7 @@ if not CLI_OPTIONS.satoshiPort == 'DEFAULT':
    try:
       BITCOIN_PORT = int(CLI_OPTIONS.satoshiPort)
    except:
-      raise TypeError, 'Invalid port for Bitcoin-Qt, using ' + str(BITCOIN_PORT)
+      raise TypeError, 'Invalid port for ppcoin-qt, using ' + str(BITCOIN_PORT)
 
 
 if not CLI_OPTIONS.rpcport == 'DEFAULT':
@@ -1093,7 +1093,7 @@ def getCurrTimeAndBlock():
 # Define all the hashing functions we're going to need.  We don't actually
 # use any of the first three directly (sha1, sha256, ripemd160), we only
 # use hash256 and hash160 which use the first three to create the ONLY hash
-# operations we ever do in the bitcoin network
+# operations we ever do in the Peercoin network
 # UPDATE:  mini-private-key format requires vanilla sha256... 
 def sha1(bits):
    return hashlib.new('sha1', bits).digest()
@@ -1290,7 +1290,7 @@ EmptyHash = hex_to_binary('00'*32)
 # BINARY/BASE58 CONVERSIONS
 def binary_to_base58(binstr):
    """
-   This method applies the Bitcoin-specific conversion from binary to Base58
+   This method applies the Peercoin-specific conversion from binary to Base58
    which may includes some extra "zero" bytes, such as is the case with the
    main-network addresses.
 
@@ -1320,7 +1320,7 @@ def binary_to_base58(binstr):
 ################################################################################
 def base58_to_binary(addr):
    """
-   This method applies the Bitcoin-specific conversion from Base58 to binary
+   This method applies the Peercoin-specific conversion from Base58 to binary
    which may includes some extra "zero" bytes, such as is the case with the
    main-network addresses.
 
@@ -1357,7 +1357,7 @@ def base58_to_binary(addr):
 ################################################################################
 def hash160_to_addrStr(binStr, isP2SH=False):
    """
-   Converts the 20-byte pubKeyHash to 25-byte binary Bitcoin address
+   Converts the 20-byte pubKeyHash to 25-byte binary Peercoin address
    which includes the network byte (prefix) and 4-byte checksum (suffix)
    """
    addr21 = (P2SHBYTE if isP2SH else ADDRBYTE) + binStr
@@ -1815,7 +1815,7 @@ class BinaryPacker(object):
 
 ################################################################################
 
-# The following params are for the Bitcoin elliptic curves (secp256k1)
+# The following params are for the Peercoin elliptic curves (secp256k1)
 SECP256K1_MOD   = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2FL
 SECP256K1_ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141L
 SECP256K1_B     = 0x0000000000000000000000000000000000000000000000000000000000000007L
@@ -4895,7 +4895,7 @@ class PyScriptProcessor(object):
 
    def checkSig(self,binSig, binPubKey, txOutScript, txInTx, txInIndex, lastOpCodeSep=None):
       """
-      Generic method for checking Bitcoin tx signatures.  This needs to be used for both
+      Generic method for checking Peercoin tx signatures.  This needs to be used for both
       OP_CHECKSIG and OP_CHECKMULTISIG.  Step 1 is to pop signature and public key off
       the stack, which must be done outside this method and passed in through the argument
       list.  The remaining steps do not require access to the stack.
@@ -10460,14 +10460,14 @@ def createBlockLocatorNumList(topblk):
 #    Armory to operate, using python-twisted.  There are "better"
 #    ways to do this with "reusable" code structures (i.e. using huge
 #    deferred callback chains), but this is not the central "creative" 
-#    part of the Bitcoin protocol.  I need just enough to broadcast tx
+#    part of the Peercoin protocol.  I need just enough to broadcast tx
 #    and receive new tx that aren't in the blockchain yet.  Beyond that,
 #    I'll just be ignoring everything else.
 #
 ################################################################################
 class ArmoryClient(Protocol):
    """
-   This is where all the Bitcoin-specific networking stuff goes.
+   This is where all the Peercoin-specific networking stuff goes.
    In the Twisted way, you need to inject your own chains of 
    callbacks through the factory in order to get this class to do
    the right thing on the various events.
@@ -10912,11 +10912,11 @@ def parseLinkList(theData):
    
 
 ################################################################################
-# jgarzik'sjj jsonrpc-bitcoin code -- stupid-easy to talk to bitcoind
+# jgarzik'sjj jsonrpc-bitcoin code -- stupid-easy to talk to ppcoind
 from jsonrpc import ServiceProxy, authproxy
 class SatoshiDaemonManager(object):
    """
-   Use an existing implementation of bitcoind 
+   Use an existing implementation of ppcoind 
    """
 
    class BitcoindError(Exception): pass
@@ -10963,10 +10963,10 @@ class SatoshiDaemonManager(object):
       if pathToBitcoindExe==None:
          pathToBitcoindExe = self.findBitcoind(extraExeSearch)
          if len(pathToBitcoindExe)==0:
-            LOGDEBUG('Failed to find bitcoind')
+            LOGDEBUG('Failed to find ppcoind')
             self.failedFindExe = True
          else:
-            LOGINFO('Found bitcoind in the following places:')
+            LOGINFO('Found ppcoind in the following places:')
             for p in pathToBitcoindExe:
                LOGINFO('   %s', p)
             pathToBitcoindExe = pathToBitcoindExe[0]
@@ -10986,7 +10986,7 @@ class SatoshiDaemonManager(object):
             LOGINFO('No home dir, makedir not requested')
             self.failedFindHome = True
 
-      if self.failedFindExe:  raise self.BitcoindError, 'bitcoind not found'
+      if self.failedFindExe:  raise self.BitcoindError, 'ppcoind not found'
       if self.failedFindHome: raise self.BitcoindError, 'homedir not found'
 
       self.satoshiHome = satoshiHome
@@ -11038,7 +11038,7 @@ class SatoshiDaemonManager(object):
                   shell = win32com.client.Dispatch('WScript.Shell')
                   targ = shell.CreateShortCut(path).Targetpath
                   targDir = os.path.dirname(targ)
-                  LOGINFO('Found Bitcoin-Qt link on desktop: %s', targDir)
+                  LOGINFO('Found ppcoin-qt link on desktop: %s', targDir)
                   possBaseDir.append( targDir )
          
          # Also look in default place in ProgramFiles dirs
@@ -11092,10 +11092,10 @@ class SatoshiDaemonManager(object):
                foundIt=True
 
          if not foundIt:
-            LOGERROR('Bitcoind could not be found in the specified installation:')
+            LOGERROR('ppcoind could not be found in the specified installation:')
             for p in extraSearchPaths:
                LOGERROR('   %s', p)
-            LOGERROR('Bitcoind is being started from:')
+            LOGERROR('ppcoind is being started from:')
             LOGERROR('   %s', self.foundExe[0])
 
       return self.foundExe
@@ -11122,16 +11122,16 @@ class SatoshiDaemonManager(object):
    
    #############################################################################
    def readBitcoinConf(self, makeIfDNE=False):
-      LOGINFO('Reading bitcoin.conf file')
-      bitconf = os.path.join( self.satoshiHome, 'bitcoin.conf' )
+      LOGINFO('Reading ppcoin.conf file')
+      bitconf = os.path.join( self.satoshiHome, 'ppcoin.conf' )
       if not os.path.exists(bitconf):
          if not makeIfDNE:
-            raise self.BitcoinDotConfError, 'Could not find bitcoin.conf'
+            raise self.BitcoinDotConfError, 'Could not find ppcoin.conf'
          else:
-            LOGINFO('No bitcoin.conf available.  Creating it...')
+            LOGINFO('No ppcoin.conf available.  Creating it...')
             touchFile(bitconf)
 
-      # Guarantee that bitcoin.conf file has very strict permissions
+      # Guarantee that ppcoin.conf file has very strict permissions
       if OS_WINDOWS:
          if OS_VARIANT[0].lower()=='xp':
             LOGERROR('Cannot set permissions correctly in XP!')
@@ -11141,14 +11141,14 @@ class SatoshiDaemonManager(object):
             LOGERROR('on XP systems):')
             LOGERROR('    %s', bitconf)
          else: 
-            LOGINFO('Setting permissions on bitcoin.conf')
+            LOGINFO('Setting permissions on ppcoin.conf')
             import win32api
             username = win32api.GetUserName()
             cmd_icacls = ['icacls',bitconf,'/inheritance:r','/grant:r', '%s:F' % username]
             icacls_out = subprocess_check_output(cmd_icacls, shell=True)
             LOGINFO('icacls returned: %s', icacls_out)
       else:
-         LOGINFO('Setting permissions on bitcoin.conf')
+         LOGINFO('Setting permissions on ppcoin.conf')
          os.chmod(bitconf, stat.S_IRUSR | stat.S_IWUSR)
                
             
@@ -11188,9 +11188,9 @@ class SatoshiDaemonManager(object):
 
 
       if not isASCII(self.bitconf['rpcuser']):
-         LOGERROR('Non-ASCII character in bitcoin.conf (rpcuser)!')
+         LOGERROR('Non-ASCII character in ppcoin.conf (rpcuser)!')
       if not isASCII(self.bitconf['rpcpassword']):
-         LOGERROR('Non-ASCII character in bitcoin.conf (rpcpassword)!')
+         LOGERROR('Non-ASCII character in ppcoin.conf (rpcpassword)!')
 
       self.bitconf['host'] = '127.0.0.1'
       
@@ -11207,10 +11207,10 @@ class SatoshiDaemonManager(object):
       import subprocess
 
       if self.isRunningBitcoind():
-         raise self.BitcoindError, 'Looks like we have already started bitcoind'
+         raise self.BitcoindError, 'Looks like we have already started ppcoind'
 
       if not os.path.exists(self.executable):
-         raise self.BitcoindError, 'Could not find bitcoind'
+         raise self.BitcoindError, 'Could not find ppcoind'
    
 
       pargs = [self.executable]
@@ -11240,13 +11240,13 @@ class SatoshiDaemonManager(object):
          LOGEXCEPT('Failed size check of blocks directory')
                
 
-      # Startup bitcoind and get its process ID (along with our own)
+      # Startup ppcoind and get its process ID (along with our own)
       self.bitcoind = launchProcess(pargs)
                                        
       self.btcdpid  = self.bitcoind.pid
       self.selfpid  = os.getpid()
 
-      LOGINFO('PID of bitcoind: %d',  self.btcdpid)
+      LOGINFO('PID of ppcoind: %d',  self.btcdpid)
       LOGINFO('PID of armory:   %d',  self.selfpid)
 
       # Startup guardian process -- it will watch Armory's PID
@@ -11262,7 +11262,7 @@ class SatoshiDaemonManager(object):
    def stopBitcoind(self):
       LOGINFO('Called stopBitcoind')
       if not self.isRunningBitcoind():
-         LOGINFO('...but bitcoind is not running, to be able to stop')
+         LOGINFO('...but ppcoind is not running, to be able to stop')
          return
 
       killProcessTree(self.bitcoind.pid)
@@ -11276,9 +11276,9 @@ class SatoshiDaemonManager(object):
    def isRunningBitcoind(self):
       """ 
       armoryengine satoshiIsAvailable() only tells us whether there's a 
-      running bitcoind that is actively responding on its port.  But it 
+      running ppcoind that is actively responding on its port.  But it 
       won't be responding immediately after we've started it (still doing
-      startup operations).  If bitcoind was started and still running, 
+      startup operations).  If ppcoind was started and still running, 
       then poll() will return None.  Any othe poll() return value means 
       that the process terminated
       """
@@ -11286,13 +11286,13 @@ class SatoshiDaemonManager(object):
          return False
       else:
          if not self.bitcoind.poll()==None:
-            LOGDEBUG('Bitcoind is no more')
+            LOGDEBUG('ppcoind is no more')
             if self.btcOut==None:
                self.btcOut, self.btcErr = self.bitcoind.communicate()
-               LOGWARN('bitcoind exited, bitcoind STDOUT:')
+               LOGWARN('ppcoind exited, ppcoind STDOUT:')
                for line in self.btcOut.split('\n'):
                   LOGWARN(line)
-               LOGWARN('bitcoind exited, bitcoind STDERR:')
+               LOGWARN('ppcoind exited, ppcoind STDERR:')
                for line in self.btcErr.split('\n'):
                   LOGWARN(line)
          return self.bitcoind.poll()==None
@@ -11309,7 +11309,7 @@ class SatoshiDaemonManager(object):
    def getSDMState(self):
       """ 
       As for why I'm doing this:  it turns out that between "initializing"
-      and "synchronizing", bitcoind temporarily stops responding entirely,
+      and "synchronizing", ppcoind temporarily stops responding entirely,
       which causes "not-available" to be the state.  I need to smooth that
       out because it wreaks havoc on the GUI which will switch to showing 
       a nasty error.
@@ -11386,7 +11386,7 @@ class SatoshiDaemonManager(object):
             # If ready, always ready
             return 'BitcoindReady'
 
-         # If we get here, bitcoind is gave us a response.
+         # If we get here, ppcoind is gave us a response.
          secSinceLastBlk = RightNow() - latestInfo['toptime']
          blkspersec = latestInfo['blkspersec']
          #print 'Blocks per 10 sec:', ('UNKNOWN' if blkspersec==-1 else blkspersec*10)
@@ -11447,11 +11447,11 @@ class SatoshiDaemonManager(object):
          LOGEXCEPT('ValueError in bkgd req top blk')
          self.lastTopBlockInfo['error'] = 'ValueError'
       except authproxy.JSONRPCException:
-         # This seems to happen when bitcoind is overwhelmed... not quite ready 
+         # This seems to happen when ppcoind is overwhelmed... not quite ready 
          LOGDEBUG('generic jsonrpc exception')
          self.lastTopBlockInfo['error'] = 'JsonRpcException'
       except socket.error:
-         # Connection isn't available... is bitcoind not running anymore?
+         # Connection isn't available... is ppcoind not running anymore?
          LOGDEBUG('generic socket error')
          self.lastTopBlockInfo['error'] = 'SocketError'
       except:
@@ -11465,7 +11465,7 @@ class SatoshiDaemonManager(object):
    #############################################################################
    def updateTopBlockInfo(self):
       """
-      We want to get the top block information, but if bitcoind is rigorously
+      We want to get the top block information, but if ppcoind is rigorously
       downloading and verifying the blockchain, it can sometimes take 10s to
       to respond to JSON-RPC calls!  We must do it in the background...
 
@@ -11754,7 +11754,7 @@ class SettingsFile(object):
 #      # 0 to 252 :   1-byte-length followed by bytes (if any)
 #      # 253 to 65,535 : byte'253' 2-byte-length followed by bytes
 #      # 65,536 to 4,294,967,295 : byte '254' 4-byte-length followed by bytes
-#      # ... and the Bitcoin client is coded to understand:
+#      # ... and the Peercoin client is coded to understand:
 #      # greater than 4,294,967,295 : byte '255' 8-byte-length followed by bytes of string
 #      # ... but I don't think it actually handles any strings that big.
 #      if self.input is None:
@@ -11860,7 +11860,7 @@ class SettingsFile(object):
 #      r = True
 #
 #   if r is not None:
-#      LOGERROR("Couldn't open wallet.dat/main. Try quitting Bitcoin and running this again.")
+#      LOGERROR("Couldn't open wallet.dat/main. Try quitting Peercoin and running this again.")
 #      sys.exit(1)
 #   
 #   return db
@@ -12988,7 +12988,7 @@ class BlockDataManagerThread(threading.Thread):
       if os.path.exists(bfile):
          os.remove(bfile)
 
-      # Check for the existence of the Bitcoin-Qt directory
+      # Check for the existence of the ppcoin-qt directory
       if not os.path.exists(self.btcdir):
          raise FileExistsError, ('Directory does not exist: %s' % self.btcdir)
 

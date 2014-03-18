@@ -209,7 +209,7 @@ class LedgerDispModelSimple(QAbstractTableModel):
                if isCB:
                   tooltipStr = '%d/120 confirmations'%nConf
                   tooltipStr += ( '\n\nThis is a "generation" transaction from\n'
-                                 'Bitcoin mining.  These transactions take\n'
+                                 'Peercoin mining.  These transactions take\n'
                                  '120 confirmations (approximately one day)\n'
                                  'before they are available to be spent.')
                else:
@@ -224,16 +224,16 @@ class LedgerDispModelSimple(QAbstractTableModel):
             #toSelf = self.index(index.row(), COL.toSelf).data().toBool()
             toSelf = rowData[COL.toSelf]
             if toSelf:
-               return QVariant('Bitcoins sent and received by the same wallet')
+               return QVariant('Peercoins sent and received by the same wallet')
             else:
                #txdir = str(index.model().data(index).toString()).strip()
                txdir = rowData[COL.TxDir]
                if rowData[COL.isCoinbase]:
-                  return QVariant('You mined these Bitcoins!')
+                  return QVariant('You mined these peercoins!')
                if float(txdir.strip())<0:
-                  return QVariant('Bitcoins sent')
+                  return QVariant('Peercoins sent')
                else:
-                  return QVariant('Bitcoins received')
+                  return QVariant('Peercoins received')
          if col==COL.Amount:
             if self.main.settings.get('DispRmFee'):
                return QVariant('The net effect on the balance of this wallet '

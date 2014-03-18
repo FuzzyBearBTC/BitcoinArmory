@@ -79,7 +79,7 @@ class MessageSigningWidget(QWidget):
       
       # Create a row with just a sign message button
       
-      self.bareSigButton = QPushButton('Bare Signature (Bitcoin-Qt Compatible)')
+      self.bareSigButton = QPushButton('Bare Signature (ppcoin-qt Compatible)')
       self.base64SigButton = QPushButton('Base64 Signature')
       self.clearSigButton = QPushButton('Clearsign Signature')
       sigButtonFrame = makeHorizFrame([self.bareSigButton,\
@@ -222,7 +222,7 @@ class SignatureVerificationWidget(QWidget):
          msg = messageString.replace('\r\n','\n')
          msg = '   ' + '<br>   '.join(msg.split('\n'))
          MsgBoxCustom(MSGBOX.Good, tr('Verified!'), tr(""" 
-            The owner of the following Bitcoin address...
+            The owner of the following Peercoin address...
             <br>
             <blockquote>
             <font face="Courier" size=4 color="#000060"><b>%s</b></font>
