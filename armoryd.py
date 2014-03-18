@@ -23,7 +23,7 @@
 #
 # Where possible this follows conventions established by the Satoshi client.
 # Does not require armory to be installed or running, this is a standalone application.
-# Requires bitcoind process to be running before starting armory-daemon.
+# Requires ppcoind process to be running before starting armory-daemon.
 # Requires an armory watch-only wallet to be in the same folder as the
 # armory-daemon script.
 # Works with testnet, use --testnet flag when starting the script.
@@ -712,8 +712,8 @@ class Armory_Daemon(object):
          LOGINFO('Blockchain load and wallet sync finished')
          LOGINFO('Wallet balance: %s' % coin2str(self.wallet.getBalance('Spendable')))
 
-         # This is CONNECT call for armoryd to talk to bitcoind
-         LOGINFO('Set up connection to bitcoind')
+         # This is CONNECT call for armoryd to talk to ppcoind
+         LOGINFO('Set up connection to ppcoind')
          self.NetworkingFactory = ArmoryClientFactory( \
                         func_loseConnect = self.showOfflineMsg, \
                         func_madeConnect = self.showOnlineMsg, \

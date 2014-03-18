@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 # jackjack's signing/verifying tool
-# verifies base64 signatures from Bitcoin
+# verifies base64 signatures from Peercoin
 # signs message in three formats:
-#   - Bitcoin base64 (compatible with Bitcoin)
+#   - Peercoin base64 (compatible with Peercoin)
 #   - ASCII armored, Clearsign
 #   - ASCII armored, Base64
 #
@@ -32,10 +32,10 @@ END_MARKER = '-----END '
 DASHX5 = '-----'
 RN = '\r\n'
 RNRN = '\r\n\r\n'
-CLEARSIGN_MSG_TYPE_MARKER = 'BITCOIN SIGNED MESSAGE'
-BITCOIN_SIG_TYPE_MARKER = 'BITCOIN SIGNATURE'
-BASE64_MSG_TYPE_MARKER = 'BITCOIN MESSAGE'
-BITCOIN_ARMORY_COMMENT = 'Comment: Signed by Bitcoin Armory v' +\
+CLEARSIGN_MSG_TYPE_MARKER = 'PEERCOIN SIGNED MESSAGE'
+BITCOIN_SIG_TYPE_MARKER = 'PEERCOIN SIGNATURE'
+BASE64_MSG_TYPE_MARKER = 'PEERCOIN MESSAGE'
+BITCOIN_ARMORY_COMMENT = 'Comment: Signed by Peercoin Armory v' +\
    getVersionString(BTCARMORY_VERSION, 3)
 class UnknownSigBlockType(Exception): pass
    
@@ -46,7 +46,7 @@ def randomk():  #better make it stronger
       rk = rk | long(random.random()*0xffffffff)<<(32*i)
    return rk
 
-# Common constants/functions for Bitcoin
+# Common constants/functions for Peercoin
 
 def hash_160_to_bc_address(h160, addrtype=0):
    vh160 = chr(addrtype) + h160
@@ -152,7 +152,7 @@ def GetSecret(pkey):
 def i2d_ECPrivateKey(pkey, compressed=False):#, crypted=True):
    part3='a081a53081a2020101302c06072a8648ce3d0101022100'  # for uncompressed keys
    if compressed:
-      if True:#not crypted:  ## Bitcoin accepts both part3's for crypted wallets...
+      if True:#not crypted:  ## Peercoin accepts both part3's for crypted wallets...
          part3='a08185308182020101302c06072a8648ce3d0101022100'  # for compressed keys
       key = '3081d30201010420' + \
          '%064x' % pkey.secret + \
@@ -426,7 +426,7 @@ def decvi(d):
    return '\xff'+decbin(d,8,True)
 
 def format_msg_to_sign(msg):
-   return "\x18Bitcoin Signed Message:\n"+decvi(len(msg))+msg
+   return "\x18Peercoin Signed Message:\n"+decvi(len(msg))+msg
 
 def sqrt_mod(a, p):
    return pow(a, (p+1)/4, p)
