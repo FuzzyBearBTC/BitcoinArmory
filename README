@@ -6,21 +6,21 @@
 #                                                                              #
 ################################################################################
 
-This is the repo straight fork of the Bitcoin Armory wallet with currently no 
+This repo is a straight fork of the Bitcoin Armory wallet, with currently no 
 changes at the time of writing this.  The repo has been set up ready for 
-developers to make the necessary changes to port the code base from bitcoin to
-Peercoin.  I will raise issues in github to track this project and work needed
+developers to make the necessary changes to port the codebase from Bitcoin to
+Peercoin.  I will raise issues in Github to track this project and work needed
 to make the Peercoin Armory Wallet.
 
 Please feel free to make pull requests to the repo.  As there is significant 
-work required here I may make a branch on the repo to allow people to submit 
-testing pulls to the code.  But please contact me directly on 
-http://www.peercointalk.org if you plan to or have made a lot of changes to the 
-code and would like to submit a large pull request.
+work required here, I may make a branch on the repo to allow people to submit 
+testing pulls to the code.  Please contact me directly on
+http://www.peercointalk.org if you plan to make (or have made) a lot of changes
+to the code, and would like to submit a large pull request.
 
-It would be nice to have all the features that the bitcoin Armory has to offer,
-but a working version for Peerocin is the current phase 1 goal.  Other features 
-can be added later.
+It would be nice to have all the features that Bitcoin Armory has to offer,
+but a working version for Peercoin is the current "Phase 1" goal.  Other
+features can be added later.
 
 Fuzzybear
 
