@@ -28,8 +28,11 @@ CPPFLAGS += -I$(GTEST_DIR) \
 				-L$(USER_DIR)/cryptopp \
 				-L$(USER_DIR)/leveldb \
 				-D__STDC_LIMIT_MACROS \
+				-D_DEBUG \
 				-g \
-				#-D_DEBUG \
+				-fprofile-arcs \
+				-ftest-coverage \
+				--coverage 
 				#-O2 \
 
 HEADERS += 	$(USER_DIR)/BinaryData.h \
@@ -54,7 +57,7 @@ OBJECTS += 	BinaryData.o \
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g 
-#CXXFLAGS += -O2
+#CXXFLAGS += -O2 -DNDEBUG -pipe -fPIC
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -71,8 +74,8 @@ all : $(TESTS)
 	rm -rf blkfiletest fakehomedir ldbtestdir/leveldb_*
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o
-
+	rm -f $(TESTS) gtest.a gtest_main.a *.o *.gcda *.gcno
+	rm -f libcryptopp.a libleveldb.a
 # Builds gtest.a and gtest_main.a.
 
 # Usually you shouldn't tweak such internal variables, indicated by a
