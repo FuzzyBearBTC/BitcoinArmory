@@ -6,9 +6,9 @@
 #                                                                              #
 ################################################################################
 
-This repo is a straight fork of the Bitcoin Armory wallet, with currently no 
+This repo is a straight fork of the Peercoin Armory wallet, with currently no 
 changes at the time of writing this.  The repo has been set up ready for 
-developers to make the necessary changes to port the codebase from Bitcoin to
+developers to make the necessary changes to port the codebase from Peercoin to
 Peercoin.  I will raise issues in Github to track this project and work needed
 to make the Peercoin Armory Wallet.
 
@@ -18,7 +18,7 @@ testing pulls to the code.  Please contact me directly on
 http://www.peercointalk.org if you plan to make (or have made) a lot of changes
 to the code, and would like to submit a large pull request.
 
-It would be nice to have all the features that Bitcoin Armory has to offer,
+It would be nice to have all the features that Peercoin Armory has to offer,
 but a working version for Peercoin is the current "Phase 1" goal.  Other
 features can be added later.
 
@@ -38,7 +38,7 @@ Fuzzybear
 * Project:    Armory
 * Author:     Alan Reiner
 * Orig Date:  13 July, 2011
-* Descr:      Armory is a full-featured Bitcoin client, offering a dozen 
+* Descr:      Armory is a full-featured Peercoin client, offering a dozen 
 *             innovative features not found in any other client software!
 *             Manage multiple wallets (deterministic and watching-only), 
 *             print paper backups that work forever, import or sweep private 
@@ -57,18 +57,18 @@ Fuzzybear
 *             it has turned out to be an inconvenience worth having. 
 *             Reimplementing all the networking code would be fraught with bugs,
 *             security holes, and possible blockchain forking.  The reliance
-*             on Bitcoin-Qt right now is actually making Armory more secure!
+*             on Peercoin-Qt right now is actually making Armory more secure!
 *           
 *
 ********************************************************************************
 *
-* Please take a moment to donate 1.0 BTC!   1ArmoryXcfq7TnCSuZa9fQjRYwJ4bkRKfv 
+* Please take a moment to donate 1.0 PPC!   1ArmoryXcfq7TnCSuZa9fQjRYwJ4bkRKfv 
 *
 ********************************************************************************
 *
 *
 * Building Armory from Source:   
-*    http://bitcoinarmory.com/index.php/building-armory-from-source
+*    http://peercoinarmory.com/index.php/building-armory-from-source
 *
 *
 ********************************************************************************

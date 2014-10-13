@@ -13,7 +13,7 @@
 #include <vector>
 #include "log.h"
 #include "BinaryData.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 #include "BlockObj.h"
 #include "StoredBlockObj.h"
 
@@ -58,7 +58,7 @@ class StoredScriptHistory;
 ////////////////////////////////////////////////////////////////////////////////
 // NOTE:  VERY IMPORTANT NOTE ABOUT THE DATABASE STRUCTURE
 //
-//    Almost everywhere you see integers serialized throughout Bitcoin, is uses
+//    Almost everywhere you see integers serialized throughout Peercoin, is uses
 //    little-endian.  This is critical to follow because you are always handling
 //    hashes of these serializations, so the byte-ordering matters.
 //

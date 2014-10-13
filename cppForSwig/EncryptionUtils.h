@@ -68,11 +68,11 @@
 #include "filters.h"
 
 #include "BinaryData.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 #include "UniversalTimer.h"
 
 // This is used to attempt to keep keying material out of swap
-// I am stealing this from bitcoin 0.4.0 src, serialize.h
+// I am stealing this from peercoin 0.4.0 src, serialize.h
 #if defined(_MSC_VER) || defined(__MINGW32__)
    // Note that VirtualLock does not provide this as a guarantee on Windows,
    // but, in practice, memory that has been VirtualLock'd almost never gets written to
@@ -110,17 +110,17 @@ using namespace std;
 // Use this to avoid "using namespace CryptoPP" (which confuses SWIG)
 // and also so it's easy to switch the AES MODE or PRNG, in one place
 #define UNSIGNED   ((CryptoPP::Integer::Signedness)(0))
-#define BTC_AES      CryptoPP::AES
-#define BTC_CFB_MODE CryptoPP::CFB_Mode
-#define BTC_CBC_MODE CryptoPP::CBC_Mode
-#define BTC_PRNG     CryptoPP::AutoSeededX917RNG<CryptoPP::AES>
+#define PPC_AES      CryptoPP::AES
+#define PPC_CFB_MODE CryptoPP::CFB_Mode
+#define PPC_CBC_MODE CryptoPP::CBC_Mode
+#define PPC_PRNG     CryptoPP::AutoSeededX917RNG<CryptoPP::AES>
 
-#define BTC_ECPOINT  CryptoPP::ECP::Point
-#define BTC_ECDSA    CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>
-#define BTC_PRIVKEY  CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::PrivateKey
-#define BTC_PUBKEY   CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::PublicKey
-#define BTC_SIGNER   CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::Signer 
-#define BTC_VERIFIER CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::Verifier
+#define PPC_ECPOINT  CryptoPP::ECP::Point
+#define PPC_ECDSA    CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>
+#define PPC_PRIVKEY  CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::PrivateKey
+#define PPC_PUBKEY   CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::PublicKey
+#define PPC_SIGNER   CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::Signer 
+#define PPC_VERIFIER CryptoPP::ECDSA<CryptoPP::ECP, CryptoPP::SHA256>::Verifier
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,8 +180,8 @@ public:
    //uint8_t const & operator[](size_t i) const {return BinaryData::operator[](i);}
    bool operator==(SecureBinaryData const & sbd2) const;
 
-   BinaryData getHash256(void) const { return BtcUtils::getHash256(getPtr(), (uint32_t)getSize()); }
-   BinaryData getHash160(void) const { return BtcUtils::getHash160(getPtr(), (uint32_t)getSize()); }
+   BinaryData getHash256(void) const { return PPCUtils::getHash256(getPtr(), (uint32_t)getSize()); }
+   BinaryData getHash160(void) const { return PPCUtils::getHash160(getPtr(), (uint32_t)getSize()); }
 
    // This would be a static method, as would be appropriate, except SWIG won't
    // play nice with static methods.  Instead, we will just use 
@@ -315,37 +315,37 @@ public:
    CryptoECDSA(void) {}
 
    /////////////////////////////////////////////////////////////////////////////
-   static BTC_PRIVKEY CreateNewPrivateKey(
+   static PPC_PRIVKEY CreateNewPrivateKey(
                               SecureBinaryData extraEntropy=SecureBinaryData());
 
    /////////////////////////////////////////////////////////////////////////////
-   static BTC_PRIVKEY ParsePrivateKey(SecureBinaryData const & privKeyData);
+   static PPC_PRIVKEY ParsePrivateKey(SecureBinaryData const & privKeyData);
    
    /////////////////////////////////////////////////////////////////////////////
-   static BTC_PUBKEY ParsePublicKey(SecureBinaryData const & pubKey65B);
+   static PPC_PUBKEY ParsePublicKey(SecureBinaryData const & pubKey65B);
 
    /////////////////////////////////////////////////////////////////////////////
-   static BTC_PUBKEY ParsePublicKey(SecureBinaryData const & pubKeyX32B,
+   static PPC_PUBKEY ParsePublicKey(SecureBinaryData const & pubKeyX32B,
                                     SecureBinaryData const & pubKeyY32B);
    
    /////////////////////////////////////////////////////////////////////////////
-   static SecureBinaryData SerializePrivateKey(BTC_PRIVKEY const & privKey);
+   static SecureBinaryData SerializePrivateKey(PPC_PRIVKEY const & privKey);
    
    /////////////////////////////////////////////////////////////////////////////
-   static SecureBinaryData SerializePublicKey(BTC_PUBKEY const & pubKey);
+   static SecureBinaryData SerializePublicKey(PPC_PUBKEY const & pubKey);
 
    /////////////////////////////////////////////////////////////////////////////
-   static BTC_PUBKEY ComputePublicKey(BTC_PRIVKEY const & cppPrivKey);
+   static PPC_PUBKEY ComputePublicKey(PPC_PRIVKEY const & cppPrivKey);
 
    
    /////////////////////////////////////////////////////////////////////////////
-   static bool CheckPubPrivKeyMatch(BTC_PRIVKEY const & cppPrivKey,
-                                    BTC_PUBKEY  const & cppPubKey);
+   static bool CheckPubPrivKeyMatch(PPC_PRIVKEY const & cppPrivKey,
+                                    PPC_PUBKEY  const & cppPubKey);
    
    /////////////////////////////////////////////////////////////////////////////
    // For signing and verification, pass in original, UN-HASHED binary string
    static SecureBinaryData SignData(SecureBinaryData const & binToSign, 
-                                    BTC_PRIVKEY const & cppPrivKey);
+                                    PPC_PRIVKEY const & cppPrivKey);
    
    
    
@@ -353,7 +353,7 @@ public:
    // For signing and verification, pass in original, UN-HASHED binary string
    static bool VerifyData(SecureBinaryData const & binMessage, 
                           SecureBinaryData const & binSignature,
-                          BTC_PUBKEY const & cppPubKey);
+                          PPC_PUBKEY const & cppPubKey);
 
    /////////////////////////////////////////////////////////////////////////////
    // For doing direct raw ECPoint operations... need the ECP object
@@ -363,7 +363,7 @@ public:
    /////////////////////////////////////////////////////////////////////////////
    // We need to make sure that we have methods that take only secure strings
    // and return secure strings (I don't feel like figuring out how to get 
-   // SWIG to take BTC_PUBKEY and BTC_PRIVKEY
+   // SWIG to take PPC_PUBKEY and PPC_PRIVKEY
 
    /////////////////////////////////////////////////////////////////////////////
    SecureBinaryData GenerateNewPrivateKey(

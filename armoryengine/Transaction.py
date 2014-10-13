@@ -336,7 +336,7 @@ def getMultisigScriptInfo(rawScript):
 
    M,N = 0,0
 
-   pubKeyStr = Cpp.BtcUtils().getMultisigPubKeyInfoStr(rawScript)
+   pubKeyStr = Cpp.PPCUtils().getMultisigPubKeyInfoStr(rawScript)
 
    bu = BinaryUnpacker(pubKeyStr)
    M = bu.get(UINT8)
@@ -368,7 +368,7 @@ def getHash160ListFromMultisigScrAddr(scrAddr):
 ################################################################################
 # These two methods are just easier-to-type wrappers around the C++ methods
 def getTxOutScriptType(script):
-   return Cpp.BtcUtils().getTxOutScriptTypeInt(script)
+   return Cpp.PPCUtils().getTxOutScriptTypeInt(script)
 
 ################################################################################
 # These two methods are just easier-to-type wrappers around the C++ methods
@@ -394,7 +394,7 @@ def getTxInScriptType(txinObj):
    """
    script = txinObj.binScript
    prevTx = txinObj.outpoint.txHash
-   return Cpp.BtcUtils().getTxInScriptTypeInt(script, prevTx)
+   return Cpp.PPCUtils().getTxInScriptTypeInt(script, prevTx)
 
 ################################################################################
 def getTxInP2SHScriptType(txinObj):
@@ -409,7 +409,7 @@ def getTxInP2SHScriptType(txinObj):
    if not scrType==CPP_TXIN_SPENDP2SH:
       return None
 
-   lastPush = Cpp.BtcUtils().getLastPushDataInScript(txinObj.binScript)
+   lastPush = Cpp.PPCUtils().getLastPushDataInScript(txinObj.binScript)
 
    return getTxOutScriptType(lastPush)
 
@@ -418,8 +418,8 @@ def getTxInP2SHScriptType(txinObj):
 def TxInExtractAddrStrIfAvail(txinObj):
    rawScript  = txinObj.binScript
    prevTxHash = txinObj.outpoint.txHash
-   scrType = Cpp.BtcUtils().getTxInScriptTypeInt(rawScript, prevTxHash)
-   lastPush = Cpp.BtcUtils().getLastPushDataInScript(rawScript)
+   scrType = Cpp.PPCUtils().getTxInScriptTypeInt(rawScript, prevTxHash)
+   lastPush = Cpp.PPCUtils().getLastPushDataInScript(rawScript)
 
    if scrType in [CPP_TXIN_STDUNCOMPR, CPP_TXIN_STDCOMPR]:
       return hash160_to_addrStr( hash160(lastPush) )
@@ -433,10 +433,10 @@ def TxInExtractAddrStrIfAvail(txinObj):
 def TxInExtractPreImageIfAvail(txinObj):
    rawScript  = txinObj.binScript
    prevTxHash = txinObj.outpoint.txHash
-   scrType = Cpp.BtcUtils().getTxInScriptTypeInt(rawScript, prevTxHash)
+   scrType = Cpp.PPCUtils().getTxInScriptTypeInt(rawScript, prevTxHash)
 
    if scrType == [CPP_TXIN_STDUNCOMPR, CPP_TXIN_STDCOMPR, CPP_TXIN_SPENDP2SH]:
-      return Cpp.BtcUtils().getLastPushDataInScript(rawScript)
+      return Cpp.PPCUtils().getLastPushDataInScript(rawScript)
    else:
       return ''
 
@@ -619,7 +619,7 @@ class PyTxOut(BlockComponent):
       indstr  = indent*nIndent
       indstr2 = indent*nIndent + indent
       print indstr + 'TxOut:'
-      print indstr2 + 'Value:   ', self.value, '(', float(self.value) / ONE_BTC, ')'
+      print indstr2 + 'Value:   ', self.value, '(', float(self.value) / ONE_PPC, ')'
       txoutType = getTxOutScriptType(self.binScript)
       if txoutType in [CPP_TXOUT_STDPUBKEY33, CPP_TXOUT_STDPUBKEY65]:
          print indstr2 + 'Script: PubKey(%s) OP_CHECKSIG' % \
@@ -639,9 +639,9 @@ class PyTxOut(BlockComponent):
    def toString(self, nIndent=0, endian=BIGENDIAN):
       indstr  = indent*nIndent
       indstr2 = indent*nIndent + indent
-      valStr, btcStr = str(self.value), str(float(self.value)/ONE_BTC)
+      valStr, ppcStr = str(self.value), str(float(self.value)/ONE_PPC)
       result = indstr + 'TxOut:\n'
-      result += indstr2 + 'Value:   %s (%s)\n' % (valStr, btcStr)
+      result += indstr2 + 'Value:   %s (%s)\n' % (valStr, ppcStr)
       result += indstr2
       txoutType = getTxOutScriptType(self.binScript)
 
@@ -888,7 +888,7 @@ class TxSigningStatus(object):
 def generatePreHashTxMsgToSign(pytx, txInIndex, prevTxOutScript, hashcode=1):
    """
    This wraps up all the complexity of:
-   https://en.bitcoin.it/w/images/en/7/70/Bitcoin_OpCheckSig_InDetail.png
+   https://en.peercoin.it/w/images/en/7/70/Peercoin_OpCheckSig_InDetail.png
    into a few simple lines of code!
    (blank all scripts except this one, insert prev script, append hashcode)
 
@@ -2022,9 +2022,9 @@ class UnsignedTransaction(AsciiSerializable):
       totalOut = sum([dtxo.value  for dtxo  in dtxoList  ])
       if totalIn - totalOut > 100*MIN_RELAY_TX_FEE:
          LOGWARN('Exceptionally high fee in createFromUnsignedTxIO')
-         LOGWARN('TotalInputs  = %s BTC', coin2strNZS(totalIn))
-         LOGWARN('TotalOutputs = %s BTC', coin2strNZS(totalOut))
-         LOGWARN('Computed Fee = %s BTC', coin2strNZS(totalIn-totalOut))
+         LOGWARN('TotalInputs  = %s PPC', coin2strNZS(totalIn))
+         LOGWARN('TotalOutputs = %s PPC', coin2strNZS(totalOut))
+         LOGWARN('Computed Fee = %s PPC', coin2strNZS(totalIn-totalOut))
       elif totalIn - totalOut < 0:
          raise ValueError('Supplied inputs are less than the supplied outputs')
 
@@ -2136,7 +2136,7 @@ class UnsignedTransaction(AsciiSerializable):
          txout.value = long(value)
 
          # Assume recipObj is either a PBA or a string
-         if isinstance(script, PyBtcAddress):
+         if isinstance(script, PyPPCAddress):
             LOGERROR("Didn't know any func was still using this conditional")
 
          intType = getTxOutScriptType(script)
@@ -2523,7 +2523,7 @@ class UnsignedTransaction(AsciiSerializable):
       print ind+'Curr TxID    : ', binary_to_hex(txHash, BIGENDIAN)
       print ind+'Version      : ', tx.version
       print ind+'Lock Time    : ', tx.lockTime
-      print ind+'Fee (BTC)    : ', coin2strNZS(self.calculateFee())
+      print ind+'Fee (PPC)    : ', coin2strNZS(self.calculateFee())
       print ind+'#Inputs      : ', len(tx.inputs)
 
       for i,ustxi in enumerate(self.ustxInputs):
@@ -2550,7 +2550,7 @@ class UnsignedTransaction(AsciiSerializable):
          addrDisp = getTxOutScriptDisplayStr(txout.binScript)
          valDisp = coin2str(txout.value, maxZeros=2)
          print ' '*2*indent + 'Recip:', addrDisp.ljust(35),
-         print valDisp, 'BTC',
+         print valDisp, 'PPC',
          print ('(%s)' % dtxo.contribID) if dtxo.contribID else ''
 
 
@@ -2616,7 +2616,7 @@ class UnsignedTransaction(AsciiSerializable):
 
 ################################################################################
 # This is intended only for lists of unsignedTxInputs that have all unlocked
-# signing keys in the signAddrObjMap.  Map is all [scrAddr, PyBtcAddress] pairs.
+# signing keys in the signAddrObjMap.  Map is all [scrAddr, PyPPCAddress] pairs.
 #
 # This method is intended for sweep transaction where a bundle of private keys
 # were provided.
@@ -2641,23 +2641,23 @@ def PyCreateAndSignTx(ustxiList, dtxoList, sbdPrivKeyMap):
 ################################################################################
 # NOTE:  This method was actually used to create the Blockchain-reorg unit-
 #        test, and hence why coinbase transactions are supported.  However,
-#        for normal transactions supported by PyBtcEngine, this support is
+#        for normal transactions supported by PyPPCEngine, this support is
 #        unnecessary.
 #
 #        Additionally, this method both creates and signs the tx:  however
-#        PyBtcEngine employs TxDistProposals which require the construction
+#        PyPPCEngine employs TxDistProposals which require the construction
 #        and signing to be two separate steps.  This method is not suited
 #        for most of the armoryengine CONOPS.
 #
 #        On the other hand, this method DOES work, and there is no reason
-#        not to use it if you already have PyBtcAddress-w-PrivKeys avail
+#        not to use it if you already have PyPPCAddress-w-PrivKeys avail
 #        and have a list of inputs and outputs as described below.
 #
 # This method will take an already-selected set of TxOuts, along with
-# PyBtcAddress objects containing necessary the private keys
+# PyPPCAddress objects containing necessary the private keys
 #
-#    Src TxOut ~ {PyBtcAddr, PrevTx, PrevTxOutIdx}  --OR--  COINBASE = -1
-#    Dst TxOut ~ {PyBtcAddr, value}
+#    Src TxOut ~ {PyPPCAddr, PrevTx, PrevTxOutIdx}  --OR--  COINBASE = -1
+#    Dst TxOut ~ {PyPPCAddr, value}
 #
 # Of course, we usually don't have the private keys of the dst addrs...
 #
@@ -2832,7 +2832,7 @@ def getUnspentTxOutsForAddr160List(addr160List, utxoType='Sweep', startBlk=-1, \
       to register the address and rescan asynchronously, skipping this method
       entirely:
 
-         cppWlt = Cpp.BtcWallet()
+         cppWlt = Cpp.PPCWallet()
          cppWlt.addScrAddress_1_(Hash160ToScrAddr(self.getAddr160()))
          TheBDM.registerScrAddr(Hash160ToScrAddr(self.getAddr160()))
          TheBDM.rescanBlockchain(wait=False)
@@ -2851,9 +2851,9 @@ def getUnspentTxOutsForAddr160List(addr160List, utxoType='Sweep', startBlk=-1, \
       if not isinstance(addr160List, (list,tuple)):
          addr160List = [addr160List]
 
-      cppWlt = Cpp.BtcWallet()
+      cppWlt = Cpp.PPCWallet()
       for addr in addr160List:
-         if isinstance(addr, PyBtcAddress):
+         if isinstance(addr, PyPPCAddress):
             cppWlt.addScrAddress_1_(Hash160ToScrAddr(addr.getAddr160()))
          else:
             cppWlt.addScrAddress_1_(Hash160ToScrAddr(addr))
@@ -2892,7 +2892,7 @@ def pprintLedgerEntry(le, indent=''):
 
 # Putting this at the end because of the circular dependency
 from armoryengine.BDM import TheBDM
-from armoryengine.PyBtcAddress import PyBtcAddress
+from armoryengine.PyPPCAddress import PyPPCAddress
 from armoryengine.CoinSelection import pprintUnspentTxOutList, sumTxOutList
 from armoryengine.Script import *
 from armoryengine.MultiSigUtils import calcLockboxID

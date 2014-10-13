@@ -22,13 +22,13 @@ from armoryengine.MultiSigUtils import \
  
 
 
-class SendBitcoinsFrame(ArmoryFrame):
+class SendPeercoinsFrame(ArmoryFrame):
    def __init__(self, parent, main, initLabel='',
                  wlt=None, prefill=None, wltIDList=None,
                  selectWltCallback = None, onlyOfflineWallets=False,
                  sendCallback = None, createUnsignedTxCallback = None,
                  spendFromLockboxID=None):
-      super(SendBitcoinsFrame, self).__init__(parent, main)
+      super(SendPeercoinsFrame, self).__init__(parent, main)
       self.maxHeight = tightSizeNChar(GETFONT('var'), 1)[1] + 8
       self.sourceAddrList = None
       self.altBalance = None
@@ -52,7 +52,7 @@ class SendBitcoinsFrame(ArmoryFrame):
 
       feetip = self.main.createToolTipWidget(\
             'Transaction fees go to users who contribute computing power to '
-            'keep the Bitcoin network secure, and in return they get your transaction '
+            'keep the Peercoin network secure, and in return they get your transaction '
             'included in the blockchain faster.  <b>Most transactions '
             'do not require a fee</b> but it is recommended anyway '
             'since it guarantees quick processing and helps the network.')
@@ -99,7 +99,7 @@ class SendBitcoinsFrame(ArmoryFrame):
             'created this wallet solely for managing imported addresses, '
             'and want to keep all funds within existing addresses.')
       self.ttipSpecify = self.main.createToolTipWidget(\
-            'You can specify any valid Bitcoin address for the change.  '
+            'You can specify any valid Peercoin address for the change.  '
             '<b>NOTE:</b> If the address you specify is not in this wallet, '
             'Armory will not be able to distinguish the outputs when it shows '
             'up in your ledger.  The change will look like a second recipient, '
@@ -146,11 +146,11 @@ class SendBitcoinsFrame(ArmoryFrame):
          
       txFrm = makeHorizFrame(componentList, condenseMargins=True)
 
-      btnEnterURI = QPushButton('Manually Enter "bitcoin:" Link')
+      btnEnterURI = QPushButton('Manually Enter "peercoin:" Link')
       ttipEnterURI = self.main.createToolTipWidget( tr("""
          Armory does not always succeed at registering itself to handle 
          URL links from webpages and email.  
-         Click this button to copy a "bitcoin:" link directly into Armory."""))
+         Click this button to copy a "peercoin:" link directly into Armory."""))
       self.connect(btnEnterURI, SIGNAL("clicked()"), self.clickEnterURI)
       fromFrameList = [self.frmSelectedWlt]
       if not USE_TESTNET:
@@ -236,7 +236,7 @@ class SendBitcoinsFrame(ArmoryFrame):
       self.setLayout(layout)
 
       self.makeRecipFrame(1)
-      self.setWindowTitle('Send Bitcoins')
+      self.setWindowTitle('Send Peercoins')
       self.setMinimumHeight(self.maxHeight * 20)
       # self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
 
@@ -266,7 +266,7 @@ class SendBitcoinsFrame(ArmoryFrame):
          result = MsgBoxWithDNAA(MSGBOX.Question, 'Please donate!', tr("""
             <i>Armory</i> is the result of thousands of hours of development 
             by very talented coders.  Yet, this software 
-            has been given to you for free to benefit the greater Bitcoin 
+            has been given to you for free to benefit the greater Peercoin 
             community! 
             <br><br>
             If you are satisfied with this software, please consider 
@@ -292,7 +292,7 @@ class SendBitcoinsFrame(ArmoryFrame):
          self.toggleChngAddr(False)
 
 
-      hexgeom = self.main.settings.get('SendBtcGeometry')
+      hexgeom = self.main.settings.get('SendPPCGeometry')
       if len(hexgeom) > 0:
          geom = QByteArray.fromHex(hexgeom)
          self.restoreGeometry(geom)
@@ -319,7 +319,7 @@ class SendBitcoinsFrame(ArmoryFrame):
          self.btnSend.setToolTip('Click to create an unsigned transaction!')
       else:
          self.btnSend.setText('Send!')
-         self.btnSend.setToolTip('Click to send bitcoins!')
+         self.btnSend.setToolTip('Click to send peercoins!')
       
 
    #############################################################################
@@ -477,7 +477,7 @@ class SendBitcoinsFrame(ArmoryFrame):
             value = str2coin(valueStr, negAllowed=False)
             if value == 0:
                QMessageBox.critical(self, 'Zero Amount', \
-                  'You cannot send 0 BTC to any recipients.  <br>Please enter '
+                  'You cannot send 0 PPC to any recipients.  <br>Please enter '
                   'a positive amount for recipient %d.' % (row+1), QMessageBox.Ok)
                return False
 
@@ -488,8 +488,8 @@ class SendBitcoinsFrame(ArmoryFrame):
             return False
          except TooMuchPrecisionError:
             QMessageBox.critical(self, 'Too much precision', \
-               'Bitcoins can only be specified down to 8 decimal places. '
-               'The smallest value that can be sent is  0.0000 0001 BTC. '
+               'Peercoins can only be specified down to 8 decimal places. '
+               'The smallest value that can be sent is  0.0000 0001 PPC. '
                'Please enter a new amount for recipient %d.' % (row + 1), QMessageBox.Ok)
             return False
          except ValueError:
@@ -508,13 +508,13 @@ class SendBitcoinsFrame(ArmoryFrame):
          script = self.widgetTable[row]['FUNC_GETSCRIPT']()['Script']
          #scraddr = script_to_scrAddr(script)
 
-         # Checking for sending bitcoins to a Lockbox using P2SH that is
+         # Checking for sending peercoins to a Lockbox using P2SH that is
          # non-standard to spend.
          # only P2SH matters, if it's a bare multi sig, you won't be able to
          # deposit if it's non-standard. In other words if it standard to spend from
          # a bare sig lockbox it's standard to deposit into it.
          # This is not necessarily so for P2SH. Must warn the user or else they
-         # may get some bitcoins stuck in a lockbox until they upgrade to bitcoin
+         # may get some peercoins stuck in a lockbox until they upgrade to peercoin
          # 0.10.0
          if isP2SHLockbox(recipStr):
             lbox = self.main.getLockboxByID(readLockboxEntryStr(recipStr))
@@ -522,15 +522,15 @@ class SendBitcoinsFrame(ArmoryFrame):
                reply = QMessageBox.warning(self, tr('Non-Standard to Spend'), tr("""
                   Due to the Lockbox size (%d-of-%d) of recipient %d, spending
                   funds from this Lockbox is valid but non-standard for versions
-                  of Bitcoin prior to 0.10.0. This means if your version of
-                  Bitcoin is 0.9.x or below, and you try to broadcast a
+                  of Peercoin prior to 0.10.0. This means if your version of
+                  Peercoin is 0.9.x or below, and you try to broadcast a
                   transaction that spends from this Lockbox the transaction
                   will not be accepted. If you have version 0.10.0, but all
                   of your peers have an older version your transaction will
                   not be forwarded to the rest of the network. If you deposit
-                  Bitcoins into this Lockbox you may have to wait until you
+                  Peercoins into this Lockbox you may have to wait until you
                   and at least some of your peers have upgraded to 0.10.0
-                  before those Bitcoins can be spent. Alternatively, if you
+                  before those Peercoins can be spent. Alternatively, if you
                   have enough computing power to mine your own transactions,
                   or know someone who does, you can arrange to have any valid
                   but non-standard transaction included in the block chain.""") % \
@@ -550,14 +550,14 @@ class SendBitcoinsFrame(ArmoryFrame):
          return False
       except TooMuchPrecisionError:
          QMessageBox.critical(self, tr('Too much precision'), tr("""
-            Bitcoins can only be specified down to 8 decimal places. 
-            The smallest unit of a Bitcoin is 0.0000 0001 BTC. 
+            Peercoins can only be specified down to 8 decimal places. 
+            The smallest unit of a Peercoin is 0.0000 0001 PPC. 
             Please enter a fee of at least 0.0000 0001"""), QMessageBox.Ok)
          return False
       except:
          QMessageBox.critical(self, tr('Invalid Fee String'), tr("""
             The fee you specified is invalid.  A standard fee is 
-            0.0001 BTC, though some transactions may succeed with 
+            0.0001 PPC, though some transactions may succeed with 
             zero fee."""), QMessageBox.Ok)
          LOGERROR(tr('Invalid fee specified: "%s"') % feeStr)
          return False
@@ -569,13 +569,13 @@ class SendBitcoinsFrame(ArmoryFrame):
          valMax = coin2str(bal, maxZeros=2).strip()
          if self.altBalance == None:
             QMessageBox.critical(self, tr('Insufficient Funds'), tr("""
-            You just tried to send more Bitcoins than you have available. You only 
-            have %s BTC (spendable) in this wallet!""") % \
+            You just tried to send more Peercoins than you have available. You only 
+            have %s PPC (spendable) in this wallet!""") % \
             valMax, QMessageBox.Ok)
          else:
             QMessageBox.critical(self, tr('Insufficient Funds'), tr("""
-            You just tried to send more Bitcoins than you have available. You only 
-            have %s BTC with this coin control selection!""") % \
+            You just tried to send more Peercoins than you have available. You only 
+            have %s PPC with this coin control selection!""") % \
             (valTry, valMax), QMessageBox.Ok)
          return False
 
@@ -607,9 +607,9 @@ class SendBitcoinsFrame(ArmoryFrame):
 
       if minFee > 99*MIN_RELAY_TX_FEE:
          QMessageBox.critical(self, tr('Minimum Transaction Fee Is Too Large'), tr("""
-            The minimum fee for this transaction is <b>%s BTC</b>. That fee is too
+            The minimum fee for this transaction is <b>%s PPC</b>. That fee is too
             large and indicates that there are probably too many small inputs to fit
-            into a single transaction. To send these Bitcoins, this transaction must
+            into a single transaction. To send these Peercoins, this transaction must
             be broken up into to smaller pieces.            
             """) % coin2strNZS(minFee), QMessageBox.Ok)
          return False
@@ -627,21 +627,21 @@ class SendBitcoinsFrame(ArmoryFrame):
             QMessageBox.warning(self, tr('Insufficient Balance'), tr("""
                The required transaction fee causes this transaction to exceed 
                your balance.  In order to send this transaction, you will be 
-               required to pay a fee of <b>%s BTC</b>. 
+               required to pay a fee of <b>%s PPC</b>. 
                <br><br>
                Please go back and adjust the value of your transaction, not 
-               to exceed a total of <b>%s BTC</b> (the necessary fee has 
+               to exceed a total of <b>%s PPC</b> (the necessary fee has 
                been entered into the form, so you can use the "MAX" button 
                to enter the remaining balance for a recipient).""") % \
                (minFeeStr, newBalStr), QMessageBox.Ok)
             return
 
          reply = QMessageBox.warning(self, tr('Insufficient Fee'), tr("""
-            The fee you have specified (%s BTC) is insufficient for the 
+            The fee you have specified (%s PPC) is insufficient for the 
             size and priority of your transaction.  You must include at 
-            least %s BTC to send this transaction. 
+            least %s PPC to send this transaction. 
             <br><br> 
-            Do you agree to the fee of %s BTC?""") % \
+            Do you agree to the fee of %s PPC?""") % \
             (usrFeeStr, minFeeStr, minFeeStr), \
             QMessageBox.Yes | QMessageBox.Cancel)
 
@@ -656,13 +656,13 @@ class SendBitcoinsFrame(ArmoryFrame):
       # Warn user of excessive fee specified
       if fee > 100*MIN_RELAY_TX_FEE or (minFee > 0 and fee > 10*minFee):
          reply = QMessageBox.warning(self, tr('Excessive Fee'), tr("""
-            You have specified a fee of <b>%s BTC</b> which is much higher
-            than the minimum fee required for this transaction: <b>%s BTC</b>.
+            You have specified a fee of <b>%s PPC</b> which is much higher
+            than the minimum fee required for this transaction: <b>%s PPC</b>.
             Are you <i>absolutely sure</i> that you want to send with this
             fee?  
             <br><br>
             If you do not want this fee, click "No" and then change the fee
-            at the bottom of the "Send Bitcoins" window before trying 
+            at the bottom of the "Send Peercoins" window before trying 
             again.""") % (coin2strNZS(fee), coin2strNZS(minFee)), QMessageBox.Yes | QMessageBox.No)
 
          if not reply==QMessageBox.Yes:
@@ -672,8 +672,8 @@ class SendBitcoinsFrame(ArmoryFrame):
       if len(utxoSelect) == 0:
          QMessageBox.critical(self, tr('Coin Selection Error'), tr("""
             There was an error constructing your transaction, due to a 
-            quirk in the way Bitcoin transactions work.  If you see this
-            error more than once, try sending your BTC in two or more 
+            quirk in the way Peercoin transactions work.  If you see this
+            error more than once, try sending your PPC in two or more 
             separate transactions."""), QMessageBox.Ok)
          return False
 
@@ -1000,8 +1000,8 @@ class SendBitcoinsFrame(ArmoryFrame):
          self.widgetTable[r]['QLE_AMT'].setMaximumHeight(self.maxHeight)
          self.widgetTable[r]['QLE_AMT'].setAlignment(Qt.AlignLeft)
 
-         self.widgetTable[r]['LBL_BTC'] = QLabel('BTC')
-         self.widgetTable[r]['LBL_BTC'].setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+         self.widgetTable[r]['LBL_PPC'] = QLabel('PPC')
+         self.widgetTable[r]['LBL_PPC'].setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
          self.widgetTable[r]['BTN_MAX'] = \
                            self.createSetMaxButton(self.widgetTable[r]['QLE_AMT'])
@@ -1027,7 +1027,7 @@ class SendBitcoinsFrame(ArmoryFrame):
 
          subLayout.addWidget(self.widgetTable[r]['LBL_AMT'],   2,0, 1,1)
          subLayout.addWidget(self.widgetTable[r]['QLE_AMT'],   2,1, 1,2)
-         subLayout.addWidget(self.widgetTable[r]['LBL_BTC'],   2,3, 1,1)
+         subLayout.addWidget(self.widgetTable[r]['LBL_PPC'],   2,3, 1,1)
          subLayout.addWidget(self.widgetTable[r]['BTN_MAX'],   2,4, 1,1)
          subLayout.addWidget(QLabel(''), 2, 5, 1, 2)
 
@@ -1239,7 +1239,7 @@ class ReviewOfflineTxFrame(ArmoryDialog):
             just requested, but is invalid because it does not contain any
             signatures.  You must take this data to the computer with the 
             full wallet to get it signed, then bring it back here to be
-            broadcast to the Bitcoin network.
+            broadcast to the Peercoin network.
             <br><br>
             Use "Save as file..." to save an <i>*.unsigned.tx</i> 
             file to USB drive or other removable media.  
@@ -1304,7 +1304,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
          'If the transaction is unsigned and you have the correct wallet, '
          'you will have the opportunity to sign it.  If it is already signed '
          'you will have the opportunity to broadcast it to '
-         'the Bitcoin network to make it final.')
+         'the Peercoin network to make it final.')
 
       self.txtUSTX = QTextEdit()
       self.txtUSTX.setFont(GETFONT('Fixed', 8))
@@ -1350,7 +1350,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
       # ##
       self.infoLbls.append([])
       self.infoLbls[-1].append(self.main.createToolTipWidget(\
-            'This is wallet from which the offline transaction spends bitcoins'))
+            'This is wallet from which the offline transaction spends peercoins'))
       self.infoLbls[-1].append(QRichLabel('<b>Wallet:</b>'))
       self.infoLbls[-1].append(QRichLabel(''))
 
@@ -1469,7 +1469,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
             self.btnBroadcast.setEnabled(True)
          else:
             self.btnBroadcast.setEnabled(False)
-            self.btnBroadcast.setToolTip('No connection to Bitcoin network!')
+            self.btnBroadcast.setToolTip('No connection to Peercoin network!')
 
       self.btnSave.setEnabled(True)
       self.btnCopyHex.setEnabled(False)
@@ -1593,7 +1593,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
 
          ##### 3
          if self.leValue:
-            self.infoLbls[3][2].setText(coin2strNZS(self.leValue) + '  BTC')
+            self.infoLbls[3][2].setText(coin2strNZS(self.leValue) + '  PPC')
          else:
             self.infoLbls[3][2].setText('')
 
@@ -1706,15 +1706,15 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
    def broadTx(self):
       if self.main.netMode == NETWORKMODE.Disconnected:
          QMessageBox.warning(self, 'No Internet!', \
-            'Armory lost its connection to Bitcoin-Qt, and cannot '
+            'Armory lost its connection to Peercoin-Qt, and cannot '
             'broadcast any transactions until it is reconnected. '
-            'Please verify that Bitcoin-Qt (or bitcoind) is open '
+            'Please verify that Peercoin-Qt (or peercoind) is open '
             'and synchronized with the network.', QMessageBox.Ok)
          return
       elif self.main.netMode == NETWORKMODE.Offline:
          QMessageBox.warning(self, 'No Internet!', \
-            'You do not currently have a connection to the Bitcoin network. '
-            'If this does not seem correct, verify that Bitcoin-Qt is open '
+            'You do not currently have a connection to the Peercoin network. '
+            'If this does not seem correct, verify that Peercoin-Qt is open '
             'and synchronized with the network.', QMessageBox.Ok)
          return
 

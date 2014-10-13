@@ -11,7 +11,7 @@ Install Git and TortoiseGit
 
 Clone the repo:
    Right click on the directory where you want the code to go: select "Git clone..."
-   URL: git://github.com/etotheipi/BitcoinArmory.git
+   URL: git://github.com/etotheipi/PeercoinArmory.git
    Click OK
 
 
@@ -30,7 +30,7 @@ While that's going, start downloading python-related stuff (there's a lot!)
 -- Download and UNPACK SWIG.  
          http://www.swig.org/download.html
 
-   Move the inner-most swig-2.0.4 directory to BtcoinArmory/cppForSwig 
+   Move the inner-most swig-2.0.4 directory to PPCoinArmory/cppForSwig 
    (you should now see 3 subdirectories in cppForSwig dir:  
     cryptopp, reorgTest and swig-2.0.4):
 

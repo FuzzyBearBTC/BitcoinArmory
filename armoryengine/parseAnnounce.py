@@ -33,7 +33,7 @@ class changelogParser(object):
       [
          [ '0.88.1', 'December 27, 2013',
             [
-               [ 'Auto-run Bitcoind', 'This version will now run ...'],
+               [ 'Auto-run Peercoind', 'This version will now run ...'],
                [ 'Mac/OSX Version',   'Binaries now available on ...'],
                [ 'Signed installers', 'All binaries are now sign ...']  
             ]
@@ -159,9 +159,9 @@ class downloadLinkParser(object):
    ArmoryOffline 0.88 Ubuntu 10.04  32  http://url/offbundle-32.tar.gz   641382c93b9
    ArmoryOffline 0.88 Ubuntu 12.10  32  http://url/offbundle-64.tar.gz   5541af39c84
 
-   # Windows 32-bit Satoshi (Bitcoin-Qt/bitcoind)
-   Satoshi 0.9.0 Windows XP,Vista,7,8 32,64 http://btc.org/win0.9.0.exe  118372a9ff3
-   Satoshi 0.9.0 Ubuntu  10.04              http://btc.org/win0.9.0.deb  2aa3f763c3b
+   # Windows 32-bit Satoshi (Peercoin-Qt/peercoind)
+   Satoshi 0.9.0 Windows XP,Vista,7,8 32,64 http://ppc.org/win0.9.0.exe  118372a9ff3
+   Satoshi 0.9.0 Ubuntu  10.04              http://ppc.org/win0.9.0.deb  2aa3f763c3b
 
    -----BEGIN BITCOIN SIGNATURE-----
    ac389861cff8a989ae57ae67af43cb3716ca189aa178cff893179531

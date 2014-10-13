@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "BinaryData.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 BinaryData::BinaryData(BinaryDataRef const & bdRef) 
@@ -192,7 +192,7 @@ BinaryData BinaryData::getSliceCopy(int32_t start_pos, uint32_t nChar) const
 uint64_t BinaryReader::get_var_int(uint8_t* nRead)
 {
    uint32_t nBytes;
-   uint64_t varInt = BtcUtils::readVarInt( bdStr_.getPtr() + pos_, &nBytes);
+   uint64_t varInt = PPCUtils::readVarInt( bdStr_.getPtr() + pos_, &nBytes);
    if(nRead != NULL)
       *nRead = nBytes;
    pos_ += nBytes;
@@ -203,7 +203,7 @@ uint64_t BinaryReader::get_var_int(uint8_t* nRead)
 uint64_t BinaryRefReader::get_var_int(uint8_t* nRead)
 {
    uint32_t nBytes;
-   uint64_t varInt = BtcUtils::readVarInt( bdRef_.getPtr() + pos_, getSizeRemaining(), &nBytes);
+   uint64_t varInt = PPCUtils::readVarInt( bdRef_.getPtr() + pos_, getSizeRemaining(), &nBytes);
    if(nRead != NULL)
       *nRead = nBytes;
    pos_ += nBytes;

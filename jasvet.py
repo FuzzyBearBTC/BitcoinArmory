@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 # jackjack's signing/verifying tool
-# verifies base64 signatures from Bitcoin
+# verifies base64 signatures from Peercoin
 # signs message in three formats:
-#   - Bitcoin base64 (compatible with Bitcoin)
+#   - Peercoin base64 (compatible with Peercoin)
 #   - ASCII armored, Clearsign
 #   - ASCII armored, Base64
 #
@@ -15,7 +15,7 @@ import random
 import time
 
 import CppBlockUtils
-from armoryengine.ArmoryUtils import getVersionString, BTCARMORY_VERSION, \
+from armoryengine.ArmoryUtils import getVersionString, PPCARMORY_VERSION, \
    ChecksumError
 
 
@@ -38,8 +38,8 @@ RNRN = '\r\n\r\n'
 CLEARSIGN_MSG_TYPE_MARKER = 'BITCOIN SIGNED MESSAGE'
 BITCOIN_SIG_TYPE_MARKER = 'BITCOIN SIGNATURE'
 BASE64_MSG_TYPE_MARKER = 'BITCOIN MESSAGE'
-BITCOIN_ARMORY_COMMENT = 'Comment: Signed by Bitcoin Armory v' +\
-   getVersionString(BTCARMORY_VERSION, 3)
+BITCOIN_ARMORY_COMMENT = 'Comment: Signed by Peercoin Armory v' +\
+   getVersionString(PPCARMORY_VERSION, 3)
 class UnknownSigBlockType(Exception): pass
    
 def randomk():  #better make it stronger
@@ -49,7 +49,7 @@ def randomk():  #better make it stronger
       rk = rk | long(random.random()*0xffffffff)<<(32*i)
    return rk
 
-# Common constants/functions for Bitcoin
+# Common constants/functions for Peercoin
 
 def hash_160_to_bc_address(h160, addrtype=0):
    vh160 = chr(addrtype) + h160
@@ -155,7 +155,7 @@ def GetSecret(pkey):
 def i2d_ECPrivateKey(pkey, compressed=False):#, crypted=True):
    part3='a081a53081a2020101302c06072a8648ce3d0101022100'  # for uncompressed keys
    if compressed:
-      if True:#not crypted:  ## Bitcoin accepts both part3's for crypted wallets...
+      if True:#not crypted:  ## Peercoin accepts both part3's for crypted wallets...
          part3='a08185308182020101302c06072a8648ce3d0101022100'  # for compressed keys
       key = '3081d30201010420' + \
          '%064x' % pkey.secret + \
@@ -429,7 +429,7 @@ def decvi(d):
    return '\xff'+decbin(d,8,True)
 
 def format_msg_to_sign(msg):
-   return "\x18Bitcoin Signed Message:\n"+decvi(len(msg))+msg
+   return "\x18Peercoin Signed Message:\n"+decvi(len(msg))+msg
 
 def sqrt_mod(a, p):
    return pow(a, (p+1)/4, p)
@@ -442,7 +442,7 @@ randrange = random.SystemRandom().randrange
 
 # Signing/verifying
 
-def verify_message_Bitcoin(signature, message, pureECDSASigning=False, networkVersionNumber=0):
+def verify_message_Peercoin(signature, message, pureECDSASigning=False, networkVersionNumber=0):
    msg=message
    if not pureECDSASigning:
       msg=Hash(format_msg_to_sign(message))
@@ -510,7 +510,7 @@ def sign_message(secret, message, pureECDSASigning=False):
    return [sig,addr,compressed,public_key]
 
 
-def sign_message_Bitcoin(secret, msg, pureECDSASigning=False):
+def sign_message_Peercoin(secret, msg, pureECDSASigning=False):
    sig,addr,compressed,public_key=sign_message(secret, msg, pureECDSASigning)
 
    for i in range(4):
@@ -520,7 +520,7 @@ def sign_message_Bitcoin(secret, msg, pureECDSASigning=False):
       sign=base64.b64encode(chr(hb)+sig.ser())
       try:
          networkVersionNumber = str_to_long(b58decode(addr, None)) >> (8*24)
-         if addr == verify_message_Bitcoin(sign, msg, pureECDSASigning, networkVersionNumber):
+         if addr == verify_message_Peercoin(sign, msg, pureECDSASigning, networkVersionNumber):
             return {'address':addr, 'b64-signature':sign, 'signature':chr(hb)+sig.ser(), 'message':msg}
       except Exception as e:
 #         print e.args
@@ -631,10 +631,10 @@ def verifySignature(b64sig, msg, signVer='v0', networkVersionNumber=0):
    # If version 1, apply RFC2440 formatting rules to the message
    if signVer=='v1':
       msg = FormatText(msg, True)
-   return verify_message_Bitcoin(b64sig, msg, networkVersionNumber = networkVersionNumber)
+   return verify_message_Peercoin(b64sig, msg, networkVersionNumber = networkVersionNumber)
 
 def ASv0(privkey, msg):
-   return sign_message_Bitcoin(privkey, msg)
+   return sign_message_Peercoin(privkey, msg)
 
 def ASv1CS(privkey, msg):
    sig=ASv0(privkey, FormatText(msg))

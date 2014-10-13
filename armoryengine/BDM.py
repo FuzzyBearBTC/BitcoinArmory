@@ -147,7 +147,7 @@ class BlockDataManagerThread(threading.Thread):
 
       THEREFORE, the BDM now has a single, master wallet.  Any address you add
       to any of your wallets, should be added to the master wallet, too.  The 
-      PyBtcWallet class does this for you, but if you are using raw BtcWallets
+      PyPPCWallet class does this for you, but if you are using raw PPCWallets
       (the C++ equivalent), you need to do:
    
             cppWallet.addScrAddress_1_(Hash160ToScrAddr(newAddr))
@@ -205,11 +205,11 @@ class BlockDataManagerThread(threading.Thread):
       self.cppWltList   = []   # these will be python refs
 
       # The BlockDataManager is easier to use if you put all your addresses
-      # into a C++ BtcWallet object, and let it 
-      self.masterCppWallet = Cpp.BtcWallet()
+      # into a C++ PPCWallet object, and let it 
+      self.masterCppWallet = Cpp.PPCWallet()
       self.bdm.registerWallet(self.masterCppWallet)
        
-      self.btcdir = BTC_HOME_DIR
+      self.ppcdir = PPC_HOME_DIR
       self.ldbdir = LEVELDB_DIR
       self.lastPctLoad = 0
       
@@ -439,16 +439,16 @@ class BlockDataManagerThread(threading.Thread):
 
    #############################################################################
    @ActLikeASingletonBDM
-   def setSatoshiDir(self, newBtcDir):
-      if not os.path.exists(newBtcDir):
-         LOGERROR('setSatoshiDir: directory does not exist: %s', newBtcDir)
+   def setSatoshiDir(self, newPPCDir):
+      if not os.path.exists(newPPCDir):
+         LOGERROR('setSatoshiDir: directory does not exist: %s', newPPCDir)
          return
 
       if not self.blkMode in (BLOCKCHAINMODE.Offline, BLOCKCHAINMODE.Uninitialized):
          LOGERROR('Cannot set blockchain/satoshi path after BDM is started')
          return
 
-      self.btcdir = newBtcDir
+      self.ppcdir = newPPCDir
 
    #############################################################################
    @ActLikeASingletonBDM
@@ -711,9 +711,9 @@ class BlockDataManagerThread(threading.Thread):
       must be a blocking method.  
       """
       rndID = int(random.uniform(0,100000000)) 
-      if isinstance(wlt, PyBtcWallet):
+      if isinstance(wlt, PyPPCWallet):
          self.inputQueue.put([BDMINPUTTYPE.AddrBookRequested, rndID, True, wlt.cppWallet])
-      elif isinstance(wlt, Cpp.BtcWallet):
+      elif isinstance(wlt, Cpp.PPCWallet):
          self.inputQueue.put([BDMINPUTTYPE.AddrBookRequested, rndID, True, wlt])
 
       try:
@@ -799,7 +799,7 @@ class BlockDataManagerThread(threading.Thread):
       """
       Will register a C++ wallet or Python wallet
       """
-      if isinstance(wlt, PyBtcWallet):
+      if isinstance(wlt, PyPPCWallet):
          scrAddrs = [Hash160ToScrAddr(a.getAddr160()) for a in wlt.getAddrList()]
 
          if isFresh:
@@ -812,9 +812,9 @@ class BlockDataManagerThread(threading.Thread):
          if not wlt in self.pyWltList:
             self.pyWltList.append(wlt)
 
-      elif isinstance(wlt, Cpp.BtcWallet):
+      elif isinstance(wlt, Cpp.PPCWallet):
          # We are using this branch to add multi-sig wallets, which aren't
-         # even help as python wallets, only low-level BtcWallets 
+         # even help as python wallets, only low-level PPCWallets 
          naddr = wlt.getNumScrAddr()
 
          for a in range(naddr):
@@ -841,7 +841,7 @@ class BlockDataManagerThread(threading.Thread):
    @ActLikeASingletonBDM
    def registerScrAddr_bdm_direct(self, scrAddr, timeInfo):
       """ 
-      Something went awry calling __registerScrAddrNow from the PyBtcWallet
+      Something went awry calling __registerScrAddrNow from the PyPPCWallet
       code (apparently I don't understand __methods).  Use this method to 
       externally bypass the BDM thread queue and register the address 
       immediately.  
@@ -950,11 +950,11 @@ class BlockDataManagerThread(threading.Thread):
       if os.path.exists(bfile):
          os.remove(bfile)
 
-      # Check for the existence of the Bitcoin-Qt directory
-      if not os.path.exists(self.btcdir):
-         raise FileExistsError, ('Directory does not exist: %s' % self.btcdir)
+      # Check for the existence of the Peercoin-Qt directory
+      if not os.path.exists(self.ppcdir):
+         raise FileExistsError, ('Directory does not exist: %s' % self.ppcdir)
 
-      blkdir = os.path.join(self.btcdir, 'blocks')
+      blkdir = os.path.join(self.ppcdir, 'blocks')
       blk1st = os.path.join(blkdir, 'blk00000.dat')
 
       # ... and its blk000X.dat files
@@ -987,7 +987,7 @@ class BlockDataManagerThread(threading.Thread):
       self.bdm.SetHomeDirLocation(armory_homedir)
       self.bdm.SetBlkFileLocation(blockdir)
       self.bdm.SetLevelDBLocation(leveldbdir)
-      self.bdm.SetBtcNetworkParams( GENESIS_BLOCK_HASH, \
+      self.bdm.SetPPCNetworkParams( GENESIS_BLOCK_HASH, \
                                     GENESIS_TX_HASH,    \
                                     MAGIC_BYTES)
 
@@ -1071,16 +1071,16 @@ class BlockDataManagerThread(threading.Thread):
 
       In order to work cleanly with the threaded BDM, the search code 
       needed to be integrated directly here, instead of being called
-      from the PyBtcWallet method.  Because that method is normally called 
+      from the PyPPCWallet method.  Because that method is normally called 
       from outside the BDM thread, but this method is only called from 
       _inside_ the BDM thread.  Those calls use the BDM stack which will
       deadlock waiting for the itself before it can move on...
 
       Unfortunately, because of this, we have to break a python-class 
-      privacy rules:  we are accessing the PyBtcWallet object as if this
-      were PyBtcWallet code (accessing properties directly).  
+      privacy rules:  we are accessing the PyPPCWallet object as if this
+      were PyPPCWallet code (accessing properties directly).  
       """
-      if not isinstance(pywlt, PyBtcWallet):
+      if not isinstance(pywlt, PyPPCWallet):
          LOGERROR('Only python wallets can be passed for recovery scans')
          return
 
@@ -1095,7 +1095,7 @@ class BlockDataManagerThread(threading.Thread):
 
       #####
 
-      # Whenever calling PyBtcWallet methods from BDM, set flag
+      # Whenever calling PyPPCWallet methods from BDM, set flag
       prevCalledFromBDM = pywlt.calledFromBDM
       pywlt.calledFromBDM = True
       
@@ -1239,7 +1239,7 @@ class BlockDataManagerThread(threading.Thread):
 
       # Flags
       self.startBDM     = False
-      #self.btcdir       = BTC_HOME_DIR
+      #self.ppcdir       = PPC_HOME_DIR
 
       # Lists of wallets that should be checked after blockchain updates
       self.pyWltList    = []   # these will be python refs
@@ -1247,8 +1247,8 @@ class BlockDataManagerThread(threading.Thread):
 
 
       # The BlockDataManager is easier to use if you put all your addresses
-      # into a C++ BtcWallet object, and let it 
-      self.masterCppWallet = Cpp.BtcWallet()
+      # into a C++ PPCWallet object, and let it 
+      self.masterCppWallet = Cpp.PPCWallet()
       self.bdm.registerWallet(self.masterCppWallet)
 
 
@@ -1607,6 +1607,6 @@ else:
 
 
 # Put the import at the end to avoid circular reference problem
-from armoryengine.PyBtcWallet import PyBtcWallet, BLOCKCHAIN_READONLY
+from armoryengine.PyPPCWallet import PyPPCWallet, BLOCKCHAIN_READONLY
 from armoryengine.Transaction import PyTx
 

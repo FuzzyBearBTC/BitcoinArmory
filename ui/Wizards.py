@@ -11,10 +11,10 @@ from PyQt4.QtGui import * #@UnusedWildImport
 from armoryengine.ArmoryUtils import USE_TESTNET
 from ui.WalletFrames import NewWalletFrame, SetPassphraseFrame, VerifyPassphraseFrame,\
    WalletBackupFrame, WizardCreateWatchingOnlyWalletFrame
-from ui.TxFrames import SendBitcoinsFrame, SignBroadcastOfflineTxFrame,\
+from ui.TxFrames import SendPeercoinsFrame, SignBroadcastOfflineTxFrame,\
    ReviewOfflineTxFrame
 from qtdefines import USERMODE, GETFONT, tr, AddToRunningDialogsList
-from armoryengine.PyBtcWallet import PyBtcWallet
+from armoryengine.PyPPCWallet import PyPPCWallet
 from CppBlockUtils import SecureBinaryData
 from armoryengine.BDM import TheBDM
 from qtdialogs import DlgProgress
@@ -33,10 +33,10 @@ class ArmoryWizard(QWizard):
       # Need to adjust the wizard frame size whenever the page changes.
       self.connect(self, SIGNAL('currentIdChanged(int)'), self.fitContents)
       if USE_TESTNET:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management [TESTNET]')
+         self.setWindowTitle('Armory - Peercoin Wallet Management [TESTNET]')
          self.setWindowIcon(QIcon(':/armory_icon_green_32x32.png'))
       else:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management')
+         self.setWindowTitle('Armory - Peercoin Wallet Management')
          self.setWindowIcon(QIcon(':/armory_icon_32x32.png'))
    
    def fitContents(self):
@@ -155,7 +155,7 @@ class WalletWizard(ArmoryWizard):
       return super(WalletWizard, self).done(event)
              
    def createNewWalletFromWizard(self):
-      self.newWallet = PyBtcWallet().createNewWallet( \
+      self.newWallet = PyPPCWallet().createNewWallet( \
                      securePassphrase=self.setPassphrasePage.pageFrame.getPassphrase(), \
                      kdfTargSec=self.walletCreationPage.pageFrame.getKdfSec(), \
                      kdfMaxMem=self.walletCreationPage.pageFrame.getKdfBytes(), \
@@ -175,7 +175,7 @@ class WalletWizard(ArmoryWizard):
       # Reopening from file helps make sure everything is correct -- don't
       # let the user use a wallet that triggers errors on reading it
       wltpath = self.newWallet.walletPath
-      walletFromDisk = PyBtcWallet().readWalletFile(wltpath)
+      walletFromDisk = PyPPCWallet().readWalletFile(wltpath)
       self.main.addWalletToApplication(walletFromDisk, walletIsNew=True)
       if TheBDM.getBDMState() in ('Uninitialized', 'Offline'):
          TheBDM.registerWallet(walletFromDisk, isFresh=True, wait=False)
@@ -340,7 +340,7 @@ class TxWizard(ArmoryWizard):
 class CreateTxPage(ArmoryWizardPage):
    def __init__(self, wizard, wlt, prefill=None, onlyOfflineWallets=False):
       super(CreateTxPage, self).__init__(wizard,
-               SendBitcoinsFrame(wizard, wizard.main,
+               SendPeercoinsFrame(wizard, wizard.main,
                                  "Create Transaction", wlt, prefill,
                                  selectWltCallback=self.updateOnSelectWallet,
                                  onlyOfflineWallets=onlyOfflineWallets))

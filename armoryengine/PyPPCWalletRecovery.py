@@ -4,14 +4,14 @@ from armoryengine.ArmoryUtils import UINT32_MAX, KeyDataError, \
                                      KILOBYTE, RightNowStr, hex_to_binary
 from armoryengine.BinaryPacker import UINT16, UINT32, UINT64, INT64, \
                                       BINARY_CHUNK
-from armoryengine.PyBtcAddress import PyBtcAddress
-from armoryengine.PyBtcWallet import (PyBtcWallet, WLT_DATATYPE_KEYDATA, \
+from armoryengine.PyPPCAddress import PyPPCAddress
+from armoryengine.PyPPCWallet import (PyPPCWallet, WLT_DATATYPE_KEYDATA, \
                                       WLT_DATATYPE_ADDRCOMMENT, \
                                       WLT_DATATYPE_TXCOMMENT, \
                                       WLT_DATATYPE_OPEVAL, \
                                       WLT_DATATYPE_DELETED, WLT_UPDATE_ADD, \
                                       getSuffixedPath)
-from CppBlockUtils import SecureBinaryData, CryptoECDSA, CryptoAES, BtcWallet 
+from CppBlockUtils import SecureBinaryData, CryptoECDSA, CryptoAES, PPCWallet 
 import os
 import shutil
 from time import sleep, ctime
@@ -27,7 +27,7 @@ RECOVERMODE = enum('NotSet', 'Stripped', 'Bare', 'Full', 'Meta', 'Check')
 
 class InvalidEntry(Exception): pass
 
-class PyBtcWalletRecovery(object):
+class PyPPCWalletRecovery(object):
    """
    Fail safe wallet recovery tool. Reads a wallet, verifies and extracts 
    sensitive data to a new file.
@@ -427,7 +427,7 @@ class PyBtcWalletRecovery(object):
          return self.BuildLogFile(-1, Progress, returnError)
       else: self.fileSize = os.path.getsize(WalletPath)
 
-      toRecover = PyBtcWallet()
+      toRecover = PyPPCWallet()
       toRecover.walletPath = WalletPath
 
       #consistency check
@@ -542,7 +542,7 @@ class PyBtcWalletRecovery(object):
             rootAddr.lock()   
             if SecurePassphrase: SecurePassphrase.destroy()
             
-            if not isinstance(RecoveredWallet, PyBtcWallet):  
+            if not isinstance(RecoveredWallet, PyPPCWallet):  
                return RecoveredWallet
             
             if isinstance(toRecover.kdfKey, SecureBinaryData): 
@@ -623,7 +623,7 @@ class PyBtcWalletRecovery(object):
          if dtype==WLT_DATATYPE_KEYDATA:
             if rmode != RECOVERMODE.Meta:
                if newAddr is None:
-                  newAddr = PyBtcAddress()
+                  newAddr = PyPPCAddress()
                   try:
                      newAddr.unserialize(rawData)
                   except:
@@ -688,7 +688,7 @@ class PyBtcWalletRecovery(object):
 
       #verify the root address is derived from the root key
       if not self.WO:
-         testroot = PyBtcAddress().createFromPlainKeyData( \
+         testroot = PyPPCAddress().createFromPlainKeyData( \
                                    rootAddr.binPrivKey32_Plain, None, None, \
                                    generateIVIfNecessary=True)
          if rootAddr.addrStr20 != testroot.addrStr20:
@@ -744,9 +744,9 @@ class PyBtcWalletRecovery(object):
          fixedAddrData = newAddr.serialize()
          if not rawData==fixedAddrData:
             self.byteError.append([newAddr.chainIndex, byteLocation])
-            fixedAddr = PyBtcAddress()
+            fixedAddr = PyPPCAddress()
             fixedAddr.unserialize(fixedAddrData)
-            newAddr = PyBtcAddress()
+            newAddr = PyPPCAddress()
             newAddr.unserialize(fixedAddrData)
             entrylist[0] = newAddr
             addrDict[i] = entrylist
@@ -1051,7 +1051,7 @@ class PyBtcWalletRecovery(object):
                   if not rawData==fixedAddrData:
                      self.importedErr.append('found byte error in imported \
                               address %d at file offset %d' % (i, entrylist[2]))
-                     newAddr = PyBtcAddress()
+                     newAddr = PyPPCAddress()
                      newAddr.unserialize(fixedAddrData)
                      entrylist[0] = newAddr
                      importedDict[i] = entrylist
@@ -1140,7 +1140,7 @@ class PyBtcWalletRecovery(object):
                            RecoveredWallet.kdf.DeriveKey(SecurePassphrase)               
                rootAddr.lock()
                
-               if not isinstance(RecoveredWallet, PyBtcWallet):
+               if not isinstance(RecoveredWallet, PyPPCWallet):
                   if SecurePassphrase: SecurePassphrase.destroy()
                   if toRecover.kdfKey: toRecover.kdfKey.destroy() 
                   return RecoveredWallet
@@ -1269,7 +1269,7 @@ class PyBtcWalletRecovery(object):
 
       try:
          if not self.WO:
-            RecoveredWallet = PyBtcWallet()
+            RecoveredWallet = PyPPCWallet()
             RecoveredWallet.createNewWallet( \
                            newWalletFilePath=self.newwalletPath, \
                            securePassphrase=SecurePassphrase, \
@@ -1297,7 +1297,7 @@ class PyBtcWalletRecovery(object):
 
       The process:
       1) Assume an address entry with invalid data type key and/or the hash160. 
-      Read ahead and try to unserialize a valid PyBtcAddress
+      Read ahead and try to unserialize a valid PyPPCAddress
       2) Assume a corrupt address entry. Move 1+20+237 bytes ahead, try to 
       unpack the next entry
 
@@ -1341,7 +1341,7 @@ class PyBtcWalletRecovery(object):
       try:
          rawdata.advance(1)
          hash160 = rawdata.get(BINARY_CHUNK, 20)
-         chunk = rawdata.get(BINARY_CHUNK, self.pybtcaddrSize)
+         chunk = rawdata.get(BINARY_CHUNK, self.pyppcaddrSize)
 
          newAddr, chksumError = self.addrEntry_unserialize_recover(chunk)
          #if we got this far, no exception was raised, return the valid entry
@@ -1360,7 +1360,7 @@ class PyBtcWalletRecovery(object):
       #try for next entry
       try:
          rawdata.advance(1+20+237)
-         dtype, hash, chunk = PyBtcWallet().unpackNextEntry(rawdata)
+         dtype, hash, chunk = PyPPCWallet().unpackNextEntry(rawdata)
          if dtype>-1 and dtype<5:
             return dtype, hash, chunk, [1, loc +1+20+237]
          else:
@@ -1378,7 +1378,7 @@ class PyBtcWalletRecovery(object):
          chunk = rawdata.get(BINARY_CHUNK, chunk_length)
 
          #test the next entry
-         dtype, hash, chunk2 = PyBtcWallet().unpackNextEntry(rawdata)
+         dtype, hash, chunk2 = PyPPCWallet().unpackNextEntry(rawdata)
          if dtype>-1 and dtype<5:
             #good entry, return it
             return 1, hash160, chunk, [1, loc]
@@ -1397,7 +1397,7 @@ class PyBtcWalletRecovery(object):
          chunk = rawdata.get(BINARY_CHUNK, chunk_length)
 
          #test the next entry
-         dtype, hash, chunk2 = PyBtcWallet().unpackNextEntry(rawdata)
+         dtype, hash, chunk2 = PyPPCWallet().unpackNextEntry(rawdata)
          if dtype>-1 and dtype<5:
             #good entry, return it
             return 2, hash256, chunk, [1, loc]
@@ -1415,7 +1415,7 @@ class PyBtcWalletRecovery(object):
          chunk = rawdata.get(BINARY_CHUNK, chunk_length)
 
          #test the next entry
-         dtype, hash, chunk2 = PyBtcWallet().unpackNextEntry(rawdata)
+         dtype, hash, chunk2 = PyPPCWallet().unpackNextEntry(rawdata)
          if dtype>-1 and dtype<5:
             baddata = 0
             for i in len(chunk):
@@ -1475,7 +1475,7 @@ class PyBtcWalletRecovery(object):
       chksumError = 0
 
       # Start with a fresh new address
-      retAddr = PyBtcAddress()
+      retAddr = PyPPCAddress()
 
       retAddr.addrStr20 = serializedData.get(BINARY_CHUNK, 20)
       chkAddr20      = serializedData.get(BINARY_CHUNK,  4)
@@ -1602,7 +1602,7 @@ class PyBtcWalletRecovery(object):
 
    ############################################################################
    def createNewWO(self, toRecover, newPath, rootAddr):
-      newWO = PyBtcWallet()
+      newWO = PyPPCWallet()
       
       newWO.version = toRecover.version
       newWO.magicBytes = toRecover.magicBytes
@@ -1631,7 +1631,7 @@ class PyBtcWalletRecovery(object):
       newWO.lastComputedChainAddr160 = firstAddr.getAddr160()
       newWO.lastComputedChainIndex  = firstAddr.chainIndex
       newWO.highestUsedChainIndex   = toRecover.highestUsedChainIndex
-      newWO.cppWallet = BtcWallet()
+      newWO.cppWallet = PPCWallet()
       
       newWO.writeFreshWalletFile(newPath)
       
@@ -1662,7 +1662,7 @@ def WalletConsistencyCheck(wallet, prgAt=None):
    string list of the scan full log
    """
 
-   return PyBtcWalletRecovery().ProcessWallet(None, wallet, None, 
+   return PyPPCWalletRecovery().ProcessWallet(None, wallet, None, 
                                     RECOVERMODE.Check, prgAt, True)
 
 #############################################################################
@@ -1683,7 +1683,7 @@ def FixWallet(wltPath, wlt, mode=RECOVERMODE.Full, DoNotMove=False,
    1 - errors found, wallet fixed
    str - errors found, couldnt fix wallet, returning the error as a str
    '''
-   fixer = PyBtcWalletRecovery()
+   fixer = PyPPCWalletRecovery()
    frt = fixer.ProcessWallet(wltPath, wlt, Passphrase, mode, Progress=Progress)
 
    # Shorten a bunch of statements

@@ -29,7 +29,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{19329A6B-FE96-4917-B69A-2B0375C12017}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>BitcoinArmory_CppTests</RootNamespace>
+    <RootNamespace>PeercoinArmory_CppTests</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -189,7 +189,7 @@
       <AdditionalLibraryDirectories>..\pthreads-w32-2-9-1-release\Pre-built.2\lib\x86;..\pthreads-w32-2-9-1-release\Pre-built.2\dll\x86;$(SolutionDir)libs\$(Platform)\;C:\WinDDK\7600.16385.1\lib\ATL\i386;C:\Python27\libs;C:\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\libs\Win32\BitcoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
+      <Command>copy ..\libs\Win32\PeercoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
 C:\Python27\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py ..\..\imgList.xml
 </Command>
     </PostBuildEvent>
@@ -216,7 +216,7 @@ C:\Python27\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py ..\
       <AdditionalLibraryDirectories>..\pthreads-w32-2-9-1-release\Pre-built.2\lib\x86;..\pthreads-w32-2-9-1-release\Pre-built.2\dll\x86;$(SolutionDir)libs\$(Platform)\Win_XP;C:\WinDDK\7600.16385.1\lib\ATL\i386;C:\Python27\libs;C:\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\libs\Win32\BitcoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
+      <Command>copy ..\libs\Win32\PeercoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
 C:\Python27\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py ..\..\imgList.xml
 </Command>
     </PostBuildEvent>
@@ -238,7 +238,7 @@ C:\Python27\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py ..\
       <AdditionalLibraryDirectories>..\pthreads-w32-2-9-1-release\Pre-built.2\lib\x64;$(SolutionDir)libs\$(Platform)\;C:\Python27_64\libs;C:\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\libs\x64\BitcoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
+      <Command>copy ..\libs\x64\PeercoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
 C:\Python27_64\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py ..\..\imgList.xml
 </Command>
     </PostBuildEvent>
@@ -263,7 +263,7 @@ C:\Python27_64\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py 
       <AdditionalLibraryDirectories>..\pthreads-w32-2-9-1-release\Pre-built.2\lib\x64;$(SolutionDir)libs\$(Platform)\;C:\Python27_64\libs;C:\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\libs\x64\BitcoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
+      <Command>copy ..\libs\x64\PeercoinArmory_SwigDLL_d.dll ..\..\_CppBlockUtils.pyd
 C:\Python27_64\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py ..\..\imgList.xml
 </Command>
     </PostBuildEvent>
@@ -298,7 +298,7 @@ C:\Python27_64\Lib\site-packages\PyQt4\pyrcc4.exe -o ..\..\qrc_img_resources.py 
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>build_installer.bat
-copy ..\libs\Win32\BitcoinArmory_SwigDLL.dll ..\..\_CppBlockUtils.pyd
+copy ..\libs\Win32\PeercoinArmory_SwigDLL.dll ..\..\_CppBlockUtils.pyd
 </Command>
     </PostBuildEvent>
     <ProjectReference>
@@ -417,7 +417,7 @@ copy ..\libs\Win32\BitcoinArmory_SwigDLL.dll ..\..\_CppBlockUtils.pyd
     <ClInclude Include="..\BinaryData.h" />
     <ClInclude Include="..\BlockObj.h" />
     <ClInclude Include="..\BlockUtils.h" />
-    <ClInclude Include="..\BtcUtils.h" />
+    <ClInclude Include="..\PPCUtils.h" />
     <ClInclude Include="..\EncryptionUtils.h" />
     <ClInclude Include="..\leveldb_wrapper.h" />
     <ClInclude Include="..\log.h" />
@@ -428,7 +428,7 @@ copy ..\libs\Win32\BitcoinArmory_SwigDLL.dll ..\..\_CppBlockUtils.pyd
     <ClCompile Include="..\BinaryData.cpp" />
     <ClCompile Include="..\BlockObj.cpp" />
     <ClCompile Include="..\BlockUtils.cpp" />
-    <ClCompile Include="..\BtcUtils.cpp" />
+    <ClCompile Include="..\PPCUtils.cpp" />
     <ClCompile Include="..\CppBlockUtils_wrap.cxx" />
     <ClCompile Include="..\EncryptionUtils.cpp" />
     <ClCompile Include="..\leveldb_windows_port\win32_posix\Win_TranslatePath.cpp" />

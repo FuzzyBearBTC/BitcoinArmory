@@ -8,7 +8,7 @@
 #
 # Project:    Armory
 # Author:     Alan Reiner
-# Website:    www.bitcoinarmory.com
+# Website:    www.peercoinarmory.com
 # Orig Date:  20 November, 2011
 #
 ################################################################################
@@ -50,8 +50,8 @@ from qrcodenative import QRCode, QRErrorCorrectLevel
 
 
 # Version Numbers
-BTCARMORY_VERSION    = (0, 92,  1, 0)  # (Major, Minor, Bugfix, AutoIncrement)
-PYBTCWALLET_VERSION  = (1, 35,  0, 0)  # (Major, Minor, Bugfix, AutoIncrement)
+PPCARMORY_VERSION    = (0, 92,  1, 0)  # (Major, Minor, Bugfix, AutoIncrement)
+PYPPCWALLET_VERSION  = (1, 35,  0, 0)  # (Major, Minor, Bugfix, AutoIncrement)
 
 ARMORY_DONATION_ADDR = '1ArmoryXcfq7TnCSuZa9fQjRYwJ4bkRKfv'
 ARMORY_DONATION_PUBKEY = ( '04'
@@ -72,10 +72,10 @@ haveGUI = [False, None]
 parser = optparse.OptionParser(usage="%prog [options]\n")
 parser.add_option("--settings",        dest="settingsPath",default='DEFAULT', type="str",          help="load Armory with a specific settings file")
 parser.add_option("--datadir",         dest="datadir",     default='DEFAULT', type="str",          help="Change the directory that Armory calls home")
-parser.add_option("--satoshi-datadir", dest="satoshiHome", default='DEFAULT', type='str',          help="The Bitcoin-Qt/bitcoind home directory")
-parser.add_option("--satoshi-port",    dest="satoshiPort", default='DEFAULT', type="str",          help="For Bitcoin-Qt instances operating on a non-standard port")
-parser.add_option("--satoshi-rpcport", dest="satoshiRpcport",default='DEFAULT',type="str",         help="RPC port Bitcoin-Qt instances operating on a non-standard port")
-#parser.add_option("--bitcoind-path",   dest="bitcoindPath",default='DEFAULT', type="str",         help="Path to the location of bitcoind on your system")
+parser.add_option("--satoshi-datadir", dest="satoshiHome", default='DEFAULT', type='str',          help="The Peercoin-Qt/peercoind home directory")
+parser.add_option("--satoshi-port",    dest="satoshiPort", default='DEFAULT', type="str",          help="For Peercoin-Qt instances operating on a non-standard port")
+parser.add_option("--satoshi-rpcport", dest="satoshiRpcport",default='DEFAULT',type="str",         help="RPC port Peercoin-Qt instances operating on a non-standard port")
+#parser.add_option("--peercoind-path",   dest="peercoindPath",default='DEFAULT', type="str",         help="Path to the location of peercoind on your system")
 parser.add_option("--dbdir",           dest="leveldbDir",  default='DEFAULT', type='str',          help="Location to store blocks database (defaults to --datadir)")
 parser.add_option("--rpcport",         dest="rpcport",     default='DEFAULT', type="str",          help="RPC port for running armoryd.py")
 parser.add_option("--testnet",         dest="testnet",     default=False,     action="store_true", help="Use the testnet protocol")
@@ -88,10 +88,10 @@ parser.add_option("--netlog",          dest="netlog",      default=False,     ac
 parser.add_option("--logfile",         dest="logFile",     default='DEFAULT', type='str',          help="Specify a non-default location to send logging information")
 parser.add_option("--mtdebug",         dest="mtdebug",     default=False,     action="store_true", help="Log multi-threaded call sequences")
 parser.add_option("--skip-online-check", dest="forceOnline", default=False,   action="store_true", help="Go into online mode, even if internet connection isn't detected")
-parser.add_option("--skip-version-check", dest="skipVerCheck", default=False, action="store_true", help="Do not contact bitcoinarmory.com to check for new versions")
+parser.add_option("--skip-version-check", dest="skipVerCheck", default=False, action="store_true", help="Do not contact peercoinarmory.com to check for new versions")
 parser.add_option("--skip-announce-check", dest="skipAnnounceCheck", default=False, action="store_true", help="Do not query for Armory announcements")
 parser.add_option("--keypool",         dest="keypool",     default=100, type="int",                help="Default number of addresses to lookahead in Armory wallets")
-parser.add_option("--redownload",      dest="redownload",  default=False,     action="store_true", help="Delete Bitcoin-Qt/bitcoind databases; redownload")
+parser.add_option("--redownload",      dest="redownload",  default=False,     action="store_true", help="Delete Peercoin-Qt/peercoind databases; redownload")
 parser.add_option("--rebuild",         dest="rebuild",     default=False,     action="store_true", help="Rebuild blockchain database and rescan")
 parser.add_option("--rescan",          dest="rescan",      default=False,     action="store_true", help="Rescan existing blockchain DB")
 parser.add_option("--maxfiles",        dest="maxOpenFiles",default=0,         type="int",          help="Set maximum allowed open files for LevelDB databases")
@@ -102,7 +102,7 @@ parser.add_option("--nospendzeroconfchange",dest="ignoreAllZC",default=False, ac
 parser.add_option("--multisigfile",  dest="multisigFile",  default='DEFAULT', type='str',          help="File to store information about multi-signature transactions")
 parser.add_option("--force-wallet-check", dest="forceWalletCheck", default=False, action="store_true", help="Force the wallet sanity check on startup")
 parser.add_option("--disable-modules", dest="disableModules", default=False, action="store_true", help="Disable looking for modules in the execution directory")
-parser.add_option("--disable-conf-permis", dest="disableConfPermis", default=False, action="store_true", help="Disable forcing permissions on bitcoin.conf")
+parser.add_option("--disable-conf-permis", dest="disableConfPermis", default=False, action="store_true", help="Disable forcing permissions on peercoin.conf")
 
 # Pre-10.9 OS X sometimes passes a process serial number as -psn_0_xxxxxx. Nuke!
 if sys.platform == 'darwin':
@@ -120,7 +120,7 @@ BASE16CHARS  = '0123 4567 89ab cdef'.replace(' ','')
 LITTLEENDIAN  = '<'
 BIGENDIAN     = '>'
 NETWORKENDIAN = '!'
-ONE_BTC       = long(100000000)
+ONE_PPC       = long(100000000)
 DONATION       = long(5000000)
 CENT          = long(1000000)
 UNINITIALIZED = None
@@ -198,7 +198,7 @@ class CompressedKeyError(Exception): pass
 class TooMuchPrecisionError(Exception): pass
 class NegativeValueError(Exception): pass
 class FiniteFieldError(Exception): pass
-class BitcoindError(Exception): pass
+class PeercoindError(Exception): pass
 class ShouldNotGetHereError(Exception): pass
 class BadInputError(Exception): pass
 class UstxError(Exception): pass
@@ -251,7 +251,7 @@ IGNOREZC  = CLI_OPTIONS.ignoreAllZC
 OS_NAME          = ''
 OS_VARIANT       = ''
 USER_HOME_DIR    = ''
-BTC_HOME_DIR     = ''
+PPC_HOME_DIR     = ''
 ARMORY_HOME_DIR  = ''
 LEVELDB_DIR      = ''
 SUBDIR = 'testnet3' if USE_TESTNET else ''
@@ -264,26 +264,26 @@ if OS_WINDOWS:
    rt = ctypes.windll.shell32.SHGetFolderPathW(0, 26, 0, 0, ctypes.byref(buffer))
    USER_HOME_DIR = unicode(buffer.value)
                
-   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Bitcoin', SUBDIR)
+   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Peercoin', SUBDIR)
    ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'Armory', SUBDIR)
-   BLKFILE_DIR     = os.path.join(BTC_HOME_DIR, 'blocks')
+   BLKFILE_DIR     = os.path.join(PPC_HOME_DIR, 'blocks')
    BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
 elif OS_LINUX:
    OS_NAME         = 'Linux'
    OS_VARIANT      = platform.linux_distribution()
    USER_HOME_DIR   = os.getenv('HOME')
-   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, '.bitcoin', SUBDIR)
+   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, '.peercoin', SUBDIR)
    ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, '.armory', SUBDIR)
-   BLKFILE_DIR     = os.path.join(BTC_HOME_DIR, 'blocks')
+   BLKFILE_DIR     = os.path.join(PPC_HOME_DIR, 'blocks')
    BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
 elif OS_MACOSX:
    platform.mac_ver()
    OS_NAME         = 'MacOSX'
    OS_VARIANT      = platform.mac_ver()
    USER_HOME_DIR   = os.path.expanduser('~/Library/Application Support')
-   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Bitcoin', SUBDIR)
+   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Peercoin', SUBDIR)
    ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'Armory', SUBDIR)
-   BLKFILE_DIR     = os.path.join(BTC_HOME_DIR, 'blocks')
+   BLKFILE_DIR     = os.path.join(PPC_HOME_DIR, 'blocks')
    BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
 else:
    print '***Unknown operating system!'
@@ -344,7 +344,7 @@ def readVersionInt(verInt):
    verList.append( int(verStr[:-7       ]) )
    return tuple(verList[::-1])
 
-# Allow user to override default bitcoin-qt/bitcoind home directory
+# Allow user to override default peercoin-qt/peercoind home directory
 if not CLI_OPTIONS.satoshiHome.lower()=='default':
    success = True
    if USE_TESTNET:
@@ -356,7 +356,7 @@ if not CLI_OPTIONS.satoshiHome.lower()=='default':
       print 'Directory "%s" does not exist!  Using default!' % \
                                                 CLI_OPTIONS.satoshiHome
    else:
-      BTC_HOME_DIR = CLI_OPTIONS.satoshiHome
+      PPC_HOME_DIR = CLI_OPTIONS.satoshiHome
 
 
 
@@ -473,7 +473,7 @@ SCRADDR_BYTE_LIST     = [SCRADDR_P2PKH_BYTE, \
                          SCRADDR_MULTISIG_BYTE, \
                          SCRADDR_NONSTD_BYTE]
 
-# Copied from cppForSwig/BtcUtils.h::getTxOutScriptTypeInt(script)
+# Copied from cppForSwig/PPCUtils.h::getTxOutScriptTypeInt(script)
 CPP_TXOUT_STDHASH160   = 0
 CPP_TXOUT_STDPUBKEY65  = 1
 CPP_TXOUT_STDPUBKEY33  = 2
@@ -496,7 +496,7 @@ CPP_TXOUT_SCRIPT_NAMES[CPP_TXOUT_MULTISIG]    = 'Multi-Signature'
 CPP_TXOUT_SCRIPT_NAMES[CPP_TXOUT_P2SH]        = 'Standard (P2SH)'
 CPP_TXOUT_SCRIPT_NAMES[CPP_TXOUT_NONSTANDARD] = 'Non-Standard'
 
-# Copied from cppForSwig/BtcUtils.h::getTxInScriptTypeInt(script)
+# Copied from cppForSwig/PPCUtils.h::getTxInScriptTypeInt(script)
 CPP_TXIN_STDUNCOMPR    = 0
 CPP_TXIN_STDCOMPR      = 1
 CPP_TXIN_COINBASE      = 2
@@ -522,13 +522,13 @@ if not CLI_OPTIONS.satoshiPort == 'DEFAULT':
    try:
       BITCOIN_PORT = int(CLI_OPTIONS.satoshiPort)
    except:
-      raise TypeError('Invalid port for Bitcoin-Qt, using ' + str(BITCOIN_PORT))
+      raise TypeError('Invalid port for Peercoin-Qt, using ' + str(BITCOIN_PORT))
 
 if not CLI_OPTIONS.satoshiRpcport == 'DEFAULT':
    try:
       BITCOIN_RPC_PORT = int(CLI_OPTIONS.satoshiRpcport)
    except:
-      raise TypeError('Invalid rpc port for Bitcoin-Qt, using ' + str(BITCOIN_RPC_PORT))
+      raise TypeError('Invalid rpc port for Peercoin-Qt, using ' + str(BITCOIN_RPC_PORT))
 
 if not CLI_OPTIONS.rpcport == 'DEFAULT':
    try:
@@ -541,12 +541,12 @@ if not CLI_OPTIONS.rpcport == 'DEFAULT':
 if sys.argv[0]=='ArmoryQt.py':
    print '********************************************************************************'
    print 'Loading Armory Engine:'
-   print '   Armory Version:      ', getVersionString(BTCARMORY_VERSION)
-   print '   PyBtcWallet  Version:', getVersionString(PYBTCWALLET_VERSION)
+   print '   Armory Version:      ', getVersionString(PPCARMORY_VERSION)
+   print '   PyPPCWallet  Version:', getVersionString(PYPPCWALLET_VERSION)
    print 'Detected Operating system:', OS_NAME
    print '   OS Variant            :', OS_VARIANT
    print '   User home-directory   :', USER_HOME_DIR
-   print '   Satoshi BTC directory :', BTC_HOME_DIR
+   print '   Satoshi PPC directory :', PPC_HOME_DIR
    print '   Armory home dir       :', ARMORY_HOME_DIR
    print '   LevelDB directory     :', LEVELDB_DIR
    print '   Armory settings file  :', SETTINGS_PATH
@@ -862,10 +862,10 @@ fileRebuild     = os.path.join(ARMORY_HOME_DIR, 'rebuild.flag')
 fileRescan      = os.path.join(ARMORY_HOME_DIR, 'rescan.flag')
 fileDelSettings = os.path.join(ARMORY_HOME_DIR, 'delsettings.flag')
 
-# Flag to remove everything in Bitcoin dir except wallet.dat (if requested)
+# Flag to remove everything in Peercoin dir except wallet.dat (if requested)
 if os.path.exists(fileRedownload):
    # Flag to remove *BITCOIN-QT* databases so it will have to re-download
-   LOGINFO('Found %s, will delete Bitcoin DBs & redownload' % fileRedownload)
+   LOGINFO('Found %s, will delete Peercoin DBs & redownload' % fileRedownload)
 
    os.remove(fileRedownload)
 
@@ -905,23 +905,23 @@ if os.path.exists(fileDelSettings):
 
 
 ################################################################################
-def deleteBitcoindDBs():
-   if not os.path.exists(BTC_HOME_DIR):
-      LOGERROR('Could not find Bitcoin-Qt/bitcoind home dir to remove blk data')
-      LOGERROR('  Does not exist: %s' % BTC_HOME_DIR)
+def deletePeercoindDBs():
+   if not os.path.exists(PPC_HOME_DIR):
+      LOGERROR('Could not find Peercoin-Qt/peercoind home dir to remove blk data')
+      LOGERROR('  Does not exist: %s' % PPC_HOME_DIR)
    else:
-      LOGINFO('Found bitcoin home dir, removing blocks and databases')
+      LOGINFO('Found peercoin home dir, removing blocks and databases')
 
       # Remove directories
-      for btcDir in ['blocks', 'chainstate', 'database']:
-         fullPath = os.path.join(BTC_HOME_DIR, btcDir)
+      for ppcDir in ['blocks', 'chainstate', 'database']:
+         fullPath = os.path.join(PPC_HOME_DIR, ppcDir)
          if os.path.exists(fullPath):
             LOGINFO('   Removing dir:  %s' % fullPath)
             shutil.rmtree(fullPath)
 
       # Remove files
-      for btcFile in ['DB_CONFIG', 'db.log', 'debug.log', 'peers.dat']:
-         fullPath = os.path.join(BTC_HOME_DIR, btcFile)
+      for ppcFile in ['DB_CONFIG', 'db.log', 'debug.log', 'peers.dat']:
+         fullPath = os.path.join(PPC_HOME_DIR, ppcFile)
          if os.path.exists(fullPath):
             LOGINFO('   Removing file: %s' % fullPath)
             os.remove(fullPath)
@@ -930,7 +930,7 @@ def deleteBitcoindDBs():
 
 #####
 if CLI_OPTIONS.redownload:
-   deleteBitcoindDBs()
+   deletePeercoindDBs()
    if os.path.exists(fileRedownload):
       os.remove(fileRedownload)
 
@@ -1088,7 +1088,7 @@ def GetSystemDetails():
          s = os.statvfs(adir)
          return s.f_bavail * s.f_frsize
    out.HddAvailA = getHddSize(ARMORY_HOME_DIR) / (1024**3)
-   out.HddAvailB = getHddSize(BTC_HOME_DIR)    / (1024**3)
+   out.HddAvailB = getHddSize(PPC_HOME_DIR)    / (1024**3)
    return out
 
 SystemSpecs = None
@@ -1114,12 +1114,12 @@ LOGINFO('************************************************************')
 LOGINFO('Invoked: ' + ' '.join(sys.argv))
 LOGINFO('************************************************************')
 LOGINFO('Loading Armory Engine:')
-LOGINFO('   Armory Version        : ' + getVersionString(BTCARMORY_VERSION))
-LOGINFO('   PyBtcWallet  Version  : ' + getVersionString(PYBTCWALLET_VERSION))
+LOGINFO('   Armory Version        : ' + getVersionString(PPCARMORY_VERSION))
+LOGINFO('   PyPPCWallet  Version  : ' + getVersionString(PYPPCWALLET_VERSION))
 LOGINFO('Detected Operating system: ' + OS_NAME)
 LOGINFO('   OS Variant            : ' + (OS_VARIANT[0] if OS_MACOSX else '-'.join(OS_VARIANT)))
 LOGINFO('   User home-directory   : ' + USER_HOME_DIR)
-LOGINFO('   Satoshi BTC directory : ' + BTC_HOME_DIR)
+LOGINFO('   Satoshi PPC directory : ' + PPC_HOME_DIR)
 LOGINFO('   Armory home dir       : ' + ARMORY_HOME_DIR)
 LOGINFO('Detected System Specs    : ')
 LOGINFO('   Total Available RAM   : %0.2f GB', SystemSpecs.Memory)
@@ -1129,7 +1129,7 @@ LOGINFO('   System is 64-bit      : ' + str(SystemSpecs.IsX64))
 LOGINFO('   Preferred Encoding    : ' + locale.getpreferredencoding())
 LOGINFO('   Machine Arch          : ' + SystemSpecs.Machine)
 LOGINFO('   Available HDD (ARM)   : %d GB' % SystemSpecs.HddAvailA)
-LOGINFO('   Available HDD (BTC)   : %d GB' % SystemSpecs.HddAvailB)
+LOGINFO('   Available HDD (PPC)   : %d GB' % SystemSpecs.HddAvailB)
 LOGINFO('')
 LOGINFO('Network Name: ' + NETWORKS[ADDRBYTE])
 LOGINFO('Satoshi Port: %d', BITCOIN_PORT)
@@ -1170,7 +1170,7 @@ def GetExecDir():
 
 def coin2str(nSatoshi, ndec=8, rJust=True, maxZeros=8):
    """
-   Converts a raw value (1e-8 BTC) into a formatted string for display
+   Converts a raw value (1e-8 PPC) into a formatted string for display
 
    ndec, guarantees that we get get a least N decimal places in our result
 
@@ -1179,8 +1179,8 @@ def coin2str(nSatoshi, ndec=8, rJust=True, maxZeros=8):
 
    """
 
-   nBtc = float(nSatoshi) / float(ONE_BTC)
-   s = ('%%0.%df' % ndec) % nBtc
+   nPPC = float(nSatoshi) / float(ONE_PPC)
+   s = ('%%0.%df' % ndec) % nPPC
    s = s.rjust(18, ' ')
 
    if maxZeros < ndec:
@@ -1189,7 +1189,7 @@ def coin2str(nSatoshi, ndec=8, rJust=True, maxZeros=8):
       if nChop>0:
          s  = s[:-nChop] + nChop*' '
 
-   if nSatoshi < 10000*ONE_BTC:
+   if nSatoshi < 10000*ONE_PPC:
       s.lstrip()
 
    if not rJust:
@@ -1231,7 +1231,7 @@ def str2coin(theStr, negAllowed=True, maxDec=8, roundHighPrec=True):
    if not '.' in coinStrPos:
       if not negAllowed and isNeg:
          raise NegativeValueError
-      return (int(coinStrPos)*ONE_BTC)*(-1 if isNeg else 1)
+      return (int(coinStrPos)*ONE_PPC)*(-1 if isNeg else 1)
    else:
       lhs,rhs = coinStrPos.strip().split('.')
       if len(lhs.strip('-'))==0:
@@ -1472,7 +1472,7 @@ def scrAddr_to_script(scraddr):
 ################################################################################
 def script_to_scrAddr(binScript):
    """ Convert a binary script to scrAddr string (used by BDM) """
-   return Cpp.BtcUtils().getScrAddrForScript(binScript)
+   return Cpp.PPCUtils().getScrAddrForScript(binScript)
 
 ################################################################################
 def script_to_addrStr(binScript):
@@ -1717,7 +1717,7 @@ def RightNowStr(fmt=DEFAULT_DATE_FORMAT):
 # Define all the hashing functions we're going to need.  We don't actually
 # use any of the first three directly (sha1, sha256, ripemd160), we only
 # use hash256 and hash160 which use the first three to create the ONLY hash
-# operations we ever do in the bitcoin network
+# operations we ever do in the peercoin network
 # UPDATE:  mini-private-key format requires vanilla sha256...
 def sha1(bits):
    return hashlib.new('sha1', bits).digest()
@@ -1728,13 +1728,13 @@ def sha512(bits):
 def ripemd160(bits):
    # It turns out that not all python has ripemd160...?
    #return hashlib.new('ripemd160', bits).digest()
-   return Cpp.BtcUtils().ripemd160_SWIG(bits)
+   return Cpp.PPCUtils().ripemd160_SWIG(bits)
 def hash256(s):
    """ Double-SHA256 """
    return sha256(sha256(s))
 def hash160(s):
    """ RIPEMD160( SHA256( binaryStr ) ) """
-   return Cpp.BtcUtils().getHash160_SWIG(s)
+   return Cpp.PPCUtils().getHash160_SWIG(s)
 
 
 def HMAC(key, msg, hashfunc=sha512, hashsz=None):
@@ -1913,7 +1913,7 @@ EmptyHash = hex_to_binary('00'*32)
 # BINARY/BASE58 CONVERSIONS
 def binary_to_base58(binstr):
    """
-   This method applies the Bitcoin-specific conversion from binary to Base58
+   This method applies the Peercoin-specific conversion from binary to Base58
    which may includes some extra "zero" bytes, such as is the case with the
    main-network addresses.
 
@@ -1943,7 +1943,7 @@ def binary_to_base58(binstr):
 ################################################################################
 def base58_to_binary(addr):
    """
-   This method applies the Bitcoin-specific conversion from Base58 to binary
+   This method applies the Peercoin-specific conversion from Base58 to binary
    which may includes some extra "zero" bytes, such as is the case with the
    main-network addresses.
 
@@ -1976,7 +1976,7 @@ def base58_to_binary(addr):
 ################################################################################
 def hash160_to_addrStr(binStr, netbyte=ADDRBYTE):
    """
-   Converts the 20-byte pubKeyHash to 25-byte binary Bitcoin address
+   Converts the 20-byte pubKeyHash to 25-byte binary Peercoin address
    which includes the network byte (prefix) and 4-byte checksum (suffix)
    """
 
@@ -2092,17 +2092,17 @@ def readSixteenEasyBytes(et18):
    else:
       return (b16new,None)
 
-##### FLOAT/BTC #####
-# https://en.bitcoin.it/wiki/Proper_Money_Handling_(JSON-RPC)
-def ubtc_to_floatStr(n):
-   return '%d.%08d' % divmod (n, ONE_BTC)
-def floatStr_to_ubtc(s):
-   return long(round(float(s) * ONE_BTC))
-def float_to_btc (f):
-   return long (round(f * ONE_BTC))
+##### FLOAT/PPC #####
+# https://en.peercoin.it/wiki/Proper_Money_Handling_(JSON-RPC)
+def uppc_to_floatStr(n):
+   return '%d.%08d' % divmod (n, ONE_PPC)
+def floatStr_to_uppc(s):
+   return long(round(float(s) * ONE_PPC))
+def float_to_ppc (f):
+   return long (round(f * ONE_PPC))
 
 
-# From https://en.bitcoin.it/wiki/Proper_Money_Handling_(JSON-RPC)
+# From https://en.peercoin.it/wiki/Proper_Money_Handling_(JSON-RPC)
 def JSONtoAmount(value):
    return long(round(float(value) * 1e8))
 def AmountToJSON(amount):
@@ -2223,8 +2223,8 @@ def verifyChecksum(binaryStr, chksum, hashFunc=hash256, fixIfNecessary=True, \
       -- 2+ bytes error:  return ''
 
    This method will check the CHECKSUM ITSELF for errors, but not correct them.
-   However, for PyBtcWallet serialization, if I determine that it is a chksum
-   error and simply return the original string, then PyBtcWallet will correct
+   However, for PyPPCWallet serialization, if I determine that it is a chksum
+   error and simply return the original string, then PyPPCWallet will correct
    the checksum in the file, next time it reserializes the data.
    """
    bin1 = str(binaryStr)
@@ -2266,7 +2266,7 @@ def verifyChecksum(binaryStr, chksum, hashFunc=hash256, fixIfNecessary=True, \
    return ''
 
 
-# Taken directly from rpc.cpp in reference bitcoin client, 0.3.24
+# Taken directly from rpc.cpp in reference peercoin client, 0.3.24
 def binaryBits_to_difficulty(b):
    """ Converts the 4-byte binary difficulty string to a float """
    i = binary_to_int(b)
@@ -2323,7 +2323,7 @@ def CreateQRMatrix(dataToEncode, errLevel=QRErrorCorrectLevel.L):
    return [qrmtrx, modCt]
 
 
-# The following params are for the Bitcoin elliptic curves (secp256k1)
+# The following params are for the Peercoin elliptic curves (secp256k1)
 SECP256K1_MOD   = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2FL
 SECP256K1_ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141L
 SECP256K1_B     = 0x0000000000000000000000000000000000000000000000000000000000000007L
@@ -2649,7 +2649,7 @@ def checkAddrType(addrBin):
 def checkAddrBinValid(addrBin, validPrefixes=None):
    """
    Checks whether this address is valid for the given network
-   (set at the top of pybtcengine.py)
+   (set at the top of pyppcengine.py)
    """
    if validPrefixes is None:
       validPrefixes = [ADDRBYTE, P2SHBYTE]
@@ -2776,7 +2776,7 @@ def encodePrivKeyBase58(privKeyBin):
 URI_VERSION_STR = '1.0'
 
 ################################################################################
-def parseBitcoinURI(theStr):
+def parsePeercoinURI(theStr):
    """ Takes a URI string, returns the pieces of it, in a dictionary """
 
    # Start by splitting it into pieces on any separator
@@ -2786,7 +2786,7 @@ def parseBitcoinURI(theStr):
    parts = theStr.split()
 
    # Now start walking through the parts and get the info out of it
-   if not parts[0] == 'bitcoin':
+   if not parts[0] == 'peercoin':
       return {}
 
    uriData = {}
@@ -2841,8 +2841,8 @@ def uriPercentToReserved(theStr):
 
 
 ################################################################################
-def createBitcoinURI(addr, amt=None, msg=None):
-   uriStr = 'bitcoin:%s' % addr
+def createPeercoinURI(addr, amt=None, msg=None):
+   uriStr = 'peercoin:%s' % addr
    if amt or msg:
       uriStr += '?'
 
@@ -2925,8 +2925,8 @@ def notifyOnSurpriseTx(blk0, blk1, wltMap, lboxWltMap, isGui, bdm, notifyQueue, 
    # a block. It is a "surprise" when the first time we see it is in a block
    if isGui:
       notifiedAlready = set([ n[1].getTxHash() for n in notifyQueue ])
-      notifyIn  = settings.getSettingOrSetDefault('NotifyBtcIn',  not OS_MACOSX)
-      notifyOut = settings.getSettingOrSetDefault('NotifyBtcOut', not OS_MACOSX)
+      notifyIn  = settings.getSettingOrSetDefault('NotifyPPCIn',  not OS_MACOSX)
+      notifyOut = settings.getSettingOrSetDefault('NotifyPPCOut', not OS_MACOSX)
 
    for blk in range(blk0, blk1):
       sbh = bdm.getMainBlockFromDB(blk)

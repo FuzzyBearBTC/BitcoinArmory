@@ -11,16 +11,16 @@ DEFAULT_FETCH_INTERVAL = 30*MINUTE
 DEFAULT_MIN_PRIORITY = 2048
 
 if not CLI_OPTIONS.testAnnounceCode:
-   # Signed with the Bitcoin offline announce key (see top of ArmoryUtils.py)
+   # Signed with the Peercoin offline announce key (see top of ArmoryUtils.py)
    ANNOUNCE_SIGN_PUBKEY = ARMORY_INFO_SIGN_PUBLICKEY
-   ANNOUNCE_URL = 'https://bitcoinarmory.com/announce.txt'
-   ANNOUNCE_URL_BACKUP = 'https://s3.amazonaws.com/bitcoinarmory-media/announce.txt'
+   ANNOUNCE_URL = 'https://peercoinarmory.com/announce.txt'
+   ANNOUNCE_URL_BACKUP = 'https://s3.amazonaws.com/peercoinarmory-media/announce.txt'
 else:
    # This is a lower-security announce file, fake data, just for testing
    ANNOUNCE_SIGN_PUBKEY = ('04'
       '601c891a2cbc14a7b2bb1ecc9b6e42e166639ea4c2790703f8e2ed126fce432c'
       '62fe30376497ad3efcd2964aa0be366010c11b8d7fc8209f586eac00bb763015')
-   ANNOUNCE_URL = 'https://s3.amazonaws.com/bitcoinarmory-testing/testannounce.txt'
+   ANNOUNCE_URL = 'https://s3.amazonaws.com/peercoinarmory-testing/testannounce.txt'
    ANNOUNCE_URL_BACKUP = ANNOUNCE_URL
 
 
@@ -206,7 +206,7 @@ class AnnounceDataFetcher(object):
       reject duplicate queries.
       """
       argsMap = {}
-      argsMap['ver'] = getVersionString(BTCARMORY_VERSION)
+      argsMap['ver'] = getVersionString(PPCARMORY_VERSION)
    
       if verbose:
          if OS_WINDOWS:

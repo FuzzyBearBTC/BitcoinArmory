@@ -6,8 +6,8 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _BTCUTILS_H_
-#define _BTCUTILS_H_
+#ifndef _PPCUTILS_H_
+#define _PPCUTILS_H_
 
 #include <stdio.h>
 
@@ -267,12 +267,12 @@ public:
 // This class holds only static methods.  
 // NOTE:  added default ctor and a few non-static, to support SWIG
 //        (-classic SWIG doesn't support static methods)
-class BtcUtils
+class PPCUtils
 {
 public:
 
    // Block of code to be called by SWIG -- i.e. made available to python
-   BtcUtils(void) {}
+   PPCUtils(void) {}
    BinaryData hash256(BinaryData const & str) {return getHash256(str);}
    BinaryData hash160(BinaryData const & str) {return getHash160(str);}
 
@@ -902,7 +902,7 @@ public:
       if(script.getSize() == 0)
          return TXIN_SCRIPT_NONSTANDARD;
 
-      if(prevTxHash == BtcUtils::EmptyHash_)
+      if(prevTxHash == PPCUtils::EmptyHash_)
          return TXIN_SCRIPT_COINBASE;
 
       // Technically, this doesn't recognize all P2SH spends.  Only 
@@ -1042,7 +1042,7 @@ public:
    //        look like the output of this function operating on a multisig 
    //        script (doesn't matter if it's valid or not)?  In other words, is
    //        there is a hole where someone could mine a script that would be
-   //        forwarded by Bitcoin-Qt to this code, which would then produce
+   //        forwarded by Peercoin-Qt to this code, which would then produce
    //        a non-std-unique-key that would be indistinguishable from the 
    //        output of this function?  My guess is, no.  And my guess is that 
    //        it's not a very useful even if it did.  But it would be good to
@@ -1314,7 +1314,7 @@ public:
    }
 
 
-   // This got more complicated when Bitcoin-Qt 0.8 switched from
+   // This got more complicated when Peercoin-Qt 0.8 switched from
    // blk0001.dat to blocks/blk00000.dat
    static string getBlkFilename(string dir, uint32_t fblkNum)
    {

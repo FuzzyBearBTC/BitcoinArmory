@@ -105,7 +105,7 @@ class UpgradeDownloader:
                QMessageBox.warning(self.frame, tr("Verification failed"), tr("""
                   The download completed but its cryptographic signature is invalid.
                   Please try the download again.  If you get another error, please
-                  report the problem to support@bitcoinarmory.com.
+                  report the problem to support@peercoinarmory.com.
                   <br><br>
                   The downloaded data has been discarded.  """))
             else:
@@ -166,13 +166,13 @@ class UpgradeDownloader:
 
       if linuxUnpackFile is not None:
          reply = QMessageBox.warning(self.frame, tr('Unpack Download'), tr("""
-            You just downloaded the Bitcoin Core software for Linux.  
+            You just downloaded the Peercoin Core software for Linux.  
             Would you like Armory to extract it for you and adjust your 
             settings to use it automatically?
             <br><br>
-            If you modified your settings to run Bitcoin Core manually, 
+            If you modified your settings to run Peercoin Core manually, 
             click "No" then extract the downloaded file and manually start
-            bitcoin-qt or bitcoind in from the extracted "bin/%d" 
+            peercoin-qt or peercoind in from the extracted "bin/%d" 
             directory.""") % (64 if SystemSpecs.IsX64 else 32), \
             QMessageBox.Yes | QMessageBox.No)
 
@@ -180,11 +180,11 @@ class UpgradeDownloader:
             finalDir = self.main.unpackLinuxTarGz(dest, changeSettings=True)
             if finalDir is None:
                QMessageBox.critical(self.frame, tr('Error Unpacking'), tr("""
-                  There was an error unpacking the Bitcoin Core file.  To use
+                  There was an error unpacking the Peercoin Core file.  To use
                   it, you need to go to where the file was saved, right-click
                   on it and select "Extract Here", then adjust your settings
                   (<i>"File"</i>\xe2\x86\x92<i>"Settings"</i> from the main 
-                  window) to point "Bitcoin Install Dir" to the extracted 
+                  window) to point "Peercoin Install Dir" to the extracted 
                   directory.
                   <br><br>
                   You saved the installer to:
@@ -193,7 +193,7 @@ class UpgradeDownloader:
             else:
                QMessageBox.warning(self.frame, tr('Finished!'), tr("""
                   The operation was successful.  Restart Armory to use the
-                  newly-downloaded Bitcoin Core software"""), QMessageBox.Ok)
+                  newly-downloaded Peercoin Core software"""), QMessageBox.Ok)
 
       self.receivedData = None
       self.downloadFile = None
@@ -265,7 +265,7 @@ class UpgradeDownloaderDialog(ArmoryDialog):
          "MacOSX" : tr("MacOSX"), \
          "32" : tr("32-bit"), \
          "64" : tr("64-bit"), \
-         "Satoshi" : tr("Bitcoin Core"), \
+         "Satoshi" : tr("Peercoin Core"), \
          "ArmoryTesting" : tr("Armory Testing (unstable)"), \
          "ArmoryOffline" : tr("Offline Armory Wallet") \
       }
@@ -548,9 +548,9 @@ class UpgradeDownloaderDialog(ArmoryDialog):
             if packagename == "Satoshi":
                logHtml = tr("""
                   No version information is available here for any of the
-                  core Bitcoin software downloads. You can find the
+                  core Peercoin software downloads. You can find the
                   information at:
-                  <a href='https://bitcoin.org/en/version-history'>https://bitcoin.org/en/version-history</a>""")
+                  <a href='https://peercoin.org/en/version-history'>https://peercoin.org/en/version-history</a>""")
             else:
                logHtml = tr("Release notes are not available for this package")
 
@@ -710,7 +710,7 @@ class UpgradeDownloaderDialog(ArmoryDialog):
          if pkgName=='Satoshi':
             if self.main.satoshiVersions[0]:
                self.lblCurrentVersion.setText(tr("""
-                  You are currently using Bitcoin Core version %s""") % \
+                  You are currently using Peercoin Core version %s""") % \
                   self.main.satoshiVersions[0])
          elif pkgName=='Armory':
             if self.main.armoryVersions[0]:
