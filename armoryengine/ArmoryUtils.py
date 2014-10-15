@@ -264,27 +264,27 @@ if OS_WINDOWS:
    rt = ctypes.windll.shell32.SHGetFolderPathW(0, 26, 0, 0, ctypes.byref(buffer))
    USER_HOME_DIR = unicode(buffer.value)
                
-   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Peercoin', SUBDIR)
+   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'PPCoin', SUBDIR)
    ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'Armory', SUBDIR)
    BLKFILE_DIR     = os.path.join(PPC_HOME_DIR, 'blocks')
-   BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
+   BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk0001.dat')
 elif OS_LINUX:
    OS_NAME         = 'Linux'
    OS_VARIANT      = platform.linux_distribution()
    USER_HOME_DIR   = os.getenv('HOME')
-   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, '.peercoin', SUBDIR)
+   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, '.ppcoin', SUBDIR)
    ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, '.armory', SUBDIR)
    BLKFILE_DIR     = os.path.join(PPC_HOME_DIR, 'blocks')
-   BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
+   BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk0001.dat')
 elif OS_MACOSX:
    platform.mac_ver()
    OS_NAME         = 'MacOSX'
    OS_VARIANT      = platform.mac_ver()
    USER_HOME_DIR   = os.path.expanduser('~/Library/Application Support')
-   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Peercoin', SUBDIR)
+   PPC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'PPCcoin', SUBDIR)
    ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'Armory', SUBDIR)
    BLKFILE_DIR     = os.path.join(PPC_HOME_DIR, 'blocks')
-   BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
+   BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk0001.dat')
 else:
    print '***Unknown operating system!'
    print '***Cannot determine default directory locations'
@@ -296,12 +296,12 @@ OS_LINUX   = 'nix'    in opsys.lower() or 'nux'     in opsys.lower()
 OS_MACOSX  = 'darwin' in opsys.lower() or 'osx'     in opsys.lower()
 
 BLOCKCHAINS = {}
-BLOCKCHAINS['\xf9\xbe\xb4\xd9'] = "Main Network"
-BLOCKCHAINS['\xfa\xbf\xb5\xda'] = "Old Test Network"
-BLOCKCHAINS['\x0b\x11\x09\x07'] = "Test Network (testnet3)"
+BLOCKCHAINS['\xe6\xe8\xe9\xe5'] = "Main Network"
+BLOCKCHAINS['\xdb\xe1\xf2\xf6'] = "Old Test Network"
+BLOCKCHAINS['\xcb\xf2\xc0\xef'] = "Test Network (testnet3)"
 
 NETWORKS = {}
-NETWORKS['\x00'] = "Main Network"
+NETWORKS['\x37'] = "Main Network"
 NETWORKS['\x05'] = "Main Network"
 NETWORKS['\x6f'] = "Test Network"
 NETWORKS['\xc4'] = "Test Network"
@@ -428,31 +428,31 @@ if not os.path.exists(LEVELDB_DIR):
 ##### MAIN NETWORK IS DEFAULT #####
 if not USE_TESTNET:
    # TODO:  The testnet genesis tx hash can't be the same...?
-   BITCOIN_PORT = 8333
-   BITCOIN_RPC_PORT = 8332
-   ARMORY_RPC_PORT = 8225
-   MAGIC_BYTES = '\xf9\xbe\xb4\xd9'
+   BITCOIN_PORT = 9901
+   BITCOIN_RPC_PORT = 9902
+   ARMORY_RPC_PORT = 9910
+   MAGIC_BYTES = '\xe6\xe8\xe9\xe5'
    GENESIS_BLOCK_HASH_HEX  = '6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000'
-   GENESIS_BLOCK_HASH      = 'o\xe2\x8c\n\xb6\xf1\xb3r\xc1\xa6\xa2F\xaec\xf7O\x93\x1e\x83e\xe1Z\x08\x9ch\xd6\x19\x00\x00\x00\x00\x00'
-   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a'
-   GENESIS_TX_HASH         = ';\xa3\xed\xfdz{\x12\xb2z\xc7,>gv\x8fa\x7f\xc8\x1b\xc3\x88\x8aQ2:\x9f\xb8\xaaK\x1e^J'
-   ADDRBYTE = '\x00'
-   P2SHBYTE = '\x05'
-   PRIVKEYBYTE = '\x80'
+   GENESIS_BLOCK_HASH      = 'o\xe2\x8c\n\xb6\xf1\xb3r\xc1\xa6\xa2F\xaec\xf7O\x93\x1e\x83e\xe1Z\x08\x9ch\xd6\x19\x00\x00\x00\x00\x00' # Sigmund: Not Set for Peercoin
+   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a' # Sigmund: Not Set for Peercoin
+   GENESIS_TX_HASH         = ';\xa3\xed\xfdz{\x12\xb2z\xc7,>gv\x8fa\x7f\xc8\x1b\xc3\x88\x8aQ2:\x9f\xb8\xaaK\x1e^J' # Sigmund: Not Set for Peercoin
+   ADDRBYTE = '\x37' # Sigmund: Not Set for Peercoin
+   P2SHBYTE = '\x05' # Sigmund: Not Set for Peercoin
+   PRIVKEYBYTE = '\xb7' # Sigmund: Not Set for Peercoin
 
    # This will usually just be used in the GUI to make links for the user
-   BLOCKEXPLORE_NAME     = 'blockchain.info'
-   BLOCKEXPLORE_URL_TX   = 'https://blockchain.info/tx/%s'
-   BLOCKEXPLORE_URL_ADDR = 'https://blockchain.info/address/%s'
+   BLOCKEXPLORE_NAME     = 'ppc.blockr.io'
+   BLOCKEXPLORE_URL_TX   = 'https://ppc.blockr.io/tx/info/%s'
+   BLOCKEXPLORE_URL_ADDR = 'https://ppc.blockr.io/address/info/%s'
 else:
-   BITCOIN_PORT = 18333
-   BITCOIN_RPC_PORT = 18332
-   ARMORY_RPC_PORT     = 18225
-   MAGIC_BYTES  = '\x0b\x11\x09\x07'
-   GENESIS_BLOCK_HASH_HEX  = '43497fd7f826957108f4a30fd9cec3aeba79972084e90ead01ea330900000000'
-   GENESIS_BLOCK_HASH      = 'CI\x7f\xd7\xf8&\x95q\x08\xf4\xa3\x0f\xd9\xce\xc3\xae\xbay\x97 \x84\xe9\x0e\xad\x01\xea3\t\x00\x00\x00\x00'
-   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a'
-   GENESIS_TX_HASH         = ';\xa3\xed\xfdz{\x12\xb2z\xc7,>gv\x8fa\x7f\xc8\x1b\xc3\x88\x8aQ2:\x9f\xb8\xaaK\x1e^J'
+   BITCOIN_PORT = 9903
+   BITCOIN_RPC_PORT = 9904
+   ARMORY_RPC_PORT  = 9920
+   MAGIC_BYTES  = '\xcb\xf2\xc0\xef'
+   GENESIS_BLOCK_HASH_HEX  = '069f7cc4ae81ca0c7c72cc30e68c65b017cd173e5096657f73bb57f701000000'
+   GENESIS_BLOCK_HASH      = 'CI\x7f\xd7\xf8&\x95q\x08\xf4\xa3\x0f\xd9\xce\xc3\xae\xbay\x97 \x84\xe9\x0e\xad\x01\xea3\t\x00\x00\x00\x00' # Sigmund: Not Set for Peercoin
+   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a' # Sigmund: Not Set for Peercoin
+   GENESIS_TX_HASH         = ';\xa3\xed\xfdz{\x12\xb2z\xc7,>gv\x8fa\x7f\xc8\x1b\xc3\x88\x8aQ2:\x9f\xb8\xaaK\x1e^J' # Sigmund: Not Set for Peercoin
    ADDRBYTE = '\x6f'
    P2SHBYTE = '\xc4'
    PRIVKEYBYTE = '\xef'

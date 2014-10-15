@@ -4615,14 +4615,14 @@ class ArmoryMainWindow(QMainWindow):
       self.dashBtns = [[None]*3 for i in range(5)]
       self.dashBtns[DASHBTNS.Close   ][BTN] = QPushButton('Close Peercoin Process')
       self.dashBtns[DASHBTNS.Install ][BTN] = QPushButton('Download Peercoin')
-      self.dashBtns[DASHBTNS.Browse  ][BTN] = QPushButton('Open www.peercoin.org')
+      self.dashBtns[DASHBTNS.Browse  ][BTN] = QPushButton('Open www.peercoin.net')
       self.dashBtns[DASHBTNS.Instruct][BTN] = QPushButton('Installation Instructions')
       self.dashBtns[DASHBTNS.Settings][BTN] = QPushButton('Change Settings')
 
 
       #####
       def openPeercoinOrg():
-         webbrowser.open('http://www.peercoin.org/en/download')
+         webbrowser.open('http://peercoin.net/download')
 
 
       #####
@@ -4661,7 +4661,7 @@ class ArmoryMainWindow(QMainWindow):
 
 
       self.dashBtns[DASHBTNS.Browse][TTIP] = self.createToolTipWidget( \
-           'Will open your default browser to http://www.peercoin.org where you can '
+           'Will open your default browser to http://www.peercoin.net where you can '
            'download the latest version of Peercoin-Qt, and get other information '
            'and links about Peercoin, in general.')
       self.dashBtns[DASHBTNS.Instruct][TTIP] = self.createToolTipWidget( \
@@ -5101,8 +5101,8 @@ class ArmoryMainWindow(QMainWindow):
    #############################################################################
    def closeExistingPeercoin(self):
       for proc in psutil.process_iter():
-         if proc.name.lower() in ['peercoind.exe','peercoin-qt.exe',\
-                                     'peercoind','peercoin-qt']:
+         if proc.name.lower() in ['ppcoind.exe','ppcoin-qt.exe',\
+                                     'ppcoind','ppcoin-qt']:
             killProcess(proc.pid)
             time.sleep(2)
             return
@@ -5505,8 +5505,8 @@ class ArmoryMainWindow(QMainWindow):
          'option, or change it in the Armory settings.'
          '<br><br>'
          'If you do not have Peercoin-Qt installed, you can '
-         'download it from <a href="http://www.peercoin.org">'
-         'http://www.peercoin.org</a>.')
+         'download it from <a href="http://www.peercoin.net">'
+         'http://www.peercoin.net</a>.')
 
       # Branch the available display text based on which Satoshi-Management
       # mode Armory is using.  It probably wasn't necessary to branch the
@@ -5552,7 +5552,7 @@ class ArmoryMainWindow(QMainWindow):
             'frequently asked questions</a> page for more general information.  '
             'If you already know what you\'re doing and simply need '
             'to fetch the latest version of Peercoin-Qt, you can download it from '
-            '<a href="http://www.peercoin.org">http://www.peercoin.org</a>.')
+            '<a href="http://www.peercoin.net">http://www.peercoin.net</a>.')
          elif state == 'OfflineNoInternet':
             return ( \
             'You are currently in offline mode because '
@@ -5612,7 +5612,7 @@ class ArmoryMainWindow(QMainWindow):
          if state == 'OfflineNeedPeercoinInst':
             return ( \
             '<b>Only one more step to getting online with Armory!</b>   You '
-            'must install the Peercoin software from www.peercoin.org in order '
+            'must install the Peercoin software from www.peercoin.net in order '
             'for Armory to communicate with the Peercoin network.  If the '
             'Peercoin software is already installed and/or you would prefer '
             'to manage it yourself, please adjust your settings and '
