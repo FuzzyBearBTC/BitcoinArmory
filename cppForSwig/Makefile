@@ -19,7 +19,7 @@ endif
 #**************************************************************************
 LINK = $(CXX)
 
-OBJS = UniversalTimer.o BinaryData.o leveldb_wrapper.o StoredBlockObj.o BtcUtils.o BlockObj.o BlockUtils.o EncryptionUtils.o libcryptopp.a libleveldb.a sighandler.o
+OBJS = UniversalTimer.o BinaryData.o leveldb_wrapper.o StoredBlockObj.o PPCUtils.o BlockObj.o BlockUtils.o EncryptionUtils.o libcryptopp.a libleveldb.a sighandler.o
 
 #if python is specified, use it
 ifndef PYVER
@@ -60,13 +60,13 @@ libleveldb.a: Makefile
 %.o: %.cpp %.h
 	$(CXX) $(CXXCPP) $(CXXFLAGS) -c $<
 
-BinaryData.o: BtcUtils.h log.h
-BtcUtils.o: log.h
-BlockObj.o: BinaryData.h BtcUtils.h
-StoredBlockObj.o: log.h BtcUtils.h BinaryData.h
-leveldb_wrapper.o: log.h BtcUtils.h BinaryData.h
+BinaryData.o: PPCUtils.h log.h
+PPCUtils.o: log.h
+BlockObj.o: BinaryData.h PPCUtils.h
+StoredBlockObj.o: log.h PPCUtils.h BinaryData.h
+leveldb_wrapper.o: log.h PPCUtils.h BinaryData.h
 BlockUtils.o: log.h BinaryData.h UniversalTimer.h PartialMerkle.h
-EncryptionUtils.o: log.h BtcUtils.h BinaryData.h
+EncryptionUtils.o: log.h PPCUtils.h BinaryData.h
 CppBlockUtils_wrap.cxx: log.h BlockUtils.h BinaryData.h BlockObj.h UniversalTimer.h BlockUtils.h BlockUtils.cpp CppBlockUtils.i
 	swig $(SWIG_OPTS) -outdir ../ -v CppBlockUtils.i 
 

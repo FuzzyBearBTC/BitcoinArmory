@@ -3,7 +3,7 @@ import os
 
 sys.path.append('..')
 
-from ArmoryUtils import ARMORY_HOME_DIR, BTC_HOME_DIR, LOGEXCEPT, \
+from ArmoryUtils import ARMORY_HOME_DIR, PPC_HOME_DIR, LOGEXCEPT, \
                         LOGERROR, LOGWARN, LOGINFO, MEGABYTE, \
                         AllowAsync, RightNow, unixTimeToFormatStr, \
                         secondsToHumanTime, MAGIC_BYTES,\
@@ -44,7 +44,7 @@ class TorrentDownloadManager(object):
       self.minSecondsBetweenUpdates = 1
       self.lastUpdate = 0
       self.disabled = doDisable
-      self.satoshiDir = BTC_HOME_DIR
+      self.satoshiDir = PPC_HOME_DIR
 
       # These need to exist even if setup hasn't been called
       self.lastStats     = {}
@@ -101,12 +101,12 @@ class TorrentDownloadManager(object):
 
          self.savePath = savePath
          if self.savePath is None:
-            self.savePath = os.path.join(BTC_HOME_DIR, self.torrentName)
+            self.savePath = os.path.join(PPC_HOME_DIR, self.torrentName)
          self.savePath_temp = self.savePath + '.partial'
 
    #############################################################################
-   def setSatoshiDir(self, btcDir):
-      self.satoshiDir = btcDir
+   def setSatoshiDir(self, ppcDir):
+      self.satoshiDir = ppcDir
 
    #############################################################################
    def isInitialized(self):

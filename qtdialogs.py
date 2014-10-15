@@ -21,14 +21,14 @@ from armorycolors import Colors, htmlColor
 from armorymodels import *
 import qrc_img_resources
 from qtdefines import *
-from armoryengine.PyBtcAddress import calcWalletIDFromRoot
+from armoryengine.PyPPCAddress import calcWalletIDFromRoot
 from announcefetch import DEFAULT_MIN_PRIORITY
 from ui.UpgradeDownloader import UpgradeDownloaderDialog
 from armoryengine.MultiSigUtils import calcLockboxID, createLockboxEntryStr,\
    LBPREFIX, isBareLockbox, isP2SHLockbox
 from ui.MultiSigModels import LockboxDisplayModel, LockboxDisplayProxy,\
    LOCKBOXCOLS
-from armoryengine.PyBtcWalletRecovery import RECOVERMODE
+from armoryengine.PyPPCWalletRecovery import RECOVERMODE
 
 NO_CHANGE = 'NoChange'
 MIN_PASSWD_WIDTH = lambda obj: tightSizeStr(obj, '*' * 16)[0]
@@ -409,8 +409,8 @@ class DlgBugReport(ArmoryDialog):
    def __init__(self, parent=None, main=None):
       super(DlgBugReport, self).__init__(parent, main)
 
-      tsPage = 'https://bitcoinarmory.com/troubleshooting'
-      faqPage = 'https://bitcoinarmory.com/faqs'
+      tsPage = 'https://peercoinarmory.com/troubleshooting'
+      faqPage = 'https://peercoinarmory.com/faqs'
 
       lblDescr = QRichLabel(tr("""
          <b><u>Send a bug report to the Armory team</u></b>
@@ -473,7 +473,7 @@ class DlgBugReport(ArmoryDialog):
       self.connect(self.btnSubmit, SIGNAL(CLICKED), self.submitReport)
       self.connect(self.btnCancel, SIGNAL(CLICKED), self, SLOT('reject()'))
 
-      armoryver = getVersionString(BTCARMORY_VERSION)
+      armoryver = getVersionString(PPCARMORY_VERSION)
       lblDetect = QRichLabel( tr("""
          <b>Detected:</b> %s (%s) / %0.2f GB RAM / Armory version %s<br>
          <font size=2>(this data will be submitted automatically with the
@@ -584,7 +584,7 @@ class DlgBugReport(ArmoryDialog):
       reportMap['uniqID']       = uniqID
       reportMap['OSmajor']      = OS_NAME
       reportMap['OSvariant']    = osvariant
-      reportMap['ArmoryVer']    = getVersionString(BTCARMORY_VERSION)
+      reportMap['ArmoryVer']    = getVersionString(PPCARMORY_VERSION)
       reportMap['TotalRAM']     = '%0.2f' % SystemSpecs.Memory
       reportMap['isAmd64']      = str(SystemSpecs.IsX64).lower()
       reportMap['userEmail']    = emailAddr
@@ -642,7 +642,7 @@ class DlgBugReport(ArmoryDialog):
 
          if responseMap==expectedResponseMap:
             LOGINFO('Server verified receipt of log file')
-            cemail = 'contact@bitcoinarmory.com'
+            cemail = 'contact@peercoinarmory.com'
             QMessageBox.information(self, tr('Submitted!'), tr("""
                <b>Your report was submitted successfully!</b> 
                <br><br>
@@ -662,7 +662,7 @@ class DlgBugReport(ArmoryDialog):
 
       except:
          LOGEXCEPT('Failed:')
-         bugpage = 'https://bitcoinarmory.com/support/'
+         bugpage = 'https://peercoinarmory.com/support/'
          QMessageBox.information(self, tr('Submitted!'), tr("""
             There was a problem submitting your bug report.  It is recommended
             that you submit this information through our webpage instead:
@@ -768,7 +768,7 @@ class DlgInconsistentWltReport(ArmoryDialog):
       self.connect(self.btnSubmit, SIGNAL(CLICKED), self.submitReport)
       self.connect(self.btnCancel, SIGNAL(CLICKED), self, SLOT('reject()'))
 
-      armoryver = getVersionString(BTCARMORY_VERSION)
+      armoryver = getVersionString(PPCARMORY_VERSION)
       lblDetect = QRichLabel( tr("""
          <b>Detected:</b> %s (%s) / %0.2f GB RAM / Armory version %s<br>
          <font size=2>(this data will be included with the data 
@@ -872,7 +872,7 @@ class DlgInconsistentWltReport(ArmoryDialog):
       reportMap['uniqID']       = uniqID
       reportMap['OSmajor']      = OS_NAME
       reportMap['OSvariant']    = osvariant
-      reportMap['ArmoryVer']    = getVersionString(BTCARMORY_VERSION)
+      reportMap['ArmoryVer']    = getVersionString(PPCARMORY_VERSION)
       reportMap['TotalRAM']     = '%0.2f' % SystemSpecs.Memory
       reportMap['isAmd64']      = str(SystemSpecs.IsX64).lower()
       reportMap['userEmail']    = emailAddr
@@ -931,7 +931,7 @@ class DlgInconsistentWltReport(ArmoryDialog):
 
          if responseMap==expectedResponseMap:
             LOGINFO('Server verified receipt of log file')
-            cemail = 'contact@bitcoinarmory.com'
+            cemail = 'contact@peercoinarmory.com'
             QMessageBox.information(self, tr('Submitted!'), tr("""
                <b>Your report was submitted successfully!</b> 
                <br><br>
@@ -946,7 +946,7 @@ class DlgInconsistentWltReport(ArmoryDialog):
 
       except:
          LOGEXCEPT('Failed:')
-         bugpage = 'https://bitcoinarmory.com/support/'
+         bugpage = 'https://peercoinarmory.com/support/'
          QMessageBox.information(self, tr('Submission Error!'), tr("""
             There was a problem submitting your data through Armory.
             Please create a new support ticket using our webpage, and attach
@@ -1431,7 +1431,7 @@ class DlgPasswd3(ArmoryDialog):
          '<font color="red"><b>!!! DO NOT FORGET YOUR PASSPHRASE !!!</b></font>', size=4)
       lblWarnTxt1.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
       lblWarnTxt2 = QRichLabel(\
-         '<b>No one can help you recover you bitcoins if you forget the '
+         '<b>No one can help you recover you peercoins if you forget the '
          'passphrase and don\'t have a paper backup!</b> Your wallet and '
          'any <u>digital</u> backups are useless if you forget it.  '
          '<br><br>'
@@ -1584,8 +1584,8 @@ class DlgWalletDetails(ArmoryDialog):
 
       exportStr = 'Data' if self.wlt.watchingOnly else 'Copy'
       
-      lbtnSendBtc = QLabelButton('Send Bitcoins')
-      lbtnGenAddr = QLabelButton('Receive Bitcoins')
+      lbtnSendPPC = QLabelButton('Send Peercoins')
+      lbtnGenAddr = QLabelButton('Receive Peercoins')
       lbtnImportA = QLabelButton('Import/Sweep Private Keys')
       lbtnDeleteA = QLabelButton('Remove Imported Address')
       # lbtnSweepA  = QLabelButton('Sweep Wallet/Address')
@@ -1598,7 +1598,7 @@ class DlgWalletDetails(ArmoryDialog):
       # fnfrag = lambda: DlgFragBackup(self, self.main, self.wlt).exec_()
       # LOGERROR('remove me!')
 
-      self.connect(lbtnSendBtc, SIGNAL(CLICKED), self.execSendBtc)
+      self.connect(lbtnSendPPC, SIGNAL(CLICKED), self.execSendPPC)
       self.connect(lbtnGenAddr, SIGNAL(CLICKED), self.getNewAddress)
       self.connect(lbtnBackups, SIGNAL(CLICKED), self.execBackupDlg)
       # self.connect(lbtnBackups, SIGNAL(CLICKED), fnfrag)
@@ -1608,18 +1608,18 @@ class DlgWalletDetails(ArmoryDialog):
       self.connect(lbtnExpWOWlt, SIGNAL(CLICKED), self.execExpWOCopy)
       #self.connect(lbtnRecover, SIGNAL(CLICKED), self.recoverPwd)
 
-      lbtnSendBtc.setToolTip('<u></u>Send bitcoins to other users, or transfer '
+      lbtnSendPPC.setToolTip('<u></u>Send peercoins to other users, or transfer '
                              'between wallets')
       if self.wlt.watchingOnly:
-         lbtnSendBtc.setToolTip('<u></u>If you have a full-copy of this wallet '
+         lbtnSendPPC.setToolTip('<u></u>If you have a full-copy of this wallet '
                                 'on another computer, you can prepare a '
                                 'transaction, to be signed by that computer.')
       lbtnGenAddr.setToolTip('<u></u>Get a new address from this wallet for receiving '
-                             'bitcoins.  Right click on the address list below '
+                             'peercoins.  Right click on the address list below '
                              'to copy an existing address.')
       lbtnImportA.setToolTip('<u></u>Import or "Sweep" an address which is not part '
                              'of your wallet.  Useful for VanityGen addresses '
-                             'and redeeming Casascius physical bitcoins.')
+                             'and redeeming Casascius physical peercoins.')
       lbtnDeleteA.setToolTip('<u></u>Permanently delete an imported address from '
                              'this wallet.  You cannot delete addresses that '
                              'were generated natively by this wallet.')
@@ -1651,7 +1651,7 @@ class DlgWalletDetails(ArmoryDialog):
          frm.setFrameStyle(QFrame.HLine | QFrame.Plain)
          return frm
 
-      if True:              optLayout.addWidget(lbtnSendBtc)
+      if True:              optLayout.addWidget(lbtnSendPPC)
       if True:              optLayout.addWidget(lbtnGenAddr)
       if hasPriv:           optLayout.addWidget(lbtnChangeCrypto)
       if True:              optLayout.addWidget(lbtnChangeLabels)
@@ -1681,7 +1681,7 @@ class DlgWalletDetails(ArmoryDialog):
       spendFunds = self.wlt.getBalance('Spendable')
       unconfFunds = self.wlt.getBalance('Unconfirmed')
       uncolor = htmlColor('MoneyNeg')  if unconfFunds > 0          else htmlColor('Foreground')
-      btccolor = htmlColor('DisableFG') if spendFunds == totalFunds else htmlColor('MoneyPos')
+      ppccolor = htmlColor('DisableFG') if spendFunds == totalFunds else htmlColor('MoneyPos')
       lblcolor = htmlColor('DisableFG') if spendFunds == totalFunds else htmlColor('Foreground')
       goodColor = htmlColor('TextGreen')
 
@@ -1701,9 +1701,9 @@ class DlgWalletDetails(ArmoryDialog):
       self.lblUnc.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 
-      self.lblBTC1 = QRichLabel('', doWrap=False)
-      self.lblBTC2 = QRichLabel('', doWrap=False)
-      self.lblBTC3 = QRichLabel('', doWrap=False)
+      self.lblPPC1 = QRichLabel('', doWrap=False)
+      self.lblPPC2 = QRichLabel('', doWrap=False)
+      self.lblPPC3 = QRichLabel('', doWrap=False)
 
       ttipTot = self.main.createToolTipWidget(\
             'Total funds if all current transactions are confirmed.  '
@@ -1727,9 +1727,9 @@ class DlgWalletDetails(ArmoryDialog):
       frmTotalsLayout.addWidget(self.lblSpendFunds, 1, 1)
       frmTotalsLayout.addWidget(self.lblUnconfFunds, 2, 1)
 
-      frmTotalsLayout.addWidget(self.lblBTC1, 0, 2)
-      frmTotalsLayout.addWidget(self.lblBTC2, 1, 2)
-      frmTotalsLayout.addWidget(self.lblBTC3, 2, 2)
+      frmTotalsLayout.addWidget(self.lblPPC1, 0, 2)
+      frmTotalsLayout.addWidget(self.lblPPC2, 1, 2)
+      frmTotalsLayout.addWidget(self.lblPPC3, 2, 2)
 
       frmTotalsLayout.addWidget(ttipTot, 0, 3)
       frmTotalsLayout.addWidget(ttipSpd, 1, 3)
@@ -1804,7 +1804,7 @@ class DlgWalletDetails(ArmoryDialog):
             'password before, only rely on a digital backup if you store '
             'the password with it!'
             '<br><br>'
-            '<a href="https://bitcointalk.org/index.php?topic=152151.0">'
+            '<a href="https://peercointalk.org/index.php?topic=152151.0">'
             'Read more about Armory backups</a>', None, yesStr='Ok', \
             dnaaStartChk=True)
          self.main.setWltSetting(wlt.uniqueIDB58, 'DNAA_RemindBackup', result[1])
@@ -1835,7 +1835,7 @@ class DlgWalletDetails(ArmoryDialog):
       spendFunds = self.wlt.getBalance('Spendable')
       unconfFunds = self.wlt.getBalance('Unconfirmed')
       uncolor = htmlColor('MoneyNeg')  if unconfFunds > 0          else htmlColor('Foreground')
-      btccolor = htmlColor('DisableFG') if spendFunds == totalFunds else htmlColor('MoneyPos')
+      ppccolor = htmlColor('DisableFG') if spendFunds == totalFunds else htmlColor('MoneyPos')
       lblcolor = htmlColor('DisableFG') if spendFunds == totalFunds else htmlColor('Foreground')
       goodColor = htmlColor('TextGreen')
 
@@ -1849,7 +1849,7 @@ class DlgWalletDetails(ArmoryDialog):
          spdStr = '-' * 12
          ucnStr = '-' * 12
       else:
-         totStr = '<b><font color="%s">%s</font></b>' % (btccolor, coin2str(totalFunds))
+         totStr = '<b><font color="%s">%s</font></b>' % (ppccolor, coin2str(totalFunds))
          spdStr = '<b><font color="%s">%s</font></b>' % (goodColor, coin2str(spendFunds))
          ucnStr = '<b><font color="%s">%s</font></b>' % (uncolor, coin2str(unconfFunds))
 
@@ -1857,9 +1857,9 @@ class DlgWalletDetails(ArmoryDialog):
       self.lblSpendFunds.setText(spdStr)
       self.lblUnconfFunds.setText(ucnStr)
 
-      self.lblBTC1.setText('<b><font color="%s">BTC</font></b>' % lblcolor)
-      self.lblBTC2.setText('<b>BTC</b>')
-      self.lblBTC3.setText('<b>BTC</b>')
+      self.lblPPC1.setText('<b><font color="%s">PPC</font></b>' % lblcolor)
+      self.lblPPC2.setText('<b>PPC</b>')
+      self.lblPPC3.setText('<b>PPC</b>')
 
 
    #############################################################################
@@ -2030,7 +2030,7 @@ class DlgWalletDetails(ArmoryDialog):
       self.wltAddrView.reset()
 
 
-   def execSendBtc(self):
+   def execSendPPC(self):
       # if self.main.blkMode == BLOCKCHAINMODE.Offline:
       if TheBDM.getBDMState() in ('Offline', 'Uninitialized'):
          QMessageBox.warning(self, 'Offline Mode', \
@@ -2052,14 +2052,14 @@ class DlgWalletDetails(ArmoryDialog):
          return
 
       self.accept()
-      DlgSendBitcoins(self.wlt, self, self.main, onlyOfflineWallets=False).exec_()
+      DlgSendPeercoins(self.wlt, self, self.main, onlyOfflineWallets=False).exec_()
       self.wltAddrModel.reset()
 
 
 
    def changeKdf(self):
       """
-      This is a low-priority feature.  I mean, the PyBtcWallet class has this
+      This is a low-priority feature.  I mean, the PyPPCWallet class has this
       feature implemented, but I don't have a GUI for it
       """
       pass
@@ -2553,7 +2553,7 @@ def showRecvCoinsWarningIfNecessary(wlt, main):
       result = QMessageBox.warning(main, tr('Careful!'), tr("""
          Armory is not online yet, and will eventually need to be online to
          access any funds sent to your wallet.  Please <u><b>do not</b></u>
-         receive Bitcoins to your Armory wallets until you have successfully
+         receive Peercoins to your Armory wallets until you have successfully
          gotten online <i>at least one time</i>.
          <br><br>
          Armory is still beta software, and some users report difficulty
@@ -2755,7 +2755,7 @@ class DlgNewAddressDisp(ArmoryDialog):
       offlineWallet = (wlttype == WLTTYPES.Offline)
 
       lblDescr = QLabel(\
-            'The following address can be used to receive bitcoins:')
+            'The following address can be used to receive peercoins:')
       self.edtNewAddr = QLineEdit()
       self.edtNewAddr.setReadOnly(True)
       self.edtNewAddr.setText(addrStr)
@@ -2779,7 +2779,7 @@ class DlgNewAddressDisp(ArmoryDialog):
       tooltip1 = self.main.createToolTipWidget(\
             'You can securely use this address as many times as you want. '
             'However, all people to whom you give this address will '
-            'be able to see the number and amount of bitcoins <b>ever</b> '
+            'be able to see the number and amount of peercoins <b>ever</b> '
             'sent to it.  Therefore, using a new address for each transaction '
             'improves overall privacy, but there is no security issues '
             'with reusing any address.')
@@ -2831,7 +2831,7 @@ class DlgNewAddressDisp(ArmoryDialog):
       frmComment.setLayout(frmCommentLayout)
 
 
-      lblRecvWlt = QRichLabel('Bitcoins sent to this address will '
+      lblRecvWlt = QRichLabel('Peercoins sent to this address will '
             'appear in the wallet:', doWrap=False)
 
       lblRecvWlt.setWordWrap(True)
@@ -2949,7 +2949,7 @@ class DlgImportAddress(ArmoryDialog):
                      'has access to it.  Otherwise, sweep it to get '
                      'the funds out of it.  All standard private-key formats '
                      'are supported <i>except for private keys created by '
-                     'Bitcoin-Qt version 0.6.0 and later (compressed)</i>.')
+                     'Peercoin-Qt version 0.6.0 and later (compressed)</i>.')
 
       lblPrivOne = QRichLabel('Private Key')
       self.edtPrivData = QLineEdit()
@@ -2958,7 +2958,7 @@ class DlgImportAddress(ArmoryDialog):
                        'Supported formats are any hexadecimal or Base58 '
                        'representation of a 32-byte private key (with or '
                        'without checksums), and mini-private-key format '
-                       'used on Casascius physical bitcoins.  Private keys '
+                       'used on Casascius physical peercoins.  Private keys '
                        'that use <i>compressed</i> public keys are not yet '
                        'supported by Armory.')
 
@@ -3039,7 +3039,7 @@ class DlgImportAddress(ArmoryDialog):
       sweepTooltip = self.main.createToolTipWidget(\
          'You should never add an untrusted key to your wallet.  By choosing this '
          'option, you are only moving the funds into your wallet, but not the key '
-         'itself.  You should use this option for Casascius physical bitcoins.')
+         'itself.  You should use this option for Casascius physical peercoins.')
 
       importTooltip = self.main.createToolTipWidget(\
          'This option will make the key part of your wallet, meaning that it '
@@ -3150,7 +3150,7 @@ class DlgImportAddress(ArmoryDialog):
          if binary_to_int(binKeyData, BIGENDIAN) >= SECP256K1_ORDER:
             QMessageBox.critical(self, 'Invalid Private Key', \
                'The private key you have entered is actually not valid '
-               'for the elliptic curve used by Bitcoin (secp256k1).  '
+               'for the elliptic curve used by Peercoin (secp256k1).  '
                'Almost any 64-character hex is a valid private key '
                '<b>except</b> for those greater than: '
                '<br><br>'
@@ -3179,7 +3179,7 @@ class DlgImportAddress(ArmoryDialog):
       except CompressedKeyError, e:
          QMessageBox.critical(self, 'Unsupported key type', 'You entered a key '
             'for an address that uses a compressed public key, usually produced '
-            'in Bitcoin-Qt/bitcoind wallets created after version 0.6.0.  Armory '
+            'in Peercoin-Qt/peercoind wallets created after version 0.6.0.  Armory '
             'does not yet support this key type.')
          LOGERROR('Compressed key data recognized but not supported')
          return
@@ -3195,7 +3195,7 @@ class DlgImportAddress(ArmoryDialog):
       if not 'mini' in keyType.lower():
          reply = QMessageBox.question(self, 'Verify Address', \
                'The key data you entered appears to correspond to '
-               'the following Bitcoin address:\n\n\t' + addrStr +
+               'the following Peercoin address:\n\n\t' + addrStr +
                '\n\nIs this the correct address?',
                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
          if reply == QMessageBox.Cancel:
@@ -3243,7 +3243,7 @@ class DlgImportAddress(ArmoryDialog):
                      '<b>Wallet Name</b>: ' + self.main.walletMap[wltID].labelName + '<br>'
                      '<b>Address Type</b>: ' + typ +
                      '<br><br>'
-                     'The sweep operation will simply move bitcoins out of the wallet '
+                     'The sweep operation will simply move peercoins out of the wallet '
                      'above into this wallet.  If the network charges a fee for this '
                      'transaction, you balance will be reduced by that much.')
                result = QMessageBox.warning(self, 'Duplicate Address', msg, \
@@ -3254,13 +3254,13 @@ class DlgImportAddress(ArmoryDialog):
 
          # if not TheBDM.getBDMState()=='BlockchainReady':
             # reply = QMessageBox.critical(self, 'Cannot Sweep Address', \
-            # 'You need access to the Bitcoin network and the blockchain in order '
+            # 'You need access to the Peercoin network and the blockchain in order '
             # 'to find the balance of this address and sweep its funds. ', \
             # QMessageBox.Ok)
             # return
 
          # Create the address object for the addr to be swept
-         sweepAddr = PyBtcAddress().createFromPlainKeyData(SecureBinaryData(binKeyData))
+         sweepAddr = PyPPCAddress().createFromPlainKeyData(SecureBinaryData(binKeyData))
          targAddr160 = self.wlt.getNextUnusedAddress().getAddr160()
 
          self.main.confirmSweepScan([sweepAddr], targAddr160)
@@ -3426,7 +3426,7 @@ class DlgImportAddress(ArmoryDialog):
             reply = QMessageBox.critical(self, 'Duplicate Addresses!', \
                'You are attempting to sweep %d addresses, but %d of them '
                'are already part of existing wallets.  That means that some or '
-               'all of the bitcoins you sweep may already be owned by you. '
+               'all of the peercoins you sweep may already be owned by you. '
                '<br><br>'
                'Would you like to continue anyway?' % \
                (len(allWltList), len(dupeWltList)), \
@@ -3435,7 +3435,7 @@ class DlgImportAddress(ArmoryDialog):
                return
 
 
-         cppWlt = Cpp.BtcWallet()
+         cppWlt = Cpp.PPCWallet()
          for addr160, addrStr, SecurePriv in privKeyList:
             cppWlt.addScrAddress_1_(Hash160ToScrAddr(addr160))
 
@@ -3443,7 +3443,7 @@ class DlgImportAddress(ArmoryDialog):
          # If we got here, let's go ahead and sweep!
          addrList = []
          for addr160, addrStr, SecurePriv in privKeyList:
-            pyAddr = PyBtcAddress().createFromPlainKeyData(SecurePriv)
+            pyAddr = PyPPCAddress().createFromPlainKeyData(SecurePriv)
             addrList.append(pyAddr)
 
          targAddr160 = self.wlt.getNextUnusedAddress().getAddr160()
@@ -3515,7 +3515,7 @@ class DlgImportAddress(ArmoryDialog):
             MsgBoxCustom(MSGBOX.Error, 'Error!', tr("""
                Failed:  No addresses could be imported.
                Please check the logfile (ArmoryQt.exe.log) or the console output
-               for information about why it failed (and email support@bitcoinarmory.com
+               for information about why it failed (and email support@peercoinarmory.com
                for help fixing the problem). """))
             return
          else:
@@ -3615,7 +3615,7 @@ class DlgVerifySweep(ArmoryDialog):
       # frmLayout.addWidget(QRichLabel('Funds will be <i>swept</i>...'), 0,0, 1,2)
       frmLayout.addWidget(QRichLabel('      From ' + inputStr, doWrap=False), 1, 0, 1, 2)
       frmLayout.addWidget(QRichLabel('      To ' + outputStr, doWrap=False), 2, 0, 1, 2)
-      frmLayout.addWidget(QRichLabel('      Total <b>%s</b> BTC %s' % (outStr, feeStr), doWrap=False), 3, 0, 1, 2)
+      frmLayout.addWidget(QRichLabel('      Total <b>%s</b> PPC %s' % (outStr, feeStr), doWrap=False), 3, 0, 1, 2)
       frm.setLayout(frmLayout)
 
       lblFinalConfirm = QLabel('Are you sure you want to execute this transaction?')
@@ -3827,9 +3827,9 @@ class DlgAddressInfo(ArmoryDialog):
       if balCoin > 0:
          goodColor = htmlColor('MoneyPos')
          lbls[-1].append(QRichLabel(\
-            '<font color=' + goodColor + '>' + balStr.strip() + '</font> BTC'))
+            '<font color=' + goodColor + '>' + balStr.strip() + '</font> PPC'))
       else:
-         lbls[-1].append(QRichLabel(balStr.strip() + ' BTC'))
+         lbls[-1].append(QRichLabel(balStr.strip() + ' PPC'))
 
 
       # Number of transactions
@@ -4192,13 +4192,13 @@ class DlgEULA(ArmoryDialog):
 
 
       lblPleaseAgree = QRichLabel(\
-         '<b>Armory Bitcoin Client is licensed under the <i>Affero General '
+         '<b>Armory Peercoin Client is licensed under the <i>Affero General '
          'Public License, Version 3 (AGPLv3)</i></b>'
          '<br><br>'
          'Additionally, as a condition of receiving this software '
          'for free, you accept all risks associated with using it '
          'and the developers of Armory will not be held liable for any '
-         'loss of money or bitcoins due to software defects.'
+         'loss of money or peercoins due to software defects.'
          '<br><br>'
          '<b>Please read the full terms of the license and indicate your '
          'agreement with its terms.</b>')
@@ -4242,17 +4242,17 @@ class DlgIntroMessage(ArmoryDialog):
       lblWelcome = QRichLabel('<b>Welcome to Armory!</b>')
       lblWelcome.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
       lblWelcome.setFont(GETFONT('Var', 14))
-      lblSlogan = QRichLabel('<i>The most advanced Bitcoin Client on Earth!</i>')
+      lblSlogan = QRichLabel('<i>The most advanced Peercoin Client on Earth!</i>')
       lblSlogan.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
       lblDescr = QRichLabel(\
-         '<b>You are about to use the most secure and feature-rich Bitcoin client '
+         '<b>You are about to use the most secure and feature-rich Peercoin client '
          'software available!</b>  But please remember, this software '
          'is still <i>Beta</i> - Armory developers will not be held responsible '
-         'for loss of bitcoins resulting from the use of this software!'
+         'for loss of peercoins resulting from the use of this software!'
          '<br><br>'
-         'For more info about Armory, and Bitcoin itself, see '
-         '<a href="https://bitcoinarmory.com/faqs">frequently '
+         'For more info about Armory, and Peercoin itself, see '
+         '<a href="https://peercoinarmory.com/faqs">frequently '
          'asked questions</a>.')
       lblDescr.setOpenExternalLinks(True)
 
@@ -4455,7 +4455,7 @@ class DlgImportPaperWallet(ArmoryDialog):
       privKey = ''.join(self.wltDataLines[:2])
       chain = ''.join(self.wltDataLines[2:])
 
-      root = PyBtcAddress().createFromPlainKeyData(SecureBinaryData(privKey))
+      root = PyPPCAddress().createFromPlainKeyData(SecureBinaryData(privKey))
       root.chaincode = SecureBinaryData(chain)
       first = root.extendAddressChain()
       newWltID = binary_to_base58((ADDRBYTE + first.getAddr160()[:5])[::-1])
@@ -4492,7 +4492,7 @@ class DlgImportPaperWallet(ArmoryDialog):
             return
 
       if passwd:
-         self.newWallet = PyBtcWallet().createNewWallet(\
+         self.newWallet = PyPPCWallet().createNewWallet(\
                                  plainRootKey=SecureBinaryData(privKey), \
                                  chaincode=SecureBinaryData(chain), \
                                  shortLabel='PaperBackup - %s' % newWltID, \
@@ -4503,7 +4503,7 @@ class DlgImportPaperWallet(ArmoryDialog):
                                  isActuallyNew=False, \
                                  doRegisterWithBDM=False)
       else:
-         self.newWallet = PyBtcWallet().createNewWallet(\
+         self.newWallet = PyPPCWallet().createNewWallet(\
                                  plainRootKey=SecureBinaryData(privKey), \
                                  chaincode=SecureBinaryData(chain), \
                                  shortLabel='PaperBackup - %s' % newWltID, \
@@ -4610,11 +4610,11 @@ class DlgRemoveWallet(ArmoryDialog):
          lbls.append([])
          lbls[3].append(QLabel('Current Balance (w/ unconfirmed):'))
          if bal > 0:
-            lbls[3].append(QLabel('<font color="red"><b>' + coin2str(bal, maxZeros=1).strip() + ' BTC</b></font>'))
+            lbls[3].append(QLabel('<font color="red"><b>' + coin2str(bal, maxZeros=1).strip() + ' PPC</b></font>'))
             lbls[3][-1].setTextFormat(Qt.RichText)
             wltEmpty = False
          else:
-            lbls[3].append(QLabel(coin2str(bal, maxZeros=1) + ' BTC'))
+            lbls[3].append(QLabel(coin2str(bal, maxZeros=1) + ' PPC'))
 
 
       # Add two WARNING images on either side of dialog
@@ -4841,7 +4841,7 @@ class DlgRemoveWallet(ArmoryDialog):
                LOGINFO('***Converting to watching-only wallet')
                newWltPath = wlt.getWalletPath('WatchOnly')
                wlt.forkOnlineWallet(newWltPath, wlt.labelName, wlt.labelDescr)
-               newWlt = PyBtcWallet().readWalletFile(newWltPath)
+               newWlt = PyPPCWallet().readWalletFile(newWltPath)
                newWlt.setBlockchainSyncFlag(BLOCKCHAIN_READONLY)
                newWlt.syncWithBlockchain()
 
@@ -4911,11 +4911,11 @@ class DlgRemoveAddress(ArmoryDialog):
          lbls.append([])
          lbls[-1].append(QLabel('Address Balance (w/ unconfirmed):'))
          if bal > 0:
-            lbls[-1].append(QLabel('<font color="red"><b>' + coin2str(bal, maxZeros=1) + ' BTC</b></font>'))
+            lbls[-1].append(QLabel('<font color="red"><b>' + coin2str(bal, maxZeros=1) + ' PPC</b></font>'))
             lbls[-1][-1].setTextFormat(Qt.RichText)
             addrEmpty = False
          else:
-            lbls[3].append(QLabel(coin2str(bal, maxZeros=1) + ' BTC'))
+            lbls[3].append(QLabel(coin2str(bal, maxZeros=1) + ' PPC'))
 
 
       # Add two WARNING images on either side of dialog
@@ -4968,7 +4968,7 @@ class DlgRemoveAddress(ArmoryDialog):
            'Simply deleting an address does not prevent anyone '
            'from sending money to it.  If you have given this address '
            'to anyone in the past, make sure that they know not to '
-           'use it again, since any bitcoins sent to it will be '
+           'use it again, since any peercoins sent to it will be '
            'inaccessible.\n\n '
            'If you are maintaining an external copy of this address '
            'please ignore this warning\n\n'
@@ -5163,7 +5163,7 @@ class DlgConfirmSend(ArmoryDialog):
 
 
       lblMsg = QRichLabel(tr("""
-         This transaction will spend <b>%s BTC</b> from 
+         This transaction will spend <b>%s PPC</b> from 
          <font color="%s">Wallet "<b>%s</b>" (%s)</font> to the following
          recipients:""") % 
          (totalSendStr, htmlColor('TextBlue'), wlt.labelName, wlt.uniqueIDB58))
@@ -5174,7 +5174,7 @@ class DlgConfirmSend(ArmoryDialog):
             outputs are going to the same wallet from which they came 
             and do not affect the wallet's final balance.
             The total balance of the wallet will actually only decrease 
-            <b>%s BTC</b> as a result of this transaction.  %s</font>""") % \
+            <b>%s PPC</b> as a result of this transaction.  %s</font>""") % \
             (sendFromWalletStr, showAllMsg))
       elif len(showAllMsg)>0:
          lblAfterBox.setText(showAllMsg)
@@ -5252,16 +5252,16 @@ class DlgConfirmSend(ArmoryDialog):
 
 
 ################################################################################
-class DlgSendBitcoins(ArmoryDialog):
+class DlgSendPeercoins(ArmoryDialog):
    def __init__(self, wlt, parent=None, main=None, prefill=None, 
                               wltIDList=None, onlyOfflineWallets=False, 
                               spendFromLockboxID=None):
-      super(DlgSendBitcoins, self).__init__(parent, main)
+      super(DlgSendPeercoins, self).__init__(parent, main)
       layout = QVBoxLayout()
 
       self.spendFromLockboxID = spendFromLockboxID
 
-      self.frame = SendBitcoinsFrame(self, main, tr('Send Bitcoins'),
+      self.frame = SendPeercoinsFrame(self, main, tr('Send Peercoins'),
                    wlt, prefill, wltIDList, onlyOfflineWallets=onlyOfflineWallets,
                    sendCallback=self.createTxAndBroadcast,
                    createUnsignedTxCallback=self.createUnsignedTxAndDisplay, 
@@ -5292,22 +5292,22 @@ class DlgSendBitcoins(ArmoryDialog):
 
    #############################################################################
    def saveGeometrySettings(self):
-      self.main.writeSetting('SendBtcGeometry', str(self.saveGeometry().toHex()))
+      self.main.writeSetting('SendPPCGeometry', str(self.saveGeometry().toHex()))
 
    #############################################################################
    def closeEvent(self, event):
       self.saveGeometrySettings()
-      super(DlgSendBitcoins, self).closeEvent(event)
+      super(DlgSendPeercoins, self).closeEvent(event)
 
    #############################################################################
    def accept(self, *args):
       self.saveGeometrySettings()
-      super(DlgSendBitcoins, self).accept(*args)
+      super(DlgSendPeercoins, self).accept(*args)
 
    #############################################################################
    def reject(self, *args):
       self.saveGeometrySettings()
-      super(DlgSendBitcoins, self).reject(*args)
+      super(DlgSendPeercoins, self).reject(*args)
 
 
 
@@ -5419,7 +5419,7 @@ class DlgOfflineSelect(ArmoryDialog):
          the private keys needed for it """))
 
       lblBroadc = QRichLabel(tr("""
-         Send a pre-signed transaction to the Bitcoin network to finalize it"""))
+         Send a pre-signed transaction to the Peercoin network to finalize it"""))
 
       lblBroadc.setMinimumWidth(tightSizeNChar(lblBroadc, 45)[0])
 
@@ -5800,10 +5800,10 @@ class DlgTxFeeOptions(ArmoryDialog):
 
       lblDescr = QLabel(\
          'Transaction fees go to people who contribute processing power to '
-         'the Bitcoin network to process transactions and keep it secure.')
+         'the Peercoin network to process transactions and keep it secure.')
       lblDescr2 = QLabel(\
          'Nearly all transactions are guaranteed to be '
-         'processed if a fee of 0.0005 BTC is included (less than $0.01 USD).  You '
+         'processed if a fee of 0.0005 PPC is included (less than $0.01 USD).  You '
          'will be prompted for confirmation if a higher fee amount is required for '
          'your transaction.')
 
@@ -6083,7 +6083,7 @@ class DlgDispTxInfo(ArmoryDialog):
       if self.mode in (USERMODE.Expert,):
          # Add protocol version and locktime to the display
          lbls.append([])
-         lbls[-1].append(self.main.createToolTipWidget('Bitcoin Protocol Version Number'))
+         lbls[-1].append(self.main.createToolTipWidget('Peercoin Protocol Version Number'))
          lbls[-1].append(QLabel('Tx Version:'))
          lbls[-1].append(QLabel(str(self.pytx.version)))
 
@@ -6164,11 +6164,11 @@ class DlgDispTxInfo(ArmoryDialog):
                'to determine which is which, and so this fields shows the sum '
                'of <b>all</b> outputs.'))
          lbls[-1].append(QLabel('Sum of Outputs:'))
-         lbls[-1].append(QLabel(coin2str(txAmt, maxZeros=1).strip() + '  BTC'))
+         lbls[-1].append(QLabel(coin2str(txAmt, maxZeros=1).strip() + '  PPC'))
       else:
          lbls.append([])
          lbls[-1].append(self.main.createToolTipWidget(
-               'Bitcoins were either sent or received, or sent-to-self'))
+               'Peercoins were either sent or received, or sent-to-self'))
          lbls[-1].append(QLabel('Transaction Direction:'))
          lbls[-1].append(QRichLabel(txdir))
 
@@ -6177,7 +6177,7 @@ class DlgDispTxInfo(ArmoryDialog):
                'The value shown here is the net effect on your '
                'wallet, including transaction fee.'))
          lbls[-1].append(QLabel('Transaction Amount:'))
-         lbls[-1].append(QRichLabel(coin2str(txAmt, maxZeros=1).strip() + '  BTC'))
+         lbls[-1].append(QRichLabel(coin2str(txAmt, maxZeros=1).strip() + '  PPC'))
          if txAmt < 0:
             lbls[-1][-1].setText('<font color="red">' + lbls[-1][-1].text() + '</font> ')
          elif txAmt > 0:
@@ -6188,10 +6188,10 @@ class DlgDispTxInfo(ArmoryDialog):
          fee = self.data[FIELDS.SumIn] - self.data[FIELDS.SumOut]
          lbls.append([])
          lbls[-1].append(self.main.createToolTipWidget(
-            'Transaction fees go to users supplying the Bitcoin network with '
+            'Transaction fees go to users supplying the Peercoin network with '
             'computing power for processing transactions and maintaining security.'))
          lbls[-1].append(QLabel('Tx Fee Paid:'))
-         lbls[-1].append(QLabel(coin2str(fee, maxZeros=0).strip() + '  BTC'))
+         lbls[-1].append(QLabel(coin2str(fee, maxZeros=0).strip() + '  PPC'))
 
 
 
@@ -6231,7 +6231,7 @@ class DlgDispTxInfo(ArmoryDialog):
 
             rlbls[-1].append(QLabel(scrAddr_to_addrStr(sv[0])))
             if numRV > 1:
-               rlbls[-1].append(QLabel(coin2str(sv[1], maxZeros=1) + '  BTC'))
+               rlbls[-1].append(QLabel(coin2str(sv[1], maxZeros=1) + '  PPC'))
             else:
                rlbls[-1].append(QLabel(''))
             ffixBold = GETFONT('Fixed', 10)
@@ -6374,7 +6374,7 @@ class DlgDispTxInfo(ArmoryDialog):
                   '(change outputs are displayed in light gray).')
 
       self.lblChangeDescr = QRichLabel( tr("""Some outputs might be "change."
-         <a href="https://bitcoinarmory.com/all-about-change">Click for more 
+         <a href="https://peercoinarmory.com/all-about-change">Click for more 
          info</a>"""), doWrap=False)
       self.lblChangeDescr.setOpenExternalLinks(True)
         
@@ -6551,7 +6551,7 @@ class DlgDispTxInfo(ArmoryDialog):
       elif action == actCopySender:
          s = str(self.txInView.model().index(idx.row(), TXINCOLS.Sender).data().toString())
       elif action == actCopyAmount:
-         s = str(self.txInView.model().index(idx.row(), TXINCOLS.Btc).data().toString())
+         s = str(self.txInView.model().index(idx.row(), TXINCOLS.PPC).data().toString())
       #elif dev and action == actCopyOutPt:
          #s1 = str(self.txInView.model().index(idx.row(), TXINCOLS.OutPt).data().toString())
          #s2 = str(self.txInView.model().index(idx.row(), TXINCOLS.OutIdx).data().toString())
@@ -6584,7 +6584,7 @@ class DlgDispTxInfo(ArmoryDialog):
       elif action == actCopyRecip:
          s = self.txOutView.model().index(idx.row(), TXOUTCOLS.AddrStr).data().toString()
       elif action == actCopyAmount:
-         s = self.txOutView.model().index(idx.row(), TXOUTCOLS.Btc).data().toString()
+         s = self.txOutView.model().index(idx.row(), TXOUTCOLS.PPC).data().toString()
       elif dev and action == actCopyScript:
          s = self.txOutView.model().index(idx.row(), TXOUTCOLS.Script).data().toString()
       else:
@@ -7209,7 +7209,7 @@ class DlgPrintBackup(ArmoryDialog):
             <b><u>Print Wallet Backup Fragments</u></b><br><br>
             When any %d of these fragments are combined, all <u>previous
             <b>and</b> future</u> addresses generated by this wallet will be
-            restored, giving you complete access to your bitcoins.  The
+            restored, giving you complete access to your peercoins.  The
             data can be copied by hand if a working printer is not
             available.  Please make sure that all data lines contain
             <b>9 columns</b>
@@ -7438,7 +7438,7 @@ class DlgPrintBackup(ArmoryDialog):
 
       self.scene.drawText('Paper Backup for Armory Wallet', GETFONT('Var', 11))
       self.scene.newLine()
-      self.scene.drawText('http://www.bitcoinarmory.com')
+      self.scene.drawText('http://www.peercoinarmory.com')
 
       self.scene.newLine(extra_dy=20)
       self.scene.drawHLine()
@@ -7492,7 +7492,7 @@ class DlgPrintBackup(ArmoryDialog):
          container = 'this wallet' if printType == 'SingleSheetFirstPage' else 'these addresses'
          warnMsg = tr("""
             <font color="#aa0000"><b>WARNING:</b></font> Anyone who has access to this
-            page has access to all the bitcoins in %s!  Please keep this
+            page has access to all the peercoins in %s!  Please keep this
             page in a safe place.""" % container)
 
       self.scene.newLine()
@@ -7787,13 +7787,13 @@ class DlgBadConnection(ArmoryDialog):
             'restart Armory.<br><br>Would you like to continue in "Offline" mode? ')
       elif haveInternet and not haveSatoshi:
          lblDescr = QRichLabel(\
-            'Armory was not able to detect the presence of Bitcoin-Qt or bitcoind '
-            'client software (available at http://www.bitcoin.org).  Please make sure that '
+            'Armory was not able to detect the presence of Peercoin-Qt or peercoind '
+            'client software (available at http://www.peercoin.org).  Please make sure that '
             'the one of those programs is... <br>'
             '<br><b>(1)</b> ...open and connected to the network '
             '<br><b>(2)</b> ...on the same network as Armory (main-network or test-network)'
             '<br><b>(3)</b> ...synchronized with the blockchain before '
-            'starting Armory<br><br>Without the Bitcoin-Qt or bitcoind open, you will only '
+            'starting Armory<br><br>Without the Peercoin-Qt or peercoind open, you will only '
             'be able to run Armory in "Offline" mode, which will not have access '
             'to new blockchain data, and you will not be able to send outgoing '
             'transactions<br><br>If you do not want to be in "Offline" mode, please '
@@ -8154,9 +8154,9 @@ class DlgECDSACalc(ArmoryDialog):
       gystr = '483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8'
 
       lblDescr = QRichLabel(tr("""
-         Use this form to perform Bitcoin elliptic curve calculations.  All
+         Use this form to perform Peercoin elliptic curve calculations.  All
          operations are performed on the secp256k1 elliptic curve, which is
-         the one used for Bitcoin.
+         the one used for Peercoin.
          Supply all values as 32-byte, big-endian, hex-encoded integers.
          <br><br>
          The following is the secp256k1 generator point coordinates (G): <br>
@@ -8224,7 +8224,7 @@ class DlgECDSACalc(ArmoryDialog):
       if not CryptoECDSA().ECVerifyPoint(binBx, binBy):
          QMessageBox.critical(self, 'Invalid EC Point', \
             'The point you specified (<b>B</b>) is not on the '
-            'elliptic curved used in Bitcoin (secp256k1).', QMessageBox.Ok)
+            'elliptic curved used in Peercoin (secp256k1).', QMessageBox.Ok)
          return
 
       C = CryptoECDSA().ECMultiplyPoint(binA, binBx, binBy)
@@ -8246,13 +8246,13 @@ class DlgECDSACalc(ArmoryDialog):
       if not CryptoECDSA().ECVerifyPoint(binAx, binAy):
          QMessageBox.critical(self, 'Invalid EC Point', \
             'The point you specified (<b>A</b>) is not on the '
-            'elliptic curved used in Bitcoin (secp256k1).', QMessageBox.Ok)
+            'elliptic curved used in Peercoin (secp256k1).', QMessageBox.Ok)
          return
 
       if not CryptoECDSA().ECVerifyPoint(binBx, binBy):
          QMessageBox.critical(self, 'Invalid EC Point', \
             'The point you specified (<b>B</b>) is not on the '
-            'elliptic curved used in Bitcoin (secp256k1).', QMessageBox.Ok)
+            'elliptic curved used in Peercoin (secp256k1).', QMessageBox.Ok)
          return
 
       C = CryptoECDSA().ECAddPoints(binAx, binAy, binBx, binBy)
@@ -8323,7 +8323,7 @@ class DlgAddressBook(ArmoryDialog):
       if self.isBrowsingOnly or selectExistingOnly:
          lblDescr = QRichLabel('Browse all receiving addresses in '
                                'this wallet, and all addresses to which this '
-                               'wallet has sent bitcoins.')
+                               'wallet has sent peercoins.')
 
       lblToWlt = QRichLabel('<b>Send to Wallet:</b>')
       lblToAddr = QRichLabel('<b>Send to Address:</b>')
@@ -8706,7 +8706,7 @@ class DlgAddressBook(ArmoryDialog):
             self.useBareMultiSigCheckBox.setChecked(False)
             self.useBareMultiSigCheckBox.setToolTip(tr("""
                Bare multi-sig is not available for M-of-N lockboxes on the 
-               main Bitcoin network with N higher than 3."""))
+               main Peercoin network with N higher than 3."""))
          else:
             self.useBareMultiSigCheckBox.setEnabled(True)
 
@@ -8894,9 +8894,9 @@ class DlgHelpAbout(ArmoryDialog):
       imgLogo.setPixmap(QPixmap(':/armory_logo_h56.png'))
       imgLogo.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
-      lblHead = QRichLabel('Armory Bitcoin Wallet : Version %s-beta' % \
-                                    getVersionString(BTCARMORY_VERSION), doWrap=False)
-      lblWebpage = QRichLabel('<a href="https://www.bitcoinarmory.com">https://www.bitcoinarmory.com</a>')
+      lblHead = QRichLabel('Armory Peercoin Wallet : Version %s-beta' % \
+                                    getVersionString(PPCARMORY_VERSION), doWrap=False)
+      lblWebpage = QRichLabel('<a href="https://www.peercoinarmory.com">https://www.peercoinarmory.com</a>')
       lblWebpage.setOpenExternalLinks(True)
       lblCopyright = QRichLabel(u'Copyright \xa9 2011-2014 Armory Technologies, Inc.')
       lblLicense = QRichLabel(tr(u'Licensed under the '
@@ -8926,9 +8926,9 @@ class DlgSettings(ArmoryDialog):
 
 
       ##########################################################################
-      # bitcoind-management settings
+      # peercoind-management settings
       self.chkManageSatoshi = QCheckBox(tr("""
-         Let Armory run Bitcoin-Qt/bitcoind in the background"""))
+         Let Armory run Peercoin-Qt/peercoind in the background"""))
       self.edtSatoshiExePath = QLineEdit()
       self.edtSatoshiHomePath = QLineEdit()
       self.edtSatoshiExePath.setMinimumWidth(tightSizeNChar(GETFONT('Fixed', 10), 40)[0])
@@ -8939,19 +8939,19 @@ class DlgSettings(ArmoryDialog):
       if OS_MACOSX:
          self.chkManageSatoshi.setEnabled(False)
          lblManageSatoshi = QRichLabel(\
-            'Bitcoin-Qt/bitcoind management is not available on Mac/OSX')
+            'Peercoin-Qt/peercoind management is not available on Mac/OSX')
       else:
          if self.main.settings.hasSetting('SatoshiExe'):
             satexe = self.main.settings.get('SatoshiExe')
 
-         sathome = BTC_HOME_DIR
+         sathome = PPC_HOME_DIR
          if self.main.settings.hasSetting('SatoshiDatadir'):
             sathome = self.main.settings.get('SatoshiDatadir')
 
          lblManageSatoshi = QRichLabel(\
-            '<b>Bitcoin Software Management</b>'
+            '<b>Peercoin Software Management</b>'
             '<br><br>'
-            'By default, Armory will manage the Bitcoin engine/software in the '
+            'By default, Armory will manage the Peercoin engine/software in the '
             'background.  You can choose to manage it yourself, or tell Armory '
             'about non-standard installation configuration.')
       if self.main.settings.hasSetting('SatoshiExe'):
@@ -8961,12 +8961,12 @@ class DlgSettings(ArmoryDialog):
          self.edtSatoshiHomePath.setText(self.main.settings.get('SatoshiDatadir'))
          self.edtSatoshiHomePath.home(False)
 
-      lblDescrExe = QRichLabel('Bitcoin Install Dir:')
-      lblDescrHome = QRichLabel('Bitcoin Home Dir:')
+      lblDescrExe = QRichLabel('Peercoin Install Dir:')
+      lblDescrHome = QRichLabel('Peercoin Home Dir:')
       lblDefaultExe = QRichLabel('Leave blank to have Armory search default '
                                   'locations for your OS', size=2)
       lblDefaultHome = QRichLabel('Leave blank to use default datadir '
-                                  '(%s)' % BTC_HOME_DIR, size=2)
+                                  '(%s)' % PPC_HOME_DIR, size=2)
 
       self.btnSetExe = createDirectorySelectButton(self, self.edtSatoshiExePath)
       self.btnSetHome = createDirectorySelectButton(self, self.edtSatoshiHomePath)
@@ -8988,7 +8988,7 @@ class DlgSettings(ArmoryDialog):
       frmMgmt.setLayout(layoutMgmt)
 
       self.clickChkManage()
-      # bitcoind-management settings
+      # peercoind-management settings
       ##########################################################################
 
       # We check for internet connection on each startup.
@@ -9005,7 +9005,7 @@ class DlgSettings(ArmoryDialog):
 
 
       self.chkDisableTorrent = QCheckBox(tr("""
-         Disable torrent download (force synchronization via Bitcoin P2P)"""))
+         Disable torrent download (force synchronization via Peercoin P2P)"""))
       disableTorrent = self.main.getSettingOrSetDefault('DisableTorrent', False)
       self.chkDisableTorrent.setChecked(disableTorrent)
 
@@ -9013,10 +9013,10 @@ class DlgSettings(ArmoryDialog):
       lblDefaultUriTitle = QRichLabel(tr("""
          <b>Set Armory as default URL handler</b>"""))
       lblDefaultURI = QRichLabel(tr("""
-         Set Armory to be the default when you click on "bitcoin:"
+         Set Armory to be the default when you click on "peercoin:"
          links in your browser or in emails.
          You can test if your operating system is supported by clicking
-         on a "bitcoin:" link right after clicking this button."""))
+         on a "peercoin:" link right after clicking this button."""))
       btnDefaultURI = QPushButton(tr('Set Armory as Default'))
       frmBtnDefaultURI = makeHorizFrame([btnDefaultURI, 'Stretch'])
 
@@ -9028,10 +9028,10 @@ class DlgSettings(ArmoryDialog):
       def clickRegURI():
          self.main.setupUriRegistration(justDoIt=True)
          QMessageBox.information(self, tr('Registered'), tr("""
-            Armory just attempted to register itself to handle "bitcoin:"
+            Armory just attempted to register itself to handle "peercoin:"
             links, but this does not work on all operating systems.  You can
             test it by going to the
-            <a href="http://www.bitcoinarmory.com">Bitcoin Armory
+            <a href="http://www.peercoinarmory.com">Peercoin Armory
             website</a> and clicking the link at the bottom of the
             homepage."""), QMessageBox.Ok)
 
@@ -9102,8 +9102,8 @@ class DlgSettings(ArmoryDialog):
          <b>Default fee to include with transactions:</b><br>"""))
       lblDefaultDescr = QRichLabel(tr("""
          Fees go to users that contribute computing power to keep the
-         Bitcoin network secure.  It also increases the priority of your
-         transactions so they confirm faster (%s BTC is standard).""") % \
+         Peercoin network secure.  It also increases the priority of your
+         transactions so they confirm faster (%s PPC is standard).""") % \
          coin2strNZS(MIN_TX_FEE))
 
       ttipDefaultFee = self.main.createToolTipWidget(tr("""
@@ -9148,28 +9148,28 @@ class DlgSettings(ArmoryDialog):
       ###############################################################
       # System Tray Notifications -- Don't work right on OSX
       lblNotify = QRichLabel('<b>Enable notifcations from the system-tray:</b>')
-      notifyBtcIn = self.main.getSettingOrSetDefault('NotifyBtcIn', not OS_MACOSX)
-      notifyBtcOut = self.main.getSettingOrSetDefault('NotifyBtcOut', not OS_MACOSX)
+      notifyPPCIn = self.main.getSettingOrSetDefault('NotifyPPCIn', not OS_MACOSX)
+      notifyPPCOut = self.main.getSettingOrSetDefault('NotifyPPCOut', not OS_MACOSX)
       notifyDiscon = self.main.getSettingOrSetDefault('NotifyDiscon', not OS_MACOSX)
       notifyReconn = self.main.getSettingOrSetDefault('NotifyReconn', not OS_MACOSX)
 
-      self.chkBtcIn = QCheckBox('Bitcoins Received')
-      self.chkBtcOut = QCheckBox('Bitcoins Sent')
-      self.chkDiscon = QCheckBox('Bitcoin-Qt/bitcoind disconnected')
-      self.chkReconn = QCheckBox('Bitcoin-Qt/bitcoind reconnected')
-      self.chkBtcIn.setChecked(notifyBtcIn)
-      self.chkBtcOut.setChecked(notifyBtcOut)
+      self.chkPPCIn = QCheckBox('Peercoins Received')
+      self.chkPPCOut = QCheckBox('Peercoins Sent')
+      self.chkDiscon = QCheckBox('Peercoin-Qt/peercoind disconnected')
+      self.chkReconn = QCheckBox('Peercoin-Qt/peercoind reconnected')
+      self.chkPPCIn.setChecked(notifyPPCIn)
+      self.chkPPCOut.setChecked(notifyPPCOut)
       self.chkDiscon.setChecked(notifyDiscon)
       self.chkReconn.setChecked(notifyReconn)
 
       if OS_MACOSX:
          lblNotify = QRichLabel('<b>Sorry!  Notifications are not available on Mac/OSX</b>')
-         self.chkBtcIn.setChecked(False)
-         self.chkBtcOut.setChecked(False)
+         self.chkPPCIn.setChecked(False)
+         self.chkPPCOut.setChecked(False)
          self.chkDiscon.setChecked(False)
          self.chkReconn.setChecked(False)
-         self.chkBtcIn.setEnabled(False)
-         self.chkBtcOut.setEnabled(False)
+         self.chkPPCIn.setEnabled(False)
+         self.chkPPCOut.setEnabled(False)
          self.chkDiscon.setEnabled(False)
          self.chkReconn.setEnabled(False)
 
@@ -9348,10 +9348,10 @@ class DlgSettings(ArmoryDialog):
       frmLayout.addWidget(lblNotify, i, 0, 1, 3)
 
       i += 1
-      frmLayout.addWidget(self.chkBtcIn, i, 0, 1, 3)
+      frmLayout.addWidget(self.chkPPCIn, i, 0, 1, 3)
 
       i += 1
-      frmLayout.addWidget(self.chkBtcOut, i, 0, 1, 3)
+      frmLayout.addWidget(self.chkPPCOut, i, 0, 1, 3)
 
       i += 1
       frmLayout.addWidget(self.chkDiscon, i, 0, 1, 3)
@@ -9437,7 +9437,7 @@ class DlgSettings(ArmoryDialog):
       # self.Options.append( ['LineEdit', 'Default_Fee', MIN_TX_FEE, \
                            # 'Default fee to include with transactions.', \
                            # 'Fees go to users that contribute computing power '
-                           # 'to keep the Bitcoin network secure (0.0005 BTC is '
+                           # 'to keep the Peercoin network secure (0.0005 PPC is '
                            # 'standard).', \
                            # 'NOTE: some transactions will require a fee '
                            # 'regardless of your preferences -- in such cases '
@@ -9449,13 +9449,13 @@ class DlgSettings(ArmoryDialog):
    def accept(self, *args):
 
       if self.chkManageSatoshi.isChecked():
-         # Check valid path is supplied for bitcoin installation
+         # Check valid path is supplied for peercoin installation
          pathExe = unicode(self.edtSatoshiExePath.text()).strip()
          if len(pathExe) > 0:
             if not os.path.exists(pathExe):
-               exeName = 'bitcoin-qt.exe' if OS_WINDOWS else 'bitcoin-qt'
+               exeName = 'peercoin-qt.exe' if OS_WINDOWS else 'peercoin-qt'
                QMessageBox.warning(self, 'Invalid Path', \
-                  'The path you specified for the Bitcoin software installation '
+                  'The path you specified for the Peercoin software installation '
                   'does not exist.  Please select the directory that contains %s '
                   'or leave it blank to have Armory search the default location '
                   'for your operating system' % exeName, QMessageBox.Ok)
@@ -9466,17 +9466,17 @@ class DlgSettings(ArmoryDialog):
          else:
             self.main.settings.delete('SatoshiExe')
 
-         # Check valid path is supplied for bitcoind home directory
+         # Check valid path is supplied for peercoind home directory
          pathHome = unicode(self.edtSatoshiHomePath.text()).strip()
          if len(pathHome) > 0:
             if not os.path.exists(pathHome):
-               exeName = 'bitcoin-qt.exe' if OS_WINDOWS else 'bitcoin-qt'
+               exeName = 'peercoin-qt.exe' if OS_WINDOWS else 'peercoin-qt'
                QMessageBox.warning(self, 'Invalid Path', \
-                  'The path you specified for the Bitcoin software home directory '
+                  'The path you specified for the Peercoin software home directory '
                   'does not exist.  Only specify this directory if you use a '
-                  'non-standard "-datadir=" option when running Bitcoin-Qt or '
-                  'bitcoind.  If you leave this field blank, the following '
-                  'path will be used: <br><br> %s' % BTC_HOME_DIR, QMessageBox.Ok)
+                  'non-standard "-datadir=" option when running Peercoin-Qt or '
+                  'peercoind.  If you leave this field blank, the following '
+                  'path will be used: <br><br> %s' % PPC_HOME_DIR, QMessageBox.Ok)
                return
             self.main.writeSetting('SatoshiDatadir', pathHome)
          else:
@@ -9497,7 +9497,7 @@ class DlgSettings(ArmoryDialog):
       except:
          QMessageBox.warning(self, 'Invalid Amount', \
             'The default fee specified could not be understood.  Please '
-            'specify in BTC with no more than 8 decimal places.', \
+            'specify in PPC with no more than 8 decimal places.', \
             QMessageBox.Ok)
          return
 
@@ -9521,8 +9521,8 @@ class DlgSettings(ArmoryDialog):
       self.main.writeSetting('MinimizeOnOpen', self.chkMinOnOpen.isChecked())
 
       # self.main.writeSetting('LedgDisplayFee', self.chkInclFee.isChecked())
-      self.main.writeSetting('NotifyBtcIn', self.chkBtcIn.isChecked())
-      self.main.writeSetting('NotifyBtcOut', self.chkBtcOut.isChecked())
+      self.main.writeSetting('NotifyPPCIn', self.chkPPCIn.isChecked())
+      self.main.writeSetting('NotifyPPCOut', self.chkPPCOut.isChecked())
       self.main.writeSetting('NotifyDiscon', self.chkDiscon.isChecked())
       self.main.writeSetting('NotifyReconn', self.chkReconn.isChecked())
 
@@ -9551,7 +9551,7 @@ class DlgSettings(ArmoryDialog):
       if modestr.lower() == 'standard':
          strDescr += \
             ('"Standard" is for users that only need the core set of features '
-             'to send and receive bitcoins.  This includes maintaining multiple '
+             'to send and receive peercoins.  This includes maintaining multiple '
              'wallets, wallet encryption, and the ability to make backups '
              'of your wallets.')
       elif modestr.lower() == 'advanced':
@@ -9565,7 +9565,7 @@ class DlgSettings(ArmoryDialog):
             ('"Expert" mode is similar to "Advanced" but includes '
              'access to lower-level info about transactions, scripts, keys '
              'and network protocol.  Most extra functionality is geared '
-             'towards Bitcoin software developers.')
+             'towards Peercoin software developers.')
       self.lblUsermodeDescr.setText(strDescr)
 
 
@@ -9974,8 +9974,8 @@ class DlgRequestPayment(ArmoryDialog):
 
       lblDescr = QRichLabel(\
          'Create a clickable link that you can copy into email or webpage to '
-         'request a payment.   If the user is running a Bitcoin program '
-         'that supports "bitcoin:" links, that program will open with '
+         'request a payment.   If the user is running a Peercoin program '
+         'that supports "peercoin:" links, that program will open with '
          'all this information pre-filled after they click the link.')
 
       lblDescr.setContentsMargins(5, 5, 5, 5)
@@ -9983,17 +9983,17 @@ class DlgRequestPayment(ArmoryDialog):
 
 
       ttipPreview = self.main.createToolTipWidget(\
-         'The following Bitcoin desktop applications <i>try</i> to '
-         'register themselves with your computer to handle "bitcoin:" '
+         'The following Peercoin desktop applications <i>try</i> to '
+         'register themselves with your computer to handle "peercoin:" '
          'links: Armory, Multibit, Electrum')
       ttipLinkText = self.main.createToolTipWidget(\
          'This is the text to be shown as the clickable link.  It should '
          'usually begin with "Click here..." to reaffirm to the user it is '
          'is clickable.')
       ttipAmount = self.main.createToolTipWidget(\
-         'All amounts are specifed in BTC')
+         'All amounts are specifed in PPC')
       ttipAddress = self.main.createToolTipWidget(\
-         'The person clicking the link will be sending bitcoins to this address')
+         'The person clicking the link will be sending peercoins to this address')
       ttipMessage = self.main.createToolTipWidget(\
          'This will be pre-filled as the label/comment field '
          'after the user clicks the link. They '
@@ -10020,7 +10020,7 @@ class DlgRequestPayment(ArmoryDialog):
       layoutEntry.addWidget(ttipAddress, i, 2)
 
       i += 1
-      layoutEntry.addWidget(QRichLabel('<b>Request (BTC):</b>'), i, 0)
+      layoutEntry.addWidget(QRichLabel('<b>Request (PPC):</b>'), i, 0)
       layoutEntry.addWidget(self.edtAmount, i, 1)
 
       i += 1
@@ -10155,7 +10155,7 @@ class DlgRequestPayment(ArmoryDialog):
 
          errorIn = 'Inputs'
          # must have address, maybe have amount and/or message
-         self.rawURI = createBitcoinURI(addr, amt, msgStr)
+         self.rawURI = createPeercoinURI(addr, amt, msgStr)
       except:
          self.lblWarn.setText('<font color="red">Invalid %s</font>' % lastTry)
          self.btnCopyRaw.setEnabled(False)
@@ -10177,7 +10177,7 @@ class DlgRequestPayment(ArmoryDialog):
       self.dispText += '<br>'
       self.dispText += '<b>Pay to</b>:\t%s<br>' % addr
       if amt:
-         self.dispText += '<b>Amount</b>:\t%s BTC<br>' % coin2str(amt, maxZeros=0).strip()
+         self.dispText += '<b>Amount</b>:\t%s PPC<br>' % coin2str(amt, maxZeros=0).strip()
       if msgStr:
          self.dispText += '<b>Message</b>:\t%s<br>' % msgStr
       self.lblLink.setText(self.dispText)
@@ -10192,7 +10192,7 @@ class DlgRequestPayment(ArmoryDialog):
       self.plainText += 'If clicking on the line above does not work, use this payment info:\n'
       self.plainText += 'Pay to:  %s' % addr
       if amt:
-         self.plainText += '\nAmount:  %s BTC' % coin2str(amt, maxZeros=0).strip()
+         self.plainText += '\nAmount:  %s PPC' % coin2str(amt, maxZeros=0).strip()
       if msgStr:
          self.plainText += '\nMessage: %s' % msgStr
       self.plainText += '\n'
@@ -10318,7 +10318,7 @@ class DlgNotificationWithDNAA(ArmoryDialog):
       GTE = '\xe2\x89\xa5'
 
       if isUpgrade:
-         currVerStr = getVersionString(BTCARMORY_VERSION)
+         currVerStr = getVersionString(PPCARMORY_VERSION)
          versionString = tr("""You are using version %s<br>""") % currVerStr
       elif minver=='*':
          versionString = tr('Affects Armory versions:  ')
@@ -10522,11 +10522,11 @@ class DlgUriCopyAndPaste(ArmoryDialog):
       super(DlgUriCopyAndPaste, self).__init__(parent, main)
 
       self.uriDict = {}
-      lblDescr = QRichLabel('Copy and paste a raw bitcoin URL string here.  '
-                            'A valid string starts with "bitcoin:" followed '
-                            'by a bitcoin address.'
+      lblDescr = QRichLabel('Copy and paste a raw peercoin URL string here.  '
+                            'A valid string starts with "peercoin:" followed '
+                            'by a peercoin address.'
                             '<br><br>'
-                            'You should use this feature if there is a "bitcoin:" '
+                            'You should use this feature if there is a "peercoin:" '
                             'link in a webpage or email that does not load Armory '
                             'when you click on it.  Instead, right-click on the '
                             'link and select "Copy Link Location" then paste it '
@@ -10814,11 +10814,11 @@ class DlgInstallLinux(ArmoryDialog):
 
 
       lblOptions = QRichLabel(\
-         'If you have manually installed Bitcoin-Qt or bitcoind on this system '
+         'If you have manually installed Peercoin-Qt or peercoind on this system '
          'before, it is recommended you use the method here you previously used.  '
          'If you get errors using this option, try using the manual instructions '
          'below.')
-      self.radioUbuntuPPA = QRadioButton('Install from bitcoin.org PPA (Ubuntu only)')
+      self.radioUbuntuPPA = QRadioButton('Install from peercoin.org PPA (Ubuntu only)')
       self.radioDlBinaries = QRadioButton('Download and unpack binaries (All Linux)')
       btngrp = QButtonGroup(self)
       btngrp.addButton(self.radioDlBinaries)
@@ -10834,13 +10834,13 @@ class DlgInstallLinux(ArmoryDialog):
       lblAutoPPA = QRichLabel(\
          'Have Armory install the PPA for you.  The does not work on all '
          'systems, so try the manual instructions below, if it fails.  '
-         'Using the PPA will install the Bitcoin software using your '
+         'Using the PPA will install the Peercoin software using your '
          'system\'s package manager, and you will be notified of updates along with '
          'other software on your system.')
-      self.btnAutoPPA = QPushButton('Install Bitcoin PPA')
+      self.btnAutoPPA = QPushButton('Install Peercoin PPA')
       self.connect(self.btnAutoPPA, SIGNAL(CLICKED), self.doPPA)
       self.btnAutoPPA.setToolTip(\
-         'Click to install the Bitcoin PPA for Ubuntu')
+         'Click to install the Peercoin PPA for Ubuntu')
 
       frmDoItForMeBtn = makeHorizFrame([STRETCH, \
                                         self.btnAutoPPA, \
@@ -10854,11 +10854,11 @@ class DlgInstallLinux(ArmoryDialog):
          'the "Applications" menu under "Accessories".')
 
       lblInstallPPACmds = QRichLabel(\
-         'sudo add-apt-repository ppa:bitcoin/bitcoin'
+         'sudo add-apt-repository ppa:peercoin/peercoin'
          '<br>'
          'sudo apt-get update'
          '<br>'
-         'sudo apt-get install bitcoin-qt bitcoind')
+         'sudo apt-get install peercoin-qt peercoind')
       lblInstallPPACmds.setFont(GETFONT('Courier', 10))
       lblInstallPPACmds.setTextInteractionFlags(Qt.TextSelectableByMouse | \
                                                 Qt.TextSelectableByKeyboard)
@@ -10881,7 +10881,7 @@ class DlgInstallLinux(ArmoryDialog):
       lblManualExperiment = QRichLabel(\
          '<b>Download and set it up for me!  (All Linux):</b>'
          '<br><br>'
-         'Armory will download and verify the binaries from www.bitcoin.org.  '
+         'Armory will download and verify the binaries from www.peercoin.org.  '
          'Your Armory settings will automatically be adjusted to point to that '
          'as the installation directory.')
       btnManualExperiment = QPushButton('Install for me!')
@@ -10889,17 +10889,17 @@ class DlgInstallLinux(ArmoryDialog):
       self.chkCustomDLPath = QCheckBox('Select custom download location')
 
       lblInstallManualDescr = QRichLabel(\
-         '<b>Manual download and install of the Bitcoin software:</b><br>'
+         '<b>Manual download and install of the Peercoin software:</b><br>'
          '<ol>'
-         '<li>Go to <a href="http://www.bitcoin.org/en/download">'
-         'http://www.bitcoin.org/en/download</a></li>'
+         '<li>Go to <a href="http://www.peercoin.org/en/download">'
+         'http://www.peercoin.org/en/download</a></li>'
          '<li>Click on the link that says "Download for Linux (tgz, 32/64-bit)" </li>'
          '<li>Open a file browser and navigate to the download directory</li>'
          '<li>Right-click on the downloaded file, and select "Extract Here"</li>'
          '</ol>'
          '<br>'
          'Once the downloaded archive is unpacked, then click the button below '
-         'to open the Armory settings and change the "Bitcoin Installation Path" '
+         'to open the Armory settings and change the "Peercoin Installation Path" '
          'to point to the new directory.  Then restart Armory')
       lblInstallManualDescr.setOpenExternalLinks(True)
 
@@ -10945,7 +10945,7 @@ class DlgInstallLinux(ArmoryDialog):
 
       self.radioUbuntuPPA.setChecked(True)
       self.clickInstallOpt()
-      self.setWindowTitle('Install Bitcoin in Linux')
+      self.setWindowTitle('Install Peercoin in Linux')
 
       from twisted.internet import reactor
       reactor.callLater(0.2, self.main.checkForLatestVersion)
@@ -10956,8 +10956,8 @@ class DlgInstallLinux(ArmoryDialog):
       if not 'SATOSHI' in dlDict or not 'Linux' in dlDict['SATOSHI']:
          QMessageBox.warning(self, 'Not available', \
             'Armory does not actually have the information needed to execute '
-            'this process securely.  Please visit the bitcoin.org and download '
-            'the Linux version of the Bitcoin software, then modify your '
+            'this process securely.  Please visit the peercoin.org and download '
+            'the Linux version of the Peercoin software, then modify your '
             'settings to point to where it was unpacked. ', QMessageBox.Ok)
          return
 
@@ -10966,7 +10966,7 @@ class DlgInstallLinux(ArmoryDialog):
          if not os.path.exists(installPath):
             os.makedirs(installPath)
       else:
-         title = 'Download Bitcoin software to...'
+         title = 'Download Peercoin software to...'
          initPath = self.main.settings.get('LastDirectory')
          if not OS_MACOSX:
             installPath = unicode(QFileDialog.getExistingDirectory(self, title, initPath))
@@ -10989,10 +10989,10 @@ class DlgInstallLinux(ArmoryDialog):
       fileData = dlg.dlFileData
       if len(fileData) == 0 or dlg.dlVerifyFailed:
          QMessageBox.critical(self, 'Download Failed', \
-            'The download failed.  Please visit www.bitcoin.org '
-            'to download and install Bitcoin-Qt manually.', QMessageBox.Ok)
+            'The download failed.  Please visit www.peercoin.org '
+            'to download and install Peercoin-Qt manually.', QMessageBox.Ok)
          import webbrowser
-         webbrowser.open('http://www.bitcoin.org/en/download')
+         webbrowser.open('http://www.peercoin.org/en/download')
          return
 
       fullPath = os.path.join(installPath, dlg.dlFileName)
@@ -11041,12 +11041,12 @@ class DlgInstallLinux(ArmoryDialog):
                       '--import %s/AndresenCodeSign.asc')
       cmdVerifyFile = ('gpg '
                       '--keyring ~/.armory/testkeyring.gpg '
-                      '--verify bitcoin.0.8.1.tar.gz')
+                      '--verify peercoin.0.8.1.tar.gz')
 
 
    #############################################################################
    def doPPA(self):
-      out, err = execAndWait('gksudo install_bitcoinqt', timeout=20)
+      out, err = execAndWait('gksudo install_peercoinqt', timeout=20)
       tryInstallLinux(self.main)
       self.main.settings.delete('SatoshiExe')
       self.accept()
@@ -11057,11 +11057,11 @@ def tryInstallLinux(main):
    def doit():
       #print '\n'
       #print '***** Executing auto-install in linux...'
-      out, err = execAndWait('gksudo "apt-get remove -y bitcoin-qt bitcoind"', \
+      out, err = execAndWait('gksudo "apt-get remove -y peercoin-qt peercoind"', \
                              timeout=20)
-      out, err = execAndWait(('gksudo apt-add-repository ppa:bitcoin/bitcoin; '
+      out, err = execAndWait(('gksudo apt-add-repository ppa:peercoin/peercoin; '
                              'gksudo apt-get update; '
-                             'gksudo "apt-get install -y bitcoin-qt bitcoind"'), \
+                             'gksudo "apt-get install -y peercoin-qt peercoind"'), \
                              timeout=120)
       try:
          TheSDM.setupSDM()
@@ -11075,12 +11075,12 @@ def tryInstallLinux(main):
          LOGINFO('***** Printing errors\n' + err)
          LOGINFO('***** End print errors\n')
          QMessageBox.warning(main, 'Unknown Error', \
-            'An error was reported while trying to install the Bitcoin '
+            'An error was reported while trying to install the Peercoin '
             'software.  The following information is given:<br><br>%s' % err, \
             QMessageBox.Ok)
          raise
 
-   DlgExecLongProcess(doit, 'Installing Bitcoin Software...', main, main).exec_()
+   DlgExecLongProcess(doit, 'Installing Peercoin Software...', main, main).exec_()
 
 
 ################################################################################
@@ -11373,11 +11373,11 @@ class DlgSimpleBackup(ArmoryDialog):
       self.wlt = wlt
 
       lblDescrTitle = QRichLabel(tr("""
-         <b>Protect Your Bitcoins -- Make a Wallet Backup!</b>"""))
+         <b>Protect Your Peercoins -- Make a Wallet Backup!</b>"""))
 
       lblDescr = QRichLabel(tr("""
          A failed hard-drive or forgotten passphrase will lead to
-         <u>permanent loss of bitcoins</u>!  Luckily, Armory wallets only
+         <u>permanent loss of peercoins</u>!  Luckily, Armory wallets only
          need to be backed up <u>one time</u>, and protect you in both
          of these events.   If you've ever forgotten a password or had
          a hardware failure, make a backup! """))
@@ -11990,7 +11990,7 @@ class DlgFragBackup(ArmoryDialog):
          fragments are sufficient to restore your wallet, and each fragment
          has the ID, <font color="%s"><b>%s</b></font>.  All fragments with the
          same fragment ID are compatible with each other!
-         <a href="https://bitcoinarmory.com/armory-backups-are-forever/">Click
+         <a href="https://peercoinarmory.com/armory-backups-are-forever/">Click
          here</a> to read more about our backup system.<br>""") % \
          (BLUE, M, BLUE, N, BLUE, self.fragPrefixStr))
 
@@ -12580,7 +12580,7 @@ class DlgRestoreSingle(ArmoryDialog):
 
       # If we got here, the data is valid, let's create the wallet and accept the dlg
       # Now we should have a fully-plaintext rootkey and chaincode
-      root = PyBtcAddress().createFromPlainKeyData(privKey)
+      root = PyPPCAddress().createFromPlainKeyData(privKey)
       root.chaincode = chain
 
       first = root.extendAddressChain()
@@ -12633,7 +12633,7 @@ class DlgRestoreSingle(ArmoryDialog):
             longl  = dlgOwnWlt.Meta['longLabel']
             nPool = max(nPool, dlgOwnWlt.Meta['naddress'])
 
-      self.newWallet = PyBtcWallet()
+      self.newWallet = PyPPCWallet()
       
       if passwd:
          self.newWallet.createNewWallet( \
@@ -12667,7 +12667,7 @@ class DlgRestoreSingle(ArmoryDialog):
 
       if dlgOwnWlt is not None:
          if dlgOwnWlt.Meta is not None:
-            from armoryengine.PyBtcWallet import WLT_UPDATE_ADD
+            from armoryengine.PyPPCWallet import WLT_UPDATE_ADD
             for n_cmt in range(0, dlgOwnWlt.Meta['ncomments']):
                entrylist = []
                entrylist = list(dlgOwnWlt.Meta[n_cmt])
@@ -12676,7 +12676,7 @@ class DlgRestoreSingle(ArmoryDialog):
                                                      entrylist[1], 
                                                      entrylist[0]]])
 
-         self.newWallet = PyBtcWallet().readWalletFile(self.newWallet.walletPath)
+         self.newWallet = PyPPCWallet().readWalletFile(self.newWallet.walletPath)
       self.accept()
 
 
@@ -12882,7 +12882,7 @@ class DlgRestoreWOData(ArmoryDialog):
 
       # Now we should have a fully-plaintext root key and chain code, and can
       # get some related data.
-      root = PyBtcAddress().createFromPublicKeyData(rootPubKey)
+      root = PyPPCAddress().createFromPublicKeyData(rootPubKey)
       root.chaincode = rootChainCode
       first = root.extendAddressChain()
       newWltID = binary_to_base58(inRootID)
@@ -12912,7 +12912,7 @@ class DlgRestoreWOData(ArmoryDialog):
             return
 
          # Create the wallet.
-         self.newWallet = PyBtcWallet().createNewWalletFromPKCC(rootPubKey, \
+         self.newWallet = PyPPCWallet().createNewWalletFromPKCC(rootPubKey, \
                                                                 rootChainCode)
 
          # Create some more addresses and show a progress bar while restoring.
@@ -13371,7 +13371,7 @@ class DlgRestoreFragged(ArmoryDialog):
 
       # If we got here, the data is valid, let's create the wallet and accept the dlg
       # Now we should have a fully-plaintext rootkey and chaincode
-      root = PyBtcAddress().createFromPlainKeyData(priv)
+      root = PyPPCAddress().createFromPlainKeyData(priv)
       root.chaincode = chain
 
       first = root.extendAddressChain()
@@ -13426,7 +13426,7 @@ class DlgRestoreFragged(ArmoryDialog):
             nPool = max(nPool, dlgOwnWlt.Meta['naddress'])
 
       if passwd:
-         self.newWallet = PyBtcWallet().createNewWallet(\
+         self.newWallet = PyPPCWallet().createNewWallet(\
                                  plainRootKey=priv, \
                                  chaincode=chain, \
                                  shortLabel='Restored - %s%s' % (newWltID, shortl), \
@@ -13438,7 +13438,7 @@ class DlgRestoreFragged(ArmoryDialog):
                                  isActuallyNew=False, \
                                  doRegisterWithBDM=False)
       else:
-         self.newWallet = PyBtcWallet().createNewWallet(\
+         self.newWallet = PyPPCWallet().createNewWallet(\
                                  plainRootKey=priv, \
                                  chaincode=chain, \
                                  shortLabel='Restored - %s%s' % (newWltID, shortl), \
@@ -13455,13 +13455,13 @@ class DlgRestoreFragged(ArmoryDialog):
  
       if dlgOwnWlt is not None:
          if dlgOwnWlt.Meta is not None:
-            from armoryengine.PyBtcWallet import WLT_UPDATE_ADD
+            from armoryengine.PyPPCWallet import WLT_UPDATE_ADD
             for n_cmt in range(0, dlgOwnWlt.Meta['ncomments']):
                entrylist = []
                entrylist = list(dlgOwnWlt.Meta[n_cmt])
                self.newWallet.walletFileSafeUpdate([[WLT_UPDATE_ADD, entrylist[2], entrylist[1], entrylist[0]]])
 
-         self.newWallet = PyBtcWallet().readWalletFile(self.newWallet.walletPath)
+         self.newWallet = PyPPCWallet().readWalletFile(self.newWallet.walletPath)
       self.accept()
 
    #############################################################################
@@ -14028,10 +14028,10 @@ class DlgReplaceWallet(ArmoryDialog):
 
    #########
    def SaveMeta(self):
-      from armoryengine.PyBtcWalletRecovery import PyBtcWalletRecovery
+      from armoryengine.PyPPCWalletRecovery import PyPPCWalletRecovery
 
       metaProgress = DlgProgress(self, self.main, Title='Ripping Meta Data')
-      getMeta = PyBtcWalletRecovery()
+      getMeta = PyPPCWalletRecovery()
       self.Meta = metaProgress.exec_(getMeta.ProcessWallet, 
                                      WalletPath=self.wltPath,  
                                      Mode=RECOVERMODE.Meta,
@@ -14523,7 +14523,7 @@ class DlgCorruptWallet(DlgProgress):
             <font color="%s">This error will pop up every time you start 
             Armory until the wallet has been analyzed and fixed!</font>""") % \
             (wallet.labelName, wallet.uniqueIDB58, htmlColor('TextWarn')))
-      elif isinstance(wallet, PyBtcWallet):
+      elif isinstance(wallet, PyPPCWallet):
          self.lblFirstMsg = QRichLabel(tr("""
             Armory will perform a consistency check on <b>Wallet "%s" (%s)</b> 
             and determine if any further action is required to keep your funds
@@ -14627,7 +14627,7 @@ class DlgCorruptWallet(DlgProgress):
       self.lblFirstMsg.setVisible(False)
       self.frmBottomMsg.setVisible(False)
 
-      from armoryengine.PyBtcWalletRecovery import FixWalletList
+      from armoryengine.PyPPCWalletRecovery import FixWalletList
       self.btnClose.setDisabled(True)
       self.btnFixWallets.setDisabled(True)
       self.isFixing = True
@@ -14665,7 +14665,7 @@ class DlgCorruptWallet(DlgProgress):
       self.lblStatus.setVisible(True)
       self.lblFirstMsg.setVisible(False)  
                      
-      from armoryengine.PyBtcWalletRecovery import ParseWallet
+      from armoryengine.PyPPCWalletRecovery import ParseWallet
       self.btnClose.setDisabled(True)
       self.btnFixWallets.setDisabled(True)
       self.isFixing = True        
@@ -14751,7 +14751,7 @@ class DlgCorruptWallet(DlgProgress):
 
    def LFW(self, wallets):
       for wlt in wallets:
-         newWallet = PyBtcWallet().readWalletFile(wlt)
+         newWallet = PyPPCWallet().readWalletFile(wlt)
          self.main.addWalletToApplication(newWallet, walletIsNew=True)
 
          if TheBDM.getBDMState() in ('Uninitialized', 'Offline'):
@@ -14784,7 +14784,7 @@ class DlgFactoryReset(ArmoryDialog):
          It is <i>strongly</i> recommended that you make backups of your
          wallets before continuing, though <b>wallet files will never be
          intentionally deleted!</b>  All Armory
-         wallet files, and the wallet.dat file used by Bitcoin-Qt/bitcoind
+         wallet files, and the wallet.dat file used by Peercoin-Qt/peercoind
          should remain untouched in their current locations.  All Armory
          wallets will automatically be detected and loaded after the reset.
          <br><br>
@@ -14808,12 +14808,12 @@ class DlgFactoryReset(ArmoryDialog):
          Will delete settings, network data, and delete and Armory's databases,
          forcing a rebuild and rescan (45 min to 3 hours)"""))
 
-      self.rdoBitcoinDB = QRadioButton()
-      self.lblBitcoinDBText = QRichLabel(tr("""
+      self.rdoPeercoinDB = QRadioButton()
+      self.lblPeercoinDBText = QRichLabel(tr("""
          <b>Also re-download the blockchain (most extreme)</b>"""))
-      self.lblBitcoinDB = QRichLabel(tr("""
+      self.lblPeercoinDB = QRichLabel(tr("""
          This will delete settings, network data, Armory's databases,
-         <b>and</b> the Bitcoin software databases.  Bitcoin-Qt/bitcoind will
+         <b>and</b> the Peercoin software databases.  Peercoin-Qt/peercoind will
          have to download the 15+ GB blockchain again.  Only use this if you
          suspect blockchain corruption, such as receiving StdOut/StdErr errors
          on the dashboard (8-72 hours depending on your connection)"""))
@@ -14826,7 +14826,7 @@ class DlgFactoryReset(ArmoryDialog):
       for rdo,txt,lbl in [ \
             [self.rdoSettings,  self.lblSettingsText,  self.lblSettings], \
             [self.rdoArmoryDB,  self.lblArmoryDBText,  self.lblArmoryDB], \
-            [self.rdoBitcoinDB, self.lblBitcoinDBText, self.lblBitcoinDB]]:
+            [self.rdoPeercoinDB, self.lblPeercoinDBText, self.lblPeercoinDB]]:
 
          optLayout = QGridLayout()
          txt.setWordWrap(False)
@@ -14845,7 +14845,7 @@ class DlgFactoryReset(ArmoryDialog):
       btngrp = QButtonGroup(self)
       btngrp.addButton(self.rdoSettings)
       btngrp.addButton(self.rdoArmoryDB)
-      btngrp.addButton(self.rdoBitcoinDB)
+      btngrp.addButton(self.rdoPeercoinDB)
 
       frmDescr = makeHorizFrame([lblDescr], STYLE_SUNKEN)
       frmOptions = makeVertFrame(optFrames, STYLE_SUNKEN)
@@ -14904,14 +14904,14 @@ class DlgFactoryReset(ArmoryDialog):
          touchFile( os.path.join(ARMORY_HOME_DIR, 'delsettings.flag'))
          self.accept()
 
-      elif self.rdoBitcoinDB.isChecked():
+      elif self.rdoPeercoinDB.isChecked():
          delSetText = 'delete your settings and '
          if self.chkSaveSettings.isChecked():
             delSetText = ''
             
          reply = QMessageBox.warning(self, tr('Confirmation'), tr("""
             You are about to %sdelete <b>all</b>
-            blockchain databases on your system.  The Bitcoin software will
+            blockchain databases on your system.  The Peercoin software will
             have to redownload 15+ GB of blockchain data over the peer-to-peer
             network again which can take from 8 to 72 hours depending on
             your system speed and connection.  <br><br><b>Are you absolutely
@@ -14927,13 +14927,13 @@ class DlgFactoryReset(ArmoryDialog):
 
 
          if not self.main.settings.get('ManageSatoshi'):
-            # Must have user shutdown Bitcoin sw now, and delete DBs now
+            # Must have user shutdown Peercoin sw now, and delete DBs now
             reply = MsgBoxCustom(MSGBOX.Warning, tr('Restart Armory'), tr("""
-               <b>Bitcoin-Qt (or bitcoind) must be closed to do the reset!</b>
-               Please close all Bitcoin software, <u><b>right now</b></u>,
+               <b>Peercoin-Qt (or peercoind) must be closed to do the reset!</b>
+               Please close all Peercoin software, <u><b>right now</b></u>,
                before clicking "Continue".
                <br><br>
-               Armory will now close.  Please restart Bitcoin-Qt/bitcoind
+               Armory will now close.  Please restart Peercoin-Qt/peercoind
                first and wait for it to finish synchronizing before restarting
                Armory."""), wCancel=True, yesStr="Continue")
 
@@ -14945,7 +14945,7 @@ class DlgFactoryReset(ArmoryDialog):
                return
 
             # Do the delete operation now
-            deleteBitcoindDBs()
+            deletePeercoindDBs()
          else:
             reply = QMessageBox.warning(self, tr('Restart Armory'), tr("""
                Armory will now close to apply the requested changes.  Please
@@ -15041,7 +15041,7 @@ class DlgBroadcastBlindTx(ArmoryDialog):
 
       lblDescr = QRichLabel(tr("""
          Copy a raw, hex-encoded transaction below to have Armory 
-         broadcast it to the Bitcoin network.  This function is 
+         broadcast it to the Peercoin network.  This function is 
          provided as a convenience to expert users, and carries 
          no guarantees of usefulness.
          <br><br>
@@ -15050,11 +15050,11 @@ class DlgBroadcastBlindTx(ArmoryDialog):
          <ul>
             <li>The transaction will be "broadcast" by sending it
                 to the connected Bitcon Core instance which will
-                forward it to the rest of the Bitcoin network.  
+                forward it to the rest of the Peercoin network.  
                 However, if the transaction is non-standard or 
-                does not satisfy standard fee rules, Bitcoin Core 
+                does not satisfy standard fee rules, Peercoin Core 
                 <u>will</u> drop it and it 
-                will never be seen by the Bitcoin network. 
+                will never be seen by the Peercoin network. 
             </li>
             <li>There will be no feedback as to whether the
                 transaction succeeded.  You will have to verify the
@@ -15149,11 +15149,11 @@ class DlgBroadcastBlindTx(ArmoryDialog):
          dispToExplorer = 'https://blockchain.info/search/%s...' % hexhash[:16]
 
       QMessageBox.information(self, tr("Broadcast!"), tr("""
-         Your transaction was successfully sent to the local Bitcoin
+         Your transaction was successfully sent to the local Peercoin
          Core instance, though there is no guarantees that it was
          forwarded to the rest of the network.   On testnet, just about
          every valid transaction will successfully propagate.  On the
-         main Bitcoin network, this will fail unless it was a standard
+         main Peercoin network, this will fail unless it was a standard
          transaction type.
 
          The transaction 
@@ -15266,6 +15266,6 @@ class DlgPrivacyPolicy(ArmoryDialog):
 # Put circular imports at the end
 from ui.WalletFrames import SelectWalletFrame, WalletBackupFrame,\
    AdvancedOptionsFrame
-from ui.TxFrames import  SendBitcoinsFrame, SignBroadcastOfflineTxFrame,\
+from ui.TxFrames import  SendPeercoinsFrame, SignBroadcastOfflineTxFrame,\
    ReviewOfflineTxFrame
 from ui.MultiSigDialogs import DlgMultiSpendReview

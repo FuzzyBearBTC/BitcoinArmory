@@ -2,7 +2,7 @@ def licenseText():
    return """
 ********************************************************************************
 *                                                                              *
-*   Armory -- Advanced Bitcoin Wallet Software                                 *
+*   Armory -- Advanced Peercoin Wallet Software                                 *
 *                                                                              *
 *   Copyright (C) 2011-2014, Armory Technologies, Inc.                         *
 *                                                                              *
@@ -22,7 +22,7 @@ def licenseText():
 *   To use this software or source code in a way not compliant with the        *
 *   APGLv3, please contact us to discuss a dual-licensing agreement:           *
 *                                                                              *
-*                 licensing@bitcoinarmory.com                                  * 
+*                 licensing@peercoinarmory.com                                  * 
 *                                                                              *
 ********************************************************************************
 

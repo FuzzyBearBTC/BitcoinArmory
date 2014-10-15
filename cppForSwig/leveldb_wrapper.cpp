@@ -13,7 +13,7 @@
 #include <vector>
 #include <set>
 #include "BinaryData.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 #include "BlockObj.h"
 #include "StoredBlockObj.h"
 #include "leveldb_wrapper.h"
@@ -1089,7 +1089,7 @@ void InterfaceToLDB::getStoredScriptHistoryByRawScript(
                                              StoredScriptHistory & ssh,
                                              BinaryDataRef script)
 {
-   BinaryData uniqueKey = BtcUtils::getTxOutScrAddr(script);
+   BinaryData uniqueKey = PPCUtils::getTxOutScrAddr(script);
    getStoredScriptHistory(ssh, uniqueKey);
 }
 
@@ -1199,8 +1199,8 @@ bool InterfaceToLDB::getFullUTXOMapForSSH(
 void InterfaceToLDB::addRegisteredScript(BinaryDataRef rawScript, 
                                          uint32_t      blockCreated)
 {
-   BinaryData uniqKey = BtcUtils::getTxOutScrAddr(rawScript);
-   bool       isMulti = BtcUtils::isMultisigScript(rawScript);
+   BinaryData uniqKey = PPCUtils::getTxOutScrAddr(rawScript);
+   bool       isMulti = PPCUtils::isMultisigScript(rawScript);
 
    StoredScriptHistory ssh;
    getStoredScriptHistory(ssh, uniqKey);
@@ -2040,7 +2040,7 @@ TxIn InterfaceToLDB::getTxInCopy( BinaryData ldbKey6B, uint16_t txInIdx)
    {
       bool isFragged = txSer==TX_SER_FRAGGED;
       vector<uint32_t> offsetsIn;
-      BtcUtils::StoredTxCalcLength(brr.getCurrPtr(), isFragged, &offsetsIn);
+      PPCUtils::StoredTxCalcLength(brr.getCurrPtr(), isFragged, &offsetsIn);
       if((uint32_t)(offsetsIn.size()-1) < (uint32_t)(txInIdx+1))
       {
          LOGERR << "Requested TxIn with index greater than numTxIn";

@@ -26,7 +26,7 @@
 #     - Priority:          Low-priority transactions might require higher
 #                          fees and/or take longer to make it into the
 #                          blockchain.  Priority is the sum of TxOut
-#                          priorities:  (NumConfirm * NumBTC / SizeKB)
+#                          priorities:  (NumConfirm * NumPPC / SizeKB)
 #                          We especially want to avoid 0-confirmation txs
 #
 #     - Output values:     In almost every transaction, we must return
@@ -61,7 +61,7 @@ import math
 import random
 
 from armoryengine.ArmoryUtils import CheckHash160, binary_to_hex, coin2str, \
-   hash160_to_addrStr, ONE_BTC, CENT, int_to_binary, MIN_RELAY_TX_FEE, MIN_TX_FEE
+   hash160_to_addrStr, ONE_PPC, CENT, int_to_binary, MIN_RELAY_TX_FEE, MIN_TX_FEE
 from armoryengine.Timer import TimeThisFunction
 from armoryengine.Transaction import *
 
@@ -149,7 +149,7 @@ def sumTxOutList(txoutList):
 # This is really just for viewing a TxOut list -- usually for debugging
 def pprintUnspentTxOutList(utxoList, headerLine='Coin Selection: '):
    totalSum = sum([u.getValue() for u in utxoList])
-   print headerLine, '(Total = %s BTC)' % coin2str(totalSum)
+   print headerLine, '(Total = %s PPC)' % coin2str(totalSum)
    print '   ','Owner Address'.ljust(34),
    print '   ','TxOutValue'.rjust(18),
    print '   ','NumConf'.rjust(8),
@@ -157,9 +157,9 @@ def pprintUnspentTxOutList(utxoList, headerLine='Coin Selection: '):
    for utxo in utxoList:
       a160 = CheckHash160(utxo.getRecipientScrAddr())
       print '   ',hash160_to_addrStr(a160).ljust(34),
-      print '   ',(coin2str(utxo.getValue()) + ' BTC').rjust(18),
+      print '   ',(coin2str(utxo.getValue()) + ' PPC').rjust(18),
       print '   ',str(utxo.getNumConfirm()).rjust(8),
-      print '   ', ('%0.2f' % (utxo.getValue()*utxo.getNumConfirm()/(ONE_BTC*144.))).rjust(16)
+      print '   ', ('%0.2f' % (utxo.getValue()*utxo.getNumConfirm()/(ONE_PPC*144.))).rjust(16)
 
 
 ################################################################################
@@ -438,9 +438,9 @@ def getSelectCoinsScores(utxoSelectList, targetOutVal, minFee):
    # If the diff is negative, the wrong answer starts to look like the
    # correct one (about which output is recipient and which is change)
    # We should give "extra credit" for those cases
-   def countTrailingZeros(btcVal):
+   def countTrailingZeros(ppcVal):
       for i in range(1,20):
-         if btcVal % 10**i != 0:
+         if ppcVal % 10**i != 0:
             return i-1
       return 0  # not sure how we'd get here, but let's be safe
    tgtTrailingZeros =  countTrailingZeros(targetOutVal)
@@ -496,7 +496,7 @@ def getSelectCoinsScores(utxoSelectList, targetOutVal, minFee):
 
 
    ##################
-   # Priority:  If our priority is above the 1-btc-after-1-day threshold
+   # Priority:  If our priority is above the 1-ppc-after-1-day threshold
    #            then we might be allowed a free tx.  But, if its priority
    #            isn't much above this thresh, it might take a couple blocks
    #            to be included
@@ -509,7 +509,7 @@ def getSelectCoinsScores(utxoSelectList, targetOutVal, minFee):
          dPriority += utxo.getValue() * utxo.getNumConfirm()
 
    dPriority = dPriority / numBytes
-   priorityThresh = ONE_BTC * 144 / 250
+   priorityThresh = ONE_PPC * 144 / 250
    if dPriority < priorityThresh:
       priorityFactor = 0
    elif dPriority < 10.0*priorityThresh:
@@ -609,7 +609,7 @@ def PyEvalCoinSelect(utxoSelectList, targetOutVal, minFee, weights=WEIGHTS):
 
 
 ################################################################################
-# https://bitcointalk.org/index.php?topic=92496.msg1126310#msg1126310 contains a
+# https://peercointalk.org/index.php?topic=92496.msg1126310#msg1126310 contains a
 # description (possibly out-of-date?) of how this function works.
 @TimeThisFunction
 def PySelectCoins(unspentTxOutInfo, targetOutVal, minFee=0, numRand=10, margin=CENT):
@@ -705,7 +705,7 @@ def PySelectCoins(unspentTxOutInfo, targetOutVal, minFee=0, numRand=10, margin=C
             continue
 
          # Don't consider any inputs that are high priority already
-         if getPriority(other) > ONE_BTC*144:
+         if getPriority(other) > ONE_PPC*144:
             continue
 
          finalSelection.append(other) 
@@ -747,7 +747,7 @@ def calcMinSuggestedFeesHackMS(selectCoinsResult, targetOutVal, preSelectedFee,
    haveDustOutputs = (0<change<CENT or targetOutVal<CENT)
 
    if((not haveDustOutputs) and \
-      prioritySum >= ONE_BTC * 144 / 250. and \
+      prioritySum >= ONE_PPC * 144 / 250. and \
       numBytes < 10000):
       return [0,0]
 
@@ -810,7 +810,7 @@ def calcMinSuggestedFees(selectCoinsResult, targetOutVal, preSelectedFee,
    haveDustOutputs = (0<change<CENT or targetOutVal<CENT)
 
    if((not haveDustOutputs) and \
-      prioritySum >= ONE_BTC * 144 / 250. and \
+      prioritySum >= ONE_PPC * 144 / 250. and \
       numBytes < 10000):
       return [0,0]
 
@@ -915,7 +915,7 @@ def calcMinSuggestedFeesNew(selectCoinsResult, scriptValPairs, preSelectedFee,
    haveDustOutputs = (0<change<CENT or targetOutVal<CENT)
 
    if((not haveDustOutputs) and \
-      prioritySum >= ONE_BTC * 144 / 250. and \
+      prioritySum >= ONE_PPC * 144 / 250. and \
       numBytes < 10000):
       return [0,0]
 

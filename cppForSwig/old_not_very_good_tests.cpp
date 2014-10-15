@@ -12,7 +12,7 @@
 #include <sstream>
 #include "UniversalTimer.h"
 #include "BinaryData.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 #include "BlockUtils.h"
 #include "EncryptionUtils.h"
 //#include "FileDataPtr.h"
@@ -61,7 +61,7 @@ void printTestHeader(string TestName)
 
 bool copyFile(string src, string dst)
 {
-   uint32_t srcsz = BtcUtils::GetFileSize(src);
+   uint32_t srcsz = PPCUtils::GetFileSize(src);
    if(srcsz == FILE_DOES_NOT_EXIST)
       return false;
 
@@ -100,10 +100,10 @@ int main(void)
    BlockDataManager_LevelDB::GetInstance().SelectNetwork("Test");
    
 
-   //string blkdir("/home/alan/.bitcoin");
-   //string blkdir("/home/alan/.bitcoin/testnet/");
-   //string blkdir("C:/Users/VBox/AppData/Roaming/Bitcoin");
-   string blkdir("C:/Users/Andy/AppData/Roaming/Bitcoin/testnet");
+   //string blkdir("/home/alan/.peercoin");
+   //string blkdir("/home/alan/.peercoin/testnet/");
+   //string blkdir("C:/Users/VBox/AppData/Roaming/Peercoin");
+   string blkdir("C:/Users/Andy/AppData/Roaming/Peercoin/testnet");
    //string multitest("./multiblktest");
    
 
@@ -225,7 +225,7 @@ void BaseTests(void)
    // This is not only non-standard, it's non-spendable
    txOutTypes.push_back( TXOUT_SCRIPT_NONSTANDARD );
    txOutScripts.push_back( h2b("76a90088ac"));
-   txOutHash160s.push_back( BtcUtils::BadAddress_);
+   txOutHash160s.push_back( PPCUtils::BadAddress_);
    txOutLDBKeys.push_back(h2b("ff76a90088ac"));
 
    // P2SH script from tx: 4ac04b4830d115eb9a08f320ef30159cc107dfb72b29bbc2f370093f962397b4 (TxOut: 1)
@@ -265,20 +265,20 @@ void BaseTests(void)
    txInTypes.push_back(TXIN_SCRIPT_COINBASE)
    txInScripts.push_back( h2b("0310920304000071c3124d696e656420627920425443204775696c640800b75f950e000000"));
    txInPrevHashes.push_back(prevHashCB);
-   txInHash160s.push_back( BtcUtils::BadAddress_); 
+   txInHash160s.push_back( PPCUtils::BadAddress_); 
 
    // Spending P2SH output as above:  fd16d6bbf1a3498ca9777b9d31ceae883eb8cb6ede1fafbdd218bae107de66fe (TxIn: 1, 219 B)
    // Leading 0x00 byte is required due to a bug in OP_CHECKMULTISIG
    txInTypes.push_back(TXIN_SCRIPT_SPENDP2SH)
    txInScripts.push_back( h2b("004830450221009254113fa46918f299b1d18ec918613e56cffbeba0960db05f66b51496e5bf3802201e229de334bd753a2b08b36cc3f38f5263a23e9714a737520db45494ec095ce80148304502206ee62f539d5cd94f990b7abfda77750f58ff91043c3f002501e5448ef6dba2520221009d29229cdfedda1dd02a1a90bb71b30b77e9c3fc28d1353f054c86371f6c2a8101475221034758cefcb75e16e4dfafb32383b709fa632086ea5ca982712de6add93060b17a2103fe96237629128a0ae8c3825af8a4be8fe3109b16f62af19cec0b1eb93b8717e252ae")); 
    txInPrevHashes.push_back(prevHashReg);
-   txInHash160s.push_back( BtcUtils::BadAddress_); 
+   txInHash160s.push_back( PPCUtils::BadAddress_); 
 
 
    txInTypes.push_back(TXIN_SCRIPT_SPENDPUBKEY)
    txInScripts.push_back( h2b("47304402201ffc44394e5a3dd9c8b55bdc12147e18574ac945d15dac026793bf3b8ff732af022035fd832549b5176126f735d87089c8c1c1319447a458a09818e173eaf0c2eef101"));
    txInPrevHashes.push_back(prevHashReg);
-   txInHash160s.push_back( BtcUtils::BadAddress_); 
+   txInHash160s.push_back( PPCUtils::BadAddress_); 
    //txInHash160s.push_back( h2b("957efec6af757ccbbcf9a436f0083c5ddaa3bf1d")); // this one can't be determined
   
 
@@ -439,7 +439,7 @@ void TestScanForWalletTx(string blkdir)
    bdm.parseEntireBlockchain();
    /////////////////////////////////////////////////////////////////////////////
    BinaryData myAddress;
-   BtcWallet wlt;
+   PPCWallet wlt;
    
    // Main-network addresses
    myAddress.createFromHex("604875c897a079f4db88e5d71145be2093cae194"); wlt.addAddress(myAddress);
@@ -472,7 +472,7 @@ void TestScanForWalletTx(string blkdir)
       {  
          cout << "    Tx: " 
            << ledger[j].getAddrStr20().getSliceCopy(0,4).toHexStr() << "  "
-           << ledger[j].getValue()/(float)(CONVERTBTC) << " (" 
+           << ledger[j].getValue()/(float)(CONVERTPPC) << " (" 
            << ledger[j].getBlockNum()
            << ")  TxHash: " << ledger[j].getTxHash().getSliceCopy(0,4).toHexStr() << endl;
       }
@@ -499,7 +499,7 @@ void TestScanForWalletTx(string blkdir)
 
    /////////////////////////////////////////////////////////////////////////////
    cout << "Test txout aggregation, with different prioritization schemes" << endl;
-   BtcWallet myWallet;
+   PPCWallet myWallet;
 
 #ifndef TEST_NETWORK
    // TODO:  I somehow borked my list of test addresses.  Make sure I have some
@@ -554,8 +554,8 @@ void TestReadAndOrganizeChainWithWallet(string blkdir)
    /////////////////////////////////////////////////////////////////////////////
    BlockDataManager_LevelDB & bdm = BlockDataManager_LevelDB::GetInstance(); 
    BinaryData myAddress;
-   BtcWallet wlt1;
-   BtcWallet wlt2;
+   PPCWallet wlt1;
+   PPCWallet wlt2;
    
    // Main-network addresses
    myAddress.createFromHex("604875c897a079f4db88e5d71145be2093cae194"); wlt2.addAddress(myAddress);
@@ -574,7 +574,7 @@ void TestReadAndOrganizeChainWithWallet(string blkdir)
    myAddress.createFromHex("d77561813ca968270d5f63794ddb6aab3493605e"); wlt1.addAddress(myAddress);
    myAddress.createFromHex("0e0aec36fe2545fb31a41164fb6954adcd96b342"); wlt1.addAddress(myAddress);
 
-   vector<BtcWallet*> wltList;
+   vector<PPCWallet*> wltList;
    wltList.push_back(&wlt1);
    wltList.push_back(&wlt2);
 
@@ -630,7 +630,7 @@ void TestReadAndOrganizeChainWithWallet(string blkdir)
 
 
    cout << endl << "Create new, unregistered wallet, scan it once (should rescan)..." << endl;
-   BtcWallet wlt3;
+   PPCWallet wlt3;
    myAddress.createFromHex("72e20a94d6b2ed34a3b4d3757c1fed5152071993"); wlt3.addAddress(myAddress);
    wlt3.addAddress(myAddress);
    bdm.scanBlockchainForTx(wlt3);
@@ -755,7 +755,7 @@ void TestBalanceConstruction(string blkdir)
    /////////////////////////////////////////////////////////////////////////////
    BlockDataManager_LevelDB & bdm = BlockDataManager_LevelDB::GetInstance(); 
    BinaryData myAddress;
-   BtcWallet wlt;
+   PPCWallet wlt;
    
    // Main-network addresses
    // I do not remember anymore what any of these addresses were for ...
@@ -834,9 +834,9 @@ void TestReadAndUpdateBlkFile(string tempBlkDir)
 
    // Clean up from the previous run
    copyFile(blk3s,  blk3);
-   if( BtcUtils::GetFileSize(blk4) != FILE_DOES_NOT_EXIST ) 
+   if( PPCUtils::GetFileSize(blk4) != FILE_DOES_NOT_EXIST ) 
       remove(blk4.c_str());
-   if( BtcUtils::GetFileSize(blk5) != FILE_DOES_NOT_EXIST ) 
+   if( PPCUtils::GetFileSize(blk5) != FILE_DOES_NOT_EXIST ) 
       remove(blk5.c_str());
 
 
@@ -896,7 +896,7 @@ void TestReorgBlockchain(string blkdir)
    string blk4A("reorgTest/blk_4A.dat");
    string blk5A("reorgTest/blk_5A.dat");
 
-   BtcWallet wlt;
+   PPCWallet wlt;
    wlt.addAddress(BinaryData::CreateFromHex("62e907b15cbf27d5425399ebf6f0fb50ebb88f18"));
    wlt.addAddress(BinaryData::CreateFromHex("ee26c56fc1d942be8d7a24b2a1001dd894693980"));
    wlt.addAddress(BinaryData::CreateFromHex("cb2abde8bccacc32e893df3a054b9ef7f227a4ce"));
@@ -950,7 +950,7 @@ void TestReorgBlockchain(string blkdir)
       {  
          cout << "    Tx: " 
               << ledger[j].getAddrStr20().getSliceCopy(0,4).toHexStr() << "  "
-              << ledger[j].getValue()/(float)(CONVERTBTC) << " (" 
+              << ledger[j].getValue()/(float)(CONVERTPPC) << " (" 
               << ledger[j].getBlockNum()
               << ")  TxHash: " << ledger[j].getTxHash().getSliceCopy(0,4).toHexStr();
          if( ! ledger[j].isValid())  cout << " (INVALID) ";
@@ -1011,7 +1011,7 @@ void TestReorgBlockchain(string blkdir)
       {  
          cout << "    Tx: " 
               << ledger[j].getAddrStr20().getSliceCopy(0,4).toHexStr() << "  "
-              << ledger[j].getValue()/(float)(CONVERTBTC) << " (" 
+              << ledger[j].getValue()/(float)(CONVERTPPC) << " (" 
               << ledger[j].getBlockNum()
               << ")  TxHash: " << ledger[j].getTxHash().getSliceCopy(0,4).toHexStr();
          if( ! ledger[j].isValid())
@@ -1035,7 +1035,7 @@ void TestZeroConf(void)
 
    BlockDataManager_LevelDB & bdm = BlockDataManager_LevelDB::GetInstance(); 
    BinaryData myAddress;
-   BtcWallet wlt;
+   PPCWallet wlt;
    /*
    bdm.Reset();
    bdm.SetBlkFileLocation("zctest/blk0001.dat", 4, 1);
@@ -1114,7 +1114,7 @@ void TestZeroConf(void)
    bdm.SetBlkFileLocation("zctest/blk0001.dat", 4, 1);
    bdm.parseEntireBlockchain();
    // More testnet addresses, with only a few transactions
-   wlt = BtcWallet();
+   wlt = PPCWallet();
    myAddress.createFromHex("4c98e1fb7aadce864b310b2e52b685c09bdfd5e7"); wlt.addAddress(myAddress);
    myAddress.createFromHex("08ccdf1ef9269b95f6ce93899ece9f68cd5afb22"); wlt.addAddress(myAddress);
    myAddress.createFromHex("edf6bbd7ba7aad222c2b28e6d8d5001178e3680c"); wlt.addAddress(myAddress);
@@ -1167,7 +1167,7 @@ void TestMerkle(void)
    cout << "    " << endl;
    cout << endl;
 
-   vector<BinaryData> merkleTree = BtcUtils::calculateMerkleTree(txList); 
+   vector<BinaryData> merkleTree = PPCUtils::calculateMerkleTree(txList); 
 
    cout << "Full Merkle Tree (this one has been unit tested before):" << endl;
    for(uint32_t i=0; i<merkleTree.size(); i++)
@@ -1310,9 +1310,9 @@ void TestMerkle(void)
    
    cout << endl;
    cout << "Size of original transaction list: " 
-        << BtcUtils::numToStrWCommas(testSize*32) << endl;
+        << PPCUtils::numToStrWCommas(testSize*32) << endl;
    cout << "Size of partial merkle tree list:  " 
-        << BtcUtils::numToStrWCommas(longSer.getSize()) << endl;
+        << PPCUtils::numToStrWCommas(longSer.getSize()) << endl;
    
 
 }
@@ -1574,8 +1574,8 @@ void TestECDSA(void)
 
    SecureBinaryData msgToSign("This message came from me!");
    SecureBinaryData privData = SecureBinaryData().GenerateRandom(32);
-   BTC_PRIVKEY privKey = CryptoECDSA().ParsePrivateKey(privData);
-   BTC_PUBKEY  pubKey  = CryptoECDSA().ComputePublicKey(privKey);
+   PPC_PRIVKEY privKey = CryptoECDSA().ParsePrivateKey(privData);
+   PPC_PUBKEY  pubKey  = CryptoECDSA().ComputePublicKey(privKey);
 
    // Test key-match check
    cout << "Do the pub-priv keypair we just created match? ";
@@ -1633,8 +1633,8 @@ void TestECDSA(void)
 
    // Test deterministic key generation
    SecureBinaryData privDataOrig = SecureBinaryData().GenerateRandom(32);
-   BTC_PRIVKEY privOrig = CryptoECDSA().ParsePrivateKey(privDataOrig);
-   BTC_PUBKEY  pubOrig  = CryptoECDSA().ComputePublicKey(privOrig);
+   PPC_PRIVKEY privOrig = CryptoECDSA().ParsePrivateKey(privDataOrig);
+   PPC_PUBKEY  pubOrig  = CryptoECDSA().ComputePublicKey(privOrig);
    cout << "Testing deterministic key generation" << endl;
    cout << "   Verify again that pub/priv objects pair match : ";
    cout << (CryptoECDSA().CheckPubPrivKeyMatch(privOrig, pubOrig) ? 1 : 0) << endl;
@@ -1690,7 +1690,7 @@ void TestPointCompression(void)
       CryptoPP::Integer pubX, pubY;
       pubX.Decode(testPubKey[i].getPtr()+1,  32, UNSIGNED);
       pubY.Decode(testPubKey[i].getPtr()+33, 32, UNSIGNED);
-      BTC_ECPOINT ptPub(pubX, pubY);
+      PPC_ECPOINT ptPub(pubX, pubY);
 
       BinaryData ptFlat(65);
       BinaryData ptComp(33);
@@ -1738,7 +1738,7 @@ void TestReadBlkFileUpdate(string testblockdir, string blkdir)
    dsts[6] = blkdir + string("/blk00003.dat");
 
    for(uint32_t i=0; i<7; i++)
-      if( BtcUtils::GetFileSize(dsts[i]) != FILE_DOES_NOT_EXIST )
+      if( PPCUtils::GetFileSize(dsts[i]) != FILE_DOES_NOT_EXIST )
          remove(dsts[i].c_str()); 
 
 
@@ -1782,7 +1782,7 @@ void TestOutOfOrder(string blkdir)
    /////////////////////////////////////////////////////////////////////////////
    BlockDataManager_LevelDB & bdm = BlockDataManager_LevelDB::GetInstance(); 
    BinaryData myAddress;
-   BtcWallet wlt;
+   PPCWallet wlt;
    
    // Main-network addresses
    // I do not remember anymore what any of these addresses were for ...
@@ -1885,7 +1885,7 @@ void TestLevelDB(string testLDBDir, string blkfilepath)
    ifstream is(blkfilepath.c_str(), ios::in | ios::binary);
    assert(is.is_open());
 
-   uint64_t filesize = BtcUtils::GetFileSize(blkfilepath);
+   uint64_t filesize = PPCUtils::GetFileSize(blkfilepath);
    BinaryStreamBuffer bsb;
    bsb.attachAsStreamBuffer(is, filesize);
 
@@ -1918,7 +1918,7 @@ void TestLevelDB(string testLDBDir, string blkfilepath)
          BinaryData headerHash(32);
          BinaryData headerRaw(HEADER_SIZE);
          brr.get_BinaryData(headerRaw, HEADER_SIZE);
-         BtcUtils::getHash256_NoSafetyCheck(headerRaw.getPtr(), HEADER_SIZE, headerHash);
+         PPCUtils::getHash256_NoSafetyCheck(headerRaw.getPtr(), HEADER_SIZE, headerHash);
          
          stat = ldb->Put(leveldb::WriteOptions(), 
                          headerHash.toBinStr(),
@@ -1929,11 +1929,11 @@ void TestLevelDB(string testLDBDir, string blkfilepath)
          uint32_t nTx = brr.get_var_int();
          for(uint32_t itx=0; itx<nTx; itx++)
          {
-            uint32_t txLen = BtcUtils::TxCalcLength(brr.getCurrPtr());
+            uint32_t txLen = PPCUtils::TxCalcLength(brr.getCurrPtr());
             BinaryData txRaw(txLen);
             brr.get_BinaryData(txRaw, txLen);
             BinaryData txHash(32);
-            BtcUtils::getHash256_NoSafetyCheck(txRaw.getPtr(), txLen, txHash); 
+            PPCUtils::getHash256_NoSafetyCheck(txRaw.getPtr(), txLen, txHash); 
 
             stat = ldb->Put(leveldb::WriteOptions(), 
                         txHash.toBinStr(),
@@ -1983,7 +1983,7 @@ void TestLDBScanBlockchain(string testdbpath)
 
    TIMER_START("Rescan_from_LevelDB");
    uint32_t nObj=0;
-   uint64_t allbtc=0;
+   uint64_t allppc=0;
    cout << "Entry Lengths: ";
    for(it->SeekToFirst(); it->Valid(); it->Next())
    {
@@ -1991,7 +1991,7 @@ void TestLDBScanBlockchain(string testdbpath)
       if(val.getSize()==80)  // need to add another condition
          continue;
 
-      uint32_t txLen = BtcUtils::TxCalcLength(val.getPtr(), &offsetsIn, &offsetsOut);
+      uint32_t txLen = PPCUtils::TxCalcLength(val.getPtr(), &offsetsIn, &offsetsOut);
       
       OutPoint op;
 
@@ -2010,7 +2010,7 @@ void TestLDBScanBlockchain(string testdbpath)
             {
                uint64_t val = *(uint64_t*)(ptr-8);
                cout << "   Received a TxOut! " << val/1e8 << endl;
-               allbtc += val;
+               allppc += val;
                op.setTxHash(it->key().ToString());
                op.setTxOutIndex(iout);
                unspentOutPoints[op] = val;
@@ -2020,12 +2020,12 @@ void TestLDBScanBlockchain(string testdbpath)
          {
             // Std spend-coinbase TxOut script
             static HashString addr20(20);
-            BtcUtils::getHash160_NoSafetyCheck(ptr+2, 65, addr20);
+            PPCUtils::getHash160_NoSafetyCheck(ptr+2, 65, addr20);
             if( addrMap.find(addr20) != addrMap.end() )
             {
                uint64_t val = *(uint64_t*)(ptr-8);
                cout << "   Received a TxOut!" << val/1e8 << endl;
-               allbtc += val;
+               allppc += val;
                op.setTxHash(it->key().ToString());
                op.setTxOutIndex(iout);
                unspentOutPoints[op] = val;
@@ -2047,7 +2047,7 @@ void TestLDBScanBlockchain(string testdbpath)
       if(val.getSize()==80)  // need to add another condition
          continue;
 
-      uint32_t txLen = BtcUtils::TxCalcLength(val.getPtr(), &offsetsIn, &offsetsOut);
+      uint32_t txLen = PPCUtils::TxCalcLength(val.getPtr(), &offsetsIn, &offsetsOut);
       
       OutPoint op;
       map<OutPoint, uint64_t>::iterator iter;
@@ -2058,14 +2058,14 @@ void TestLDBScanBlockchain(string testdbpath)
          if(iter != unspentOutPoints.end())
          {
             cout << "   Spent a TxOut! " << endl;
-            allbtc -= iter->second;
+            allppc -= iter->second;
             unspentOutPoints.erase(iter);
          }
       }
    }
 
    TIMER_STOP("Rescan_from_LevelDB");
-   cout << "Total TxOuts: " << allbtc/1e8 << endl;
+   cout << "Total TxOuts: " << allppc/1e8 << endl;
 
 }
 

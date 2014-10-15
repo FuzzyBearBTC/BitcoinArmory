@@ -9,7 +9,7 @@ from CppBlockUtils import SecureBinaryData, CryptoAES, CryptoECDSA
 from armoryengine.ArmoryUtils import ADDRBYTE, hash256, binary_to_base58, \
    KeyDataError, RightNow, LOGERROR, ChecksumError, convertKeyDataToAddress, \
    verifyChecksum, WalletLockError, createDERSigFromRS, binary_to_int, \
-   computeChecksum, getVersionInt, PYBTCWALLET_VERSION, bitset_to_int, \
+   computeChecksum, getVersionInt, PYPPCWALLET_VERSION, bitset_to_int, \
    LOGDEBUG, Hash160ToScrAddr, int_to_bitset, UnserializeError, \
    hash160_to_addrStr, int_to_binary, BIGENDIAN, \
    BadAddressError, checkAddrStrValid, binary_to_hex
@@ -23,14 +23,14 @@ import CppBlockUtils as Cpp
 #############################################################################
 def calcWalletIDFromRoot(root, chain):
    """ Helper method for computing a wallet ID """
-   root  = PyBtcAddress().createFromPlainKeyData(SecureBinaryData(root))
+   root  = PyPPCAddress().createFromPlainKeyData(SecureBinaryData(root))
    root.chaincode = SecureBinaryData(chain)
    first = root.extendAddressChain()
    return binary_to_base58((ADDRBYTE + first.getAddr160()[:5])[::-1])
 
-class PyBtcAddress(object):
+class PyPPCAddress(object):
    """
-   PyBtcAddress --
+   PyPPCAddress --
 
    This class encapsulated EVERY kind of address object:
       -- Plaintext private-key-bearing addresses
@@ -138,7 +138,7 @@ class PyBtcAddress(object):
    def getPubKey(self):
       '''Return the uncompressed public key of the address.'''
       if self.binPublicKey65.getSize() != 65:
-         raise KeyDataError, 'PyBtcAddress does not have a public key!'
+         raise KeyDataError, 'PyPPCAddress does not have a public key!'
       return self.binPublicKey65
 
 
@@ -152,7 +152,7 @@ class PyBtcAddress(object):
    def getChainCode(self):
       '''Return the chain code of the address.'''
       if len(self.chaincode) != 32:
-         raise KeyDataError, 'PyBtcAddress does not have a chain code!'
+         raise KeyDataError, 'PyPPCAddress does not have a chain code!'
       return self.chaincode
 
 
@@ -164,7 +164,7 @@ class PyBtcAddress(object):
    #############################################################################
    def getAddr160(self):
       if len(self.addrStr20)!=20:
-         raise KeyDataError, 'PyBtcAddress does not have an address string!'
+         raise KeyDataError, 'PyPPCAddress does not have an address string!'
       return self.addrStr20
 
 
@@ -210,7 +210,7 @@ class PyBtcAddress(object):
 
    #############################################################################
    def copy(self):
-      newAddr = PyBtcAddress().unserialize(self.serialize())
+      newAddr = PyPPCAddress().unserialize(self.serialize())
       newAddr.binPrivKey32_Plain = self.binPrivKey32_Plain.copy()
       newAddr.binPrivKey32_Encr  = self.binPrivKey32_Encr.copy()
       newAddr.binPublicKey65     = self.binPublicKey65.copy()
@@ -771,7 +771,7 @@ class PyBtcAddress(object):
       if not self.chaincode.getSize() == 32:
          raise KeyDataError, 'No chaincode has been defined to extend chain'
 
-      newAddr = PyBtcAddress()
+      newAddr = PyPPCAddress()
       privKeyAvailButNotDecryptable = (self.hasPrivKey() and \
                                        self.isLocked     and \
                                        not secureKdfOutput  )
@@ -942,7 +942,7 @@ class PyBtcAddress(object):
       binOut = BinaryPacker()
       binOut.put(BINARY_CHUNK,   self.addrStr20,                    width=20)
       binOut.put(BINARY_CHUNK,   chk(self.addrStr20),               width= 4)
-      binOut.put(UINT32,         getVersionInt(PYBTCWALLET_VERSION))
+      binOut.put(UINT32,         getVersionInt(PYPPCWALLET_VERSION))
       binOut.put(UINT64,         bitset_to_int(flags))
 
       # Write out address-chaining parameters (for deterministic wallets)
@@ -996,7 +996,7 @@ class PyBtcAddress(object):
       register the address and rescan asynchronously, skipping this method
       entirely:
 
-         cppWlt = Cpp.BtcWallet()
+         cppWlt = Cpp.PPCWallet()
          cppWlt.addScrAddress_1_(Hash160ToScrAddr(self.getAddr160()))
          TheBDM.registerScrAddr(Hash160ToScrAddr(self.getAddr160()))
          TheBDM.rescanBlockchain(wait=False)
@@ -1017,7 +1017,7 @@ class PyBtcAddress(object):
 
          # We are expecting this method to return balance
          # and UTXO data, so we must make sure we're blocking.
-         cppWlt = Cpp.BtcWallet()
+         cppWlt = Cpp.PPCWallet()
          cppWlt.addScrAddress_1_(Hash160ToScrAddr(self.getAddr160()))
          TheBDM.registerWallet(cppWlt, wait=True)
          TheBDM.scanBlockchainForTx(cppWlt, wait=True)
@@ -1270,7 +1270,7 @@ class PyBtcAddress(object):
             return '--'*32
          else:
             return x.toHexStr()[:nchar]
-      print indent + 'BTC Address      :', self.getAddrStr()
+      print indent + 'PPC Address      :', self.getAddrStr()
       print indent + 'Hash160[BE]      :', binary_to_hex(self.getAddr160())
       print indent + 'Wallet Location  :', self.walletByteLoc
       print indent + 'Chained Address  :', self.chainIndex >= -1
@@ -1307,7 +1307,7 @@ class PyBtcAddress(object):
             return '--'*32
          else:
             return x.toHexStr()[:nchar]
-      result = ''.join([indent + 'BTC Address      :', self.getAddrStr()])
+      result = ''.join([indent + 'PPC Address      :', self.getAddrStr()])
       result = ''.join([result, '\n', indent + 'Hash160[BE]      :', binary_to_hex(self.getAddr160())])
       result = ''.join([result, '\n',  indent + 'Wallet Location  :', str(self.walletByteLoc)])
       result = ''.join([result, '\n',  indent + 'Chained Address  :', str(self.chainIndex >= -1)])

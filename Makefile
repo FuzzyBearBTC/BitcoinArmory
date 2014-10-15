@@ -15,14 +15,14 @@ clean :
 	rm -f qrc_img_resources.py
 	rm -f _CppBlockUtils.so
 	rm -f cppForSwig/cryptopp/a.out
-	rm -f *.pyc BitTornado/*.pyc bitcoinrpc_jsonrpc/*.pyc ui/*.pyc
+	rm -f *.pyc BitTornado/*.pyc peercoinrpc_jsonrpc/*.pyc ui/*.pyc
 	rm -f armoryengine/*.pyc dialogs/*.pyc BitTornado/BT1/*.pyc
 	rm -f pytest/*.pyc txjsonrpc/*.pyc jsonrpc/*.pyc txjsonrpc/web/*.pyc 
 
 install : all
 	mkdir -p $(DESTDIR)$(PREFIX)/share/armory/img
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/armory/extras
-	mkdir -p $(DESTDIR)$(PREFIX)/lib/armory/bitcoinrpc_jsonrpc
+	mkdir -p $(DESTDIR)$(PREFIX)/lib/armory/peercoinrpc_jsonrpc
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/armory/txjsonrpc
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/armory/txjsonrpc/web
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/armory/ui
@@ -36,7 +36,7 @@ install : all
 	rsync -rupE armoryengine $(DESTDIR)$(PREFIX)/lib/armory/
 	rsync -rupE --exclude="img/.DS_Store" img $(DESTDIR)$(PREFIX)/share/armory/
 	cp extras/*.py $(DESTDIR)$(PREFIX)/lib/armory/extras
-	cp bitcoinrpc_jsonrpc/*.py $(DESTDIR)$(PREFIX)/lib/armory/bitcoinrpc_jsonrpc
+	cp peercoinrpc_jsonrpc/*.py $(DESTDIR)$(PREFIX)/lib/armory/peercoinrpc_jsonrpc
 	cp -r txjsonrpc/*.py $(DESTDIR)$(PREFIX)/lib/armory/txjsonrpc
 	cp -r txjsonrpc/web/*.py $(DESTDIR)$(PREFIX)/lib/armory/txjsonrpc/web
 	cp ui/*.py $(DESTDIR)$(PREFIX)/lib/armory/ui

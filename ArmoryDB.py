@@ -1,6 +1,6 @@
 #######################################################################################################
 #
-# Inconsistencies found in the DB map (https://dl.dropboxusercontent.com/u/1139081/BitcoinImg/armory_db_keyvalue_maps.png) as compared to the actual DB:
+# Inconsistencies found in the DB map (https://dl.dropboxusercontent.com/u/1139081/PeercoinImg/armory_db_keyvalue_maps.png) as compared to the actual DB:
 #
 # In leveldb_headers:
 # StoredDBInfo (Key '\0'):

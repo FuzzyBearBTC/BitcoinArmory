@@ -11,17 +11,17 @@ import socket
 import stat
 import time
 from threading import Event
-from bitcoinrpc_jsonrpc import ServiceProxy
+from peercoinrpc_jsonrpc import ServiceProxy
 from CppBlockUtils import SecureBinaryData, CryptoECDSA
 from armoryengine.ArmoryUtils import BITCOIN_PORT, LOGERROR, hex_to_binary, \
-   ARMORY_INFO_SIGN_PUBLICKEY, LOGINFO, BTC_HOME_DIR, LOGDEBUG, OS_WINDOWS, \
+   ARMORY_INFO_SIGN_PUBLICKEY, LOGINFO, PPC_HOME_DIR, LOGDEBUG, OS_WINDOWS, \
    SystemSpecs, subprocess_check_output, LOGEXCEPT, FileExistsError, OS_VARIANT, \
    BITCOIN_RPC_PORT, binary_to_base58, isASCII, USE_TESTNET, GIGABYTE, \
    launchProcess, killProcessTree, killProcess, LOGWARN, RightNow, HOUR, \
    PyBackgroundThread, touchFile, DISABLE_TORRENTDL, secondsToHumanTime, \
-   bytesToHumanSize, MAGIC_BYTES, deleteBitcoindDBs, TheTDM, satoshiIsAvailable,\
+   bytesToHumanSize, MAGIC_BYTES, deletePeercoindDBs, TheTDM, satoshiIsAvailable,\
    MEGABYTE, ARMORY_HOME_DIR, CLI_OPTIONS
-from bitcoinrpc_jsonrpc import authproxy
+from peercoinrpc_jsonrpc import authproxy
 
 
 ################################################################################
@@ -89,15 +89,15 @@ def parseLinkList(theData):
 
 
 ################################################################################
-# jgarzik'sjj jsonrpc-bitcoin code -- stupid-easy to talk to bitcoind
+# jgarzik'sjj jsonrpc-peercoin code -- stupid-easy to talk to peercoind
 class SatoshiDaemonManager(object):
    """
-   Use an existing implementation of bitcoind
+   Use an existing implementation of peercoind
    """
 
-   class BitcoindError(Exception): pass
-   class BitcoindNotAvailableError(Exception): pass
-   class BitcoinDotConfError(Exception): pass
+   class PeercoindError(Exception): pass
+   class PeercoindNotAvailableError(Exception): pass
+   class PeercoinDotConfError(Exception): pass
    class SatoshiHomeDirDNE(Exception): pass
    class ConfigFileUserDNE(Exception): pass
    class ConfigFilePwdDNE(Exception): pass
@@ -109,7 +109,7 @@ class SatoshiDaemonManager(object):
       self.satoshiHome = None
       self.bitconf = {}
       self.proxy = None
-      self.bitcoind = None
+      self.peercoind = None
       self.isMidQuery = False
       self.last20queries = []
       self.disabled = False
@@ -118,8 +118,8 @@ class SatoshiDaemonManager(object):
       self.foundExe = []
       self.circBufferState = []
       self.circBufferTime = []
-      self.btcOut = None
-      self.btcErr = None
+      self.ppcOut = None
+      self.ppcErr = None
       self.lastTopBlockInfo = { \
                                  'numblks':    -1,
                                  'tophash':    '',
@@ -175,7 +175,7 @@ class SatoshiDaemonManager(object):
 
 
       # We will tell the TDM to write status updates to the log file, and only
-      # every 90 seconds.  After it finishes (or fails), simply launch bitcoind
+      # every 90 seconds.  After it finishes (or fails), simply launch peercoind
       # as we would've done without the torrent
       #####
       def torrentLogToFile(dpflag=Event(), fractionDone=None, timeEst=None,
@@ -204,9 +204,9 @@ class SatoshiDaemonManager(object):
             bootsz = bytesToHumanSize(os.path.getsize(bootfile))
 
          LOGINFO('Torrent finished; size of %s is %s', torrentPath, bootsz)
-         LOGINFO('Remove the core btc databases before doing bootstrap')
-         deleteBitcoindDBs()
-         self.launchBitcoindAndGuardian()
+         LOGINFO('Remove the core ppc databases before doing bootstrap')
+         deletePeercoindDBs()
+         self.launchPeercoindAndGuardian()
 
       #####
       def warnUserHashFail():
@@ -228,7 +228,7 @@ class SatoshiDaemonManager(object):
             bootsz = bytesToHumanSize(os.path.getsize(bootfile))
 
          LOGERROR('Torrent failed; size of %s is %s', torrentPath, bootsz)
-         self.launchBitcoindAndGuardian()
+         self.launchPeercoindAndGuardian()
          
 
  
@@ -250,7 +250,7 @@ class SatoshiDaemonManager(object):
       if DISABLE_TORRENTDL or TheTDM.getTDMState()=='Disabled':
          return False
 
-      # The only torrent we have is for the primary Bitcoin network
+      # The only torrent we have is for the primary Peercoin network
       if not MAGIC_BYTES=='\xf9\xbe\xb4\xd9':
          return False
       
@@ -265,7 +265,7 @@ class SatoshiDaemonManager(object):
                return False
                
 
-      # If they don't even have a BTC_HOME_DIR, corebtc never been installed
+      # If they don't even have a PPC_HOME_DIR, coreppc never been installed
       blockDir = os.path.join(self.satoshiHome, 'blocks')
       if not os.path.exists(self.satoshiHome) or not os.path.exists(blockDir):
          return True
@@ -281,7 +281,7 @@ class SatoshiDaemonManager(object):
       if blockDirSize < szThresh:
          return True
 
-      # So far we know they have a BTC_HOME_DIR, with more than 6GB in blocks/
+      # So far we know they have a PPC_HOME_DIR, with more than 6GB in blocks/
       # The only thing that can induce torrent now is if we have a partially-
       # finished bootstrap file bigger than the blocks dir.
       bootFiles = ['','']
@@ -301,39 +301,39 @@ class SatoshiDaemonManager(object):
       #self.satoshiHome = newDir
 
    #############################################################################
-   def setupSDM(self, pathToBitcoindExe=None, satoshiHome=None, \
+   def setupSDM(self, pathToPeercoindExe=None, satoshiHome=None, \
                       extraExeSearch=[], createHomeIfDNE=True):
       LOGDEBUG('Exec setupSDM')
       self.failedFindExe = False
       self.failedFindHome = False
       # If we are supplied a path, then ignore the extra exe search paths
-      if pathToBitcoindExe==None:
-         pathToBitcoindExe = self.findBitcoind(extraExeSearch)
-         if len(pathToBitcoindExe)==0:
-            LOGDEBUG('Failed to find bitcoind')
+      if pathToPeercoindExe==None:
+         pathToPeercoindExe = self.findPeercoind(extraExeSearch)
+         if len(pathToPeercoindExe)==0:
+            LOGDEBUG('Failed to find peercoind')
             self.failedFindExe = True
          else:
-            LOGINFO('Found bitcoind in the following places:')
-            for p in pathToBitcoindExe:
+            LOGINFO('Found peercoind in the following places:')
+            for p in pathToPeercoindExe:
                LOGINFO('   %s', p)
-            pathToBitcoindExe = pathToBitcoindExe[0]
-            LOGINFO('Using: %s', pathToBitcoindExe)
+            pathToPeercoindExe = pathToPeercoindExe[0]
+            LOGINFO('Using: %s', pathToPeercoindExe)
 
-            if not os.path.exists(pathToBitcoindExe):
+            if not os.path.exists(pathToPeercoindExe):
                LOGINFO('Somehow failed to find exe even after finding it...?')
                self.failedFindExe = True
 
-      self.executable = pathToBitcoindExe
+      self.executable = pathToPeercoindExe
 
       # Four possible conditions for already-set satoshi home dir, and input arg
       if satoshiHome is not None:
          self.satoshiHome = satoshiHome
       else:
          if self.satoshiHome is None:
-            self.satoshiHome = BTC_HOME_DIR
+            self.satoshiHome = PPC_HOME_DIR
 
       # If no new dir is specified, leave satoshi home if it's already set
-      # Give it a default BTC_HOME_DIR if not.
+      # Give it a default PPC_HOME_DIR if not.
       if not os.path.exists(self.satoshiHome):
          if createHomeIfDNE:
             LOGINFO('Making satoshi home dir')
@@ -342,16 +342,16 @@ class SatoshiDaemonManager(object):
             LOGINFO('No home dir, makedir not requested')
             self.failedFindHome = True
 
-      if self.failedFindExe:  raise self.BitcoindError, 'bitcoind not found'
-      if self.failedFindHome: raise self.BitcoindError, 'homedir not found'
+      if self.failedFindExe:  raise self.PeercoindError, 'peercoind not found'
+      if self.failedFindHome: raise self.PeercoindError, 'homedir not found'
 
       self.disabled = False
       self.proxy = None
-      self.bitcoind = None  # this will be a Popen object
+      self.peercoind = None  # this will be a Popen object
       self.isMidQuery = False
       self.last20queries = []
 
-      self.readBitcoinConf(makeIfDNE=True)
+      self.readPeercoinConf(makeIfDNE=True)
 
 
 
@@ -362,8 +362,8 @@ class SatoshiDaemonManager(object):
       s = self.getSDMState()
 
       if newBool==True:
-         if s in ('BitcoindInitializing', 'BitcoindSynchronizing', 'BitcoindReady'):
-            self.stopBitcoind()
+         if s in ('PeercoindInitializing', 'PeercoindSynchronizing', 'PeercoindReady'):
+            self.stopPeercoind()
 
       self.disabled = newBool
 
@@ -374,15 +374,15 @@ class SatoshiDaemonManager(object):
 
 
    #############################################################################
-   def findBitcoind(self, extraSearchPaths=[]):
+   def findPeercoind(self, extraSearchPaths=[]):
       self.foundExe = []
 
       searchPaths = list(extraSearchPaths)  # create a copy
 
       if OS_WINDOWS:
-         # Making sure the search path argument comes with /daemon and /Bitcoin on Windows
+         # Making sure the search path argument comes with /daemon and /Peercoin on Windows
 
-         searchPaths.extend([os.path.join(sp, 'Bitcoin') for sp in searchPaths])
+         searchPaths.extend([os.path.join(sp, 'Peercoin') for sp in searchPaths])
          searchPaths.extend([os.path.join(sp, 'daemon') for sp in searchPaths])
 
          possBaseDir = []         
@@ -402,12 +402,12 @@ class SatoshiDaemonManager(object):
          if os.path.exists(desktop):
             dtopfiles = os.listdir(desktop)
             for path in [os.path.join(desktop, fn) for fn in dtopfiles]:
-               if 'bitcoin' in path.lower() and path.lower().endswith('.lnk'):
+               if 'peercoin' in path.lower() and path.lower().endswith('.lnk'):
                   import win32com.client
                   shell = win32com.client.Dispatch('WScript.Shell')
                   targ = shell.CreateShortCut(path).Targetpath
                   targDir = os.path.dirname(targ)
-                  LOGINFO('Found Bitcoin-Qt link on desktop: %s', targDir)
+                  LOGINFO('Found Peercoin-Qt link on desktop: %s', targDir)
                   possBaseDir.append( targDir )
 
          # Also look in default place in ProgramFiles dirs
@@ -417,12 +417,12 @@ class SatoshiDaemonManager(object):
 
          # Now look at a few subdirs of the
          searchPaths.extend(possBaseDir)
-         searchPaths.extend([os.path.join(p, 'Bitcoin', 'daemon') for p in possBaseDir])
+         searchPaths.extend([os.path.join(p, 'Peercoin', 'daemon') for p in possBaseDir])
          searchPaths.extend([os.path.join(p, 'daemon') for p in possBaseDir])
-         searchPaths.extend([os.path.join(p, 'Bitcoin') for p in possBaseDir])
+         searchPaths.extend([os.path.join(p, 'Peercoin') for p in possBaseDir])
 
          for p in searchPaths:
-            testPath = os.path.join(p, 'bitcoind.exe')
+            testPath = os.path.join(p, 'peercoind.exe')
             if os.path.exists(testPath):
                self.foundExe.append(testPath)
 
@@ -433,17 +433,17 @@ class SatoshiDaemonManager(object):
          else:
             searchPaths.extend([os.path.join(p, 'bin/32') for p in extraSearchPaths])
 
-         searchPaths.extend(['/usr/bin/', '/usr/lib/bitcoin/'])
+         searchPaths.extend(['/usr/bin/', '/usr/lib/peercoin/'])
 
          for p in searchPaths:
-            testPath = os.path.join(p, 'bitcoind')
+            testPath = os.path.join(p, 'peercoind')
             if os.path.exists(testPath):
                self.foundExe.append(testPath)
 
          try:
-            locs = subprocess_check_output(['whereis','bitcoind']).split()
+            locs = subprocess_check_output(['whereis','peercoind']).split()
             if len(locs)>1:
-               locs = filter(lambda x: os.path.basename(x)=='bitcoind', locs)
+               locs = filter(lambda x: os.path.basename(x)=='peercoind', locs)
                LOGINFO('"whereis" returned: %s', str(locs))
                self.foundExe.extend(locs)
          except:
@@ -460,10 +460,10 @@ class SatoshiDaemonManager(object):
                foundIt=True
 
          if not foundIt:
-            LOGERROR('Bitcoind could not be found in the specified installation:')
+            LOGERROR('Peercoind could not be found in the specified installation:')
             for p in extraSearchPaths:
                LOGERROR('   %s', p)
-            LOGERROR('Bitcoind is being started from:')
+            LOGERROR('Peercoind is being started from:')
             LOGERROR('   %s', self.foundExe[0])
 
       return self.foundExe
@@ -486,17 +486,17 @@ class SatoshiDaemonManager(object):
       return gpath
 
    #############################################################################
-   def readBitcoinConf(self, makeIfDNE=False):
-      LOGINFO('Reading bitcoin.conf file')
-      bitconf = os.path.join( self.satoshiHome, 'bitcoin.conf' )
+   def readPeercoinConf(self, makeIfDNE=False):
+      LOGINFO('Reading peercoin.conf file')
+      bitconf = os.path.join( self.satoshiHome, 'peercoin.conf' )
       if not os.path.exists(bitconf):
          if not makeIfDNE:
-            raise self.BitcoinDotConfError, 'Could not find bitcoin.conf'
+            raise self.PeercoinDotConfError, 'Could not find peercoin.conf'
          else:
-            LOGINFO('No bitcoin.conf available.  Creating it...')
+            LOGINFO('No peercoin.conf available.  Creating it...')
             touchFile(bitconf)
 
-      # Guarantee that bitcoin.conf file has very strict permissions
+      # Guarantee that peercoin.conf file has very strict permissions
       if OS_WINDOWS:
          if OS_VARIANT[0].lower()=='xp':
             LOGERROR('Cannot set permissions correctly in XP!')
@@ -506,7 +506,7 @@ class SatoshiDaemonManager(object):
             LOGERROR('on XP systems):')
             LOGERROR('    %s', bitconf)
          else:
-            LOGINFO('Setting permissions on bitcoin.conf')
+            LOGINFO('Setting permissions on peercoin.conf')
             import ctypes
             username_u16 = ctypes.create_unicode_buffer(u'\0', 512)
             str_length = ctypes.c_int(512)
@@ -514,15 +514,15 @@ class SatoshiDaemonManager(object):
                                                 ctypes.byref(str_length))
             
             if not CLI_OPTIONS.disableConfPermis:
-               LOGINFO('Setting permissions on bitcoin.conf')
+               LOGINFO('Setting permissions on peercoin.conf')
                cmd_icacls = [u'icacls',bitconf,u'/inheritance:r',u'/grant:r', u'%s:F' % username_u16.value]
                icacls_out = subprocess_check_output(cmd_icacls, shell=True)
                LOGINFO('icacls returned: %s', icacls_out)
             else:
-               LOGWARN('Skipped setting permissions on bitcoin.conf file')
+               LOGWARN('Skipped setting permissions on peercoin.conf file')
             
       else:
-         LOGINFO('Setting permissions on bitcoin.conf')
+         LOGINFO('Setting permissions on peercoin.conf')
          os.chmod(bitconf, stat.S_IRUSR | stat.S_IWUSR)
 
 
@@ -562,9 +562,9 @@ class SatoshiDaemonManager(object):
 
 
       if not isASCII(self.bitconf['rpcuser']):
-         LOGERROR('Non-ASCII character in bitcoin.conf (rpcuser)!')
+         LOGERROR('Non-ASCII character in peercoin.conf (rpcuser)!')
       if not isASCII(self.bitconf['rpcpassword']):
-         LOGERROR('Non-ASCII character in bitcoin.conf (rpcpassword)!')
+         LOGERROR('Non-ASCII character in peercoin.conf (rpcpassword)!')
 
       self.bitconf['host'] = '127.0.0.1'
 
@@ -575,19 +575,19 @@ class SatoshiDaemonManager(object):
       pass    
 
    #############################################################################
-   def startBitcoind(self):
-      self.btcOut, self.btcErr = None,None
+   def startPeercoind(self):
+      self.ppcOut, self.ppcErr = None,None
       if self.disabled:
          LOGERROR('SDM was disabled, must be re-enabled before starting')
          return
 
-      LOGINFO('Called startBitcoind')
+      LOGINFO('Called startPeercoind')
 
-      if self.isRunningBitcoind() or TheTDM.getTDMState()=='Downloading':
-         raise self.BitcoindError, 'Looks like we have already started theSDM'
+      if self.isRunningPeercoind() or TheTDM.getTDMState()=='Downloading':
+         raise self.PeercoindError, 'Looks like we have already started theSDM'
 
       if not os.path.exists(self.executable):
-         raise self.BitcoindError, 'Could not find bitcoind'
+         raise self.PeercoindError, 'Could not find peercoind'
 
       
       chk1 = os.path.exists(self.useTorrentFile)
@@ -597,12 +597,12 @@ class SatoshiDaemonManager(object):
       if chk1 and chk2 and chk3:
          TheTDM.startDownload()
       else:
-         self.launchBitcoindAndGuardian()
+         self.launchPeercoindAndGuardian()
             
 
 
    #############################################################################
-   def launchBitcoindAndGuardian(self):
+   def launchPeercoindAndGuardian(self):
 
       pargs = [self.executable]
 
@@ -635,18 +635,18 @@ class SatoshiDaemonManager(object):
          LOGEXCEPT('Failed size check of blocks directory')
 
 
-      # Startup bitcoind and get its process ID (along with our own)
-      self.bitcoind = launchProcess(pargs)
+      # Startup peercoind and get its process ID (along with our own)
+      self.peercoind = launchProcess(pargs)
 
-      self.btcdpid  = self.bitcoind.pid
+      self.ppcdpid  = self.peercoind.pid
       self.selfpid  = os.getpid()
 
-      LOGINFO('PID of bitcoind: %d',  self.btcdpid)
+      LOGINFO('PID of peercoind: %d',  self.ppcdpid)
       LOGINFO('PID of armory:   %d',  self.selfpid)
 
       # Startup guardian process -- it will watch Armory's PID
       gpath = self.getGuardianPath()
-      pargs = [gpath, str(self.selfpid), str(self.btcdpid)]
+      pargs = [gpath, str(self.selfpid), str(self.ppcdpid)]
       if not OS_WINDOWS:
          pargs.insert(0, 'python')
       launchProcess(pargs)
@@ -654,57 +654,57 @@ class SatoshiDaemonManager(object):
 
 
    #############################################################################
-   def stopBitcoind(self):
-      LOGINFO('Called stopBitcoind')
-      if not self.isRunningBitcoind():
-         LOGINFO('...but bitcoind is not running, to be able to stop')
+   def stopPeercoind(self):
+      LOGINFO('Called stopPeercoind')
+      if not self.isRunningPeercoind():
+         LOGINFO('...but peercoind is not running, to be able to stop')
          return
 
-      killProcessTree(self.bitcoind.pid)
-      killProcess(self.bitcoind.pid)
+      killProcessTree(self.peercoind.pid)
+      killProcess(self.peercoind.pid)
 
       time.sleep(1)
-      self.bitcoind = None
+      self.peercoind = None
 
 
    #############################################################################
-   def isRunningBitcoind(self):
+   def isRunningPeercoind(self):
       """
       armoryengine satoshiIsAvailable() only tells us whether there's a
-      running bitcoind that is actively responding on its port.  But it
+      running peercoind that is actively responding on its port.  But it
       won't be responding immediately after we've started it (still doing
-      startup operations).  If bitcoind was started and still running,
+      startup operations).  If peercoind was started and still running,
       then poll() will return None.  Any othe poll() return value means
       that the process terminated
       """
-      if self.bitcoind==None:
+      if self.peercoind==None:
          return False
       else:
-         if not self.bitcoind.poll()==None:
-            LOGDEBUG('Bitcoind is no more')
-            if self.btcOut==None:
-               self.btcOut, self.btcErr = self.bitcoind.communicate()
-               LOGWARN('bitcoind exited, bitcoind STDOUT:')
-               for line in self.btcOut.split('\n'):
+         if not self.peercoind.poll()==None:
+            LOGDEBUG('Peercoind is no more')
+            if self.ppcOut==None:
+               self.ppcOut, self.ppcErr = self.peercoind.communicate()
+               LOGWARN('peercoind exited, peercoind STDOUT:')
+               for line in self.ppcOut.split('\n'):
                   LOGWARN(line)
-               LOGWARN('bitcoind exited, bitcoind STDERR:')
-               for line in self.btcErr.split('\n'):
+               LOGWARN('peercoind exited, peercoind STDERR:')
+               for line in self.ppcErr.split('\n'):
                   LOGWARN(line)
-         return self.bitcoind.poll()==None
+         return self.peercoind.poll()==None
 
    #############################################################################
-   def wasRunningBitcoind(self):
-      return (not self.bitcoind==None)
+   def wasRunningPeercoind(self):
+      return (not self.peercoind==None)
 
    #############################################################################
-   def bitcoindIsResponsive(self):
+   def peercoindIsResponsive(self):
       return satoshiIsAvailable(self.bitconf['host'], self.bitconf['rpcport'])
 
    #############################################################################
    def getSDMState(self):
       """
       As for why I'm doing this:  it turns out that between "initializing"
-      and "synchronizing", bitcoind temporarily stops responding entirely,
+      and "synchronizing", peercoind temporarily stops responding entirely,
       which causes "not-available" to be the state.  I need to smooth that
       out because it wreaks havoc on the GUI which will switch to showing
       a nasty error.
@@ -724,10 +724,10 @@ class SatoshiDaemonManager(object):
       # of "not available").   "NotAvail" keeps getting added to the
       # buffer, but if it was "initializing" in the last 5 seconds,
       # we will keep "initializing"
-      if state=='BitcoindNotAvailable':
-         if 'BitcoindInitializing' in self.circBufferState:
+      if state=='PeercoindNotAvailable':
+         if 'PeercoindInitializing' in self.circBufferState:
             LOGWARN('Overriding not-available state. This should happen 0-5 times')
-            return 'BitcoindInitializing'
+            return 'PeercoindInitializing'
 
       return state
 
@@ -735,66 +735,66 @@ class SatoshiDaemonManager(object):
    def getSDMStateLogic(self):
 
       if self.disabled:
-         return 'BitcoindMgmtDisabled'
+         return 'PeercoindMgmtDisabled'
 
       if self.failedFindExe:
-         return 'BitcoindExeMissing'
+         return 'PeercoindExeMissing'
 
       if self.failedFindHome:
-         return 'BitcoindHomeMissing'
+         return 'PeercoindHomeMissing'
 
       if TheTDM.isRunning():
          return 'TorrentSynchronizing'
 
       latestInfo = self.getTopBlockInfo()
 
-      if self.bitcoind==None and latestInfo['error']=='Uninitialized':
-         return 'BitcoindNeverStarted'
+      if self.peercoind==None and latestInfo['error']=='Uninitialized':
+         return 'PeercoindNeverStarted'
 
-      if not self.isRunningBitcoind():
+      if not self.isRunningPeercoind():
          # Not running at all:  either never started, or process terminated
-         if not self.btcErr==None and len(self.btcErr)>0:
-            errstr = self.btcErr.replace(',',' ').replace('.',' ').replace('!',' ')
+         if not self.ppcErr==None and len(self.ppcErr)>0:
+            errstr = self.ppcErr.replace(',',' ').replace('.',' ').replace('!',' ')
             errPcs = set([a.lower() for a in errstr.split()])
             runPcs = set(['cannot','obtain','lock','already','running'])
             dbePcs = set(['database', 'recover','backup','except','wallet','dat'])
             if len(errPcs.intersection(runPcs))>=(len(runPcs)-1):
-               return 'BitcoindAlreadyRunning'
+               return 'PeercoindAlreadyRunning'
             elif len(errPcs.intersection(dbePcs))>=(len(dbePcs)-1):
-               return 'BitcoindDatabaseEnvError'
+               return 'PeercoindDatabaseEnvError'
             else:
-               return 'BitcoindUnknownCrash'
+               return 'PeercoindUnknownCrash'
          else:
-            return 'BitcoindNotAvailable'
-      elif not self.bitcoindIsResponsive():
+            return 'PeercoindNotAvailable'
+      elif not self.peercoindIsResponsive():
          # Running but not responsive... must still be initializing
-         return 'BitcoindInitializing'
+         return 'PeercoindInitializing'
       else:
          # If it's responsive, get the top block and check
          # TODO: These conditionals are based on experimental results.  May
          #       not be accurate what the specific errors mean...
          if latestInfo['error']=='ValueError':
-            return 'BitcoindWrongPassword'
+            return 'PeercoindWrongPassword'
          elif latestInfo['error']=='JsonRpcException':
-            return 'BitcoindInitializing'
+            return 'PeercoindInitializing'
          elif latestInfo['error']=='SocketError':
-            return 'BitcoindNotAvailable'
+            return 'PeercoindNotAvailable'
 
-         if 'BitcoindReady' in self.circBufferState:
+         if 'PeercoindReady' in self.circBufferState:
             # If ready, always ready
-            return 'BitcoindReady'
+            return 'PeercoindReady'
 
-         # If we get here, bitcoind is gave us a response.
+         # If we get here, peercoind is gave us a response.
          secSinceLastBlk = RightNow() - latestInfo['toptime']
          blkspersec = latestInfo['blkspersec']
          #print 'Blocks per 10 sec:', ('UNKNOWN' if blkspersec==-1 else blkspersec*10)
          if secSinceLastBlk > 4*HOUR or blkspersec==-1:
-            return 'BitcoindSynchronizing'
+            return 'PeercoindSynchronizing'
          else:
-            if blkspersec*20 > 2 and not 'BitcoindReady' in self.circBufferState:
-               return 'BitcoindSynchronizing'
+            if blkspersec*20 > 2 and not 'PeercoindReady' in self.circBufferState:
+               return 'PeercoindSynchronizing'
             else:
-               return 'BitcoindReady'
+               return 'PeercoindReady'
 
 
 
@@ -844,11 +844,11 @@ class SatoshiDaemonManager(object):
          LOGEXCEPT('ValueError in bkgd req top blk')
          self.lastTopBlockInfo['error'] = 'ValueError'
       except authproxy.JSONRPCException:
-         # This seems to happen when bitcoind is overwhelmed... not quite ready
+         # This seems to happen when peercoind is overwhelmed... not quite ready
          LOGDEBUG('generic jsonrpc exception')
          self.lastTopBlockInfo['error'] = 'JsonRpcException'
       except socket.error:
-         # Connection isn't available... is bitcoind not running anymore?
+         # Connection isn't available... is peercoind not running anymore?
          LOGDEBUG('generic socket error')
          self.lastTopBlockInfo['error'] = 'SocketError'
       except:
@@ -862,7 +862,7 @@ class SatoshiDaemonManager(object):
    #############################################################################
    def updateTopBlockInfo(self):
       """
-      We want to get the top block information, but if bitcoind is rigorously
+      We want to get the top block information, but if peercoind is rigorously
       downloading and verifying the blockchain, it can sometimes take 10s to
       to respond to JSON-RPC calls!  We must do it in the background...
 
@@ -870,7 +870,7 @@ class SatoshiDaemonManager(object):
       just return the last value, which may be "stale" but we don't really
       care for this particular use-case
       """
-      if not self.isRunningBitcoind():
+      if not self.isRunningPeercoind():
          return
 
       if self.isMidQuery:
@@ -883,7 +883,7 @@ class SatoshiDaemonManager(object):
 
    #############################################################################
    def getTopBlockInfo(self):
-      if self.isRunningBitcoind():
+      if self.isRunningPeercoind():
          self.updateTopBlockInfo()
          self.queryThread.join(0.001)  # In most cases, result should come in 1 ms
          # We return a copy so that the data is not changing as we use it
@@ -894,10 +894,10 @@ class SatoshiDaemonManager(object):
    #############################################################################
    def callJSON(self, func, *args):
       state = self.getSDMState()
-      if not state in ('BitcoindReady', 'BitcoindSynchronizing'):
+      if not state in ('PeercoindReady', 'PeercoindSynchronizing'):
          LOGERROR('Called callJSON(%s, %s)', func, str(args))
          LOGERROR('Current SDM state: %s', state)
-         raise self.BitcoindError, 'callJSON while %s'%state
+         raise self.PeercoindError, 'callJSON while %s'%state
 
       return self.proxy.__getattr__(func)(*args)
 
@@ -912,7 +912,7 @@ class SatoshiDaemonManager(object):
          sdminfo['topblk_%s'%key] = val
 
       sdminfo['executable'] = self.executable
-      sdminfo['isrunning']  = self.isRunningBitcoind()
+      sdminfo['isrunning']  = self.isRunningPeercoind()
       sdminfo['homedir']    = self.satoshiHome
       sdminfo['proxyinit']  = (not self.proxy==None)
       sdminfo['ismidquery'] = self.isMidQuery

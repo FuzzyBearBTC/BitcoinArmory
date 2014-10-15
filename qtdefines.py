@@ -37,16 +37,16 @@ STYLE_NONE   = QFrame.NoFrame
 VERTICAL = 'vertical'
 HORIZONTAL = 'horizontal'
 CHANGE_ADDR_DESCR_STRING = '[[ Change received ]]'
-HTTP_VERSION_FILE = 'https://bitcoinarmory.com/versions.txt'
-BUG_REPORT_URL = 'https://bitcoinarmory.com/scripts/receive_debug.php'
-PRIVACY_URL = 'https://bitcoinarmory.com/privacy-policy'
+HTTP_VERSION_FILE = 'https://peercoinarmory.com/versions.txt'
+BUG_REPORT_URL = 'https://peercoinarmory.com/scripts/receive_debug.php'
+PRIVACY_URL = 'https://peercoinarmory.com/privacy-policy'
 # For announcements handling
 ANNOUNCE_FETCH_INTERVAL = 1 * HOUR
 if CLI_OPTIONS.testAnnounceCode:
    HTTP_ANNOUNCE_FILE = \
-      'https://s3.amazonaws.com/bitcoinarmory-testing/testannounce.txt'
+      'https://s3.amazonaws.com/peercoinarmory-testing/testannounce.txt'
 else:
-   HTTP_ANNOUNCE_FILE = 'https://bitcoinarmory.com/atiannounce.txt'
+   HTTP_ANNOUNCE_FILE = 'https://peercoinarmory.com/atiannounce.txt'
 
 # Keep track of dialogs and wizard that are executing
 runningDialogsList = []
@@ -744,10 +744,10 @@ class ArmoryDialog(QDialog):
       self.setWindowFlags(Qt.Window)
 
       if USE_TESTNET:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management [TESTNET]')
+         self.setWindowTitle('Armory - Peercoin Wallet Management [TESTNET]')
          self.setWindowIcon(QIcon(':/armory_icon_green_32x32.png'))
       else:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management')
+         self.setWindowTitle('Armory - Peercoin Wallet Management')
          self.setWindowIcon(QIcon(':/armory_icon_32x32.png'))
    
    @AddToRunningDialogsList

@@ -9,7 +9,7 @@
 
 from sys import path as PYPATH, argv
 PYPATH.append('..')
-from btcarmoryengine import *
+from ppcarmoryengine import *
 from datetime import datetime
 from os import path
 
@@ -17,11 +17,11 @@ import platform
 opsys = platform.system()
 blkfile = ''
 if 'win' in opsys.lower():
-   blkfile = path.join(os.getenv('APPDATA'), 'Bitcoin', 'blk0001.dat')
+   blkfile = path.join(os.getenv('APPDATA'), 'Peercoin', 'blk0001.dat')
 if 'nix' in opsys.lower() or 'nux' in opsys.lower():
-   blkfile = path.join(os.getenv('HOME'), '.bitcoin', 'blk0001.dat')
+   blkfile = path.join(os.getenv('HOME'), '.peercoin', 'blk0001.dat')
 if 'mac' in opsys.lower() or 'osx' in opsys.lower():
-   blkfile = os.path.expanduser('~/Library/Application Support/Bitcoin/blk0001.dat')
+   blkfile = os.path.expanduser('~/Library/Application Support/Peercoin/blk0001.dat')
 
 if len(sys.argv) > 1:
    blkfile = sys.argv[1]
@@ -151,7 +151,7 @@ addrStr6 = hex_to_binary('0e0aec36fe2545fb31a41164fb6954adcd96b342');
 
 # The _1_ methods are to avoid quirks with SWIG related using overloaded methods
 # requiring arguments that were typemap'd (BinaryData, in this case)
-cppWallet = Cpp.BtcWallet()
+cppWallet = Cpp.PPCWallet()
 cppWallet.addAddress_1_(addrStr1);
 cppWallet.addAddress_1_(addrStr2);
 cppWallet.addAddress_1_(addrStr3);

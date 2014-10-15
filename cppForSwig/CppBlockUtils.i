@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
 //  Copyright (C) 2011-2014, Armory Technologies, Inc.                        //
-//  support@bitcoinarmory.com                                                 //
+//  support@peercoinarmory.com                                                 //
 //  Distributed under the GNU Affero General Public License (AGPL v3)         //
 //  See LICENSE or http://www.gnu.org/licenses/agpl.html                      //
 //                                                                            //
@@ -17,7 +17,7 @@
 #include "BlockObj.h"
 #include "StoredBlockObj.h"
 #include "BlockUtils.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 #include "EncryptionUtils.h"
 %}
 
@@ -47,7 +47,7 @@ namespace std
    %template(vector_Tx) std::vector<Tx>;
    %template(vector_BlockHeaderPtr) std::vector<BlockHeader>;
    %template(vector_UnspentTxOut) std::vector<UnspentTxOut>;
-   %template(vector_BtcWallet) std::vector<BtcWallet*>;
+   %template(vector_PPCWallet) std::vector<PPCWallet*>;
    %template(vector_AddressBookEntry) std::vector<AddressBookEntry>;
    %template(vector_RegisteredTx) std::vector<RegisteredTx>;
 }
@@ -102,7 +102,7 @@ namespace std
 %include "BlockObj.h"
 %include "StoredBlockObj.h"
 %include "BlockUtils.h"
-%include "BtcUtils.h"
+%include "PPCUtils.h"
 %include "EncryptionUtils.h"
 
 

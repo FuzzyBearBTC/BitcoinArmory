@@ -13,7 +13,7 @@
 #    Armory to operate, using python-twisted.  There are "better"
 #    ways to do this with "reusable" code structures (i.e. using huge
 #    deferred callback chains), but this is not the central "creative" 
-#    part of the Bitcoin protocol.  I need just enough to broadcast tx
+#    part of the Peercoin protocol.  I need just enough to broadcast tx
 #    and receive new tx that aren't in the blockchain yet.  Beyond that,
 #    I'll just be ignoring everything else.
 #
@@ -26,7 +26,7 @@ from twisted.internet.defer import Deferred
 from twisted.internet.protocol import Protocol, ReconnectingClientFactory
 
 from armoryengine.ArmoryUtils import LOGINFO, RightNow, getVersionString, \
-   BTCARMORY_VERSION, NetworkIDError, LOGERROR, BLOCKCHAINS, CLI_OPTIONS, LOGDEBUG, \
+   PPCARMORY_VERSION, NetworkIDError, LOGERROR, BLOCKCHAINS, CLI_OPTIONS, LOGDEBUG, \
    binary_to_hex, BIGENDIAN, LOGRAWDATA, ARMORY_HOME_DIR, ConnectionError, \
    MAGIC_BYTES, hash256, verifyChecksum, NETWORKENDIAN, int_to_bitset, \
    bitset_to_int, unixTimeToFormatStr
@@ -40,7 +40,7 @@ from armoryengine.Transaction import PyTx, indent
 
 class ArmoryClient(Protocol):
    """
-   This is where all the Bitcoin-specific networking stuff goes.
+   This is where all the Peercoin-specific networking stuff goes.
    In the Twisted way, you need to inject your own chains of 
    callbacks through the factory in order to get this class to do
    the right thing on the various events.
@@ -76,7 +76,7 @@ class ArmoryClient(Protocol):
       msgVersion.addrRecv = PyNetAddress(0, services, addrTo,   portTo  )
       msgVersion.addrFrom = PyNetAddress(0, services, addrFrom, portFrom)
       msgVersion.nonce    = random.randint(2**60, 2**64-1)
-      msgVersion.subver   = 'Armory:%s' % getVersionString(BTCARMORY_VERSION)
+      msgVersion.subver   = 'Armory:%s' % getVersionString(PPCARMORY_VERSION)
       msgVersion.height0  = -1
       self.sendMessage( msgVersion )
       self.factory.func_madeConnect()
@@ -477,7 +477,7 @@ class PyMessage(object):
    def pprint(self, nIndent=0):
       indstr = indent*nIndent
       print ''
-      print indstr + 'Bitcoin-Network-Message -- ' + self.cmd.upper()
+      print indstr + 'Peercoin-Network-Message -- ' + self.cmd.upper()
       print indstr + indent + 'Magic:   ' + binary_to_hex(self.magic)
       print indstr + indent + 'Command: ' + self.cmd
       print indstr + indent + 'Payload: ' + str(len(self.payload.serialize())) + ' bytes'

@@ -2,7 +2,7 @@ from PyQt4.Qt import *
 from PyQt4.QtGui import *
 from PyQt4.QtNetwork import *
 from qtdefines import *
-from qtdialogs import createAddrBookButton, DlgSetComment, DlgSendBitcoins, \
+from qtdialogs import createAddrBookButton, DlgSetComment, DlgSendPeercoins, \
                       DlgUnlockWallet, DlgQRCodeDisplay, DlgRequestPayment
 from armoryengine.ALL import *
 from armorymodels import *

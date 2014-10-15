@@ -243,7 +243,7 @@ class PyScriptProcessor(object):
 
    def checkSig(self,binSig, binPubKey, txOutScript, txInTx, txInIndex, lastOpCodeSep=None):
       """
-      Generic method for checking Bitcoin tx signatures.  This needs to be used for both
+      Generic method for checking Peercoin tx signatures.  This needs to be used for both
       OP_CHECKSIG and OP_CHECKMULTISIG.  Step 1 is to pop signature and public key off
       the stack, which must be done outside this method and passed in through the argument
       list.  The remaining steps do not require access to the stack.
@@ -281,7 +281,7 @@ class PyScriptProcessor(object):
       txCopy.inputs[txInIndex].binScript = subscript
 
       # 9. Prepare the signature and public key
-      senderAddr = PyBtcAddress().createFromPublicKey(binPubKey)
+      senderAddr = PyPPCAddress().createFromPublicKey(binPubKey)
       binHashCode = int_to_binary(hashtype, widthBytes=4)
       toHash = txCopy.serialize() + binHashCode
 
@@ -623,7 +623,7 @@ class PyScriptProcessor(object):
 
       elif opcode == OP_CHECKMULTISIG or opcode == OP_CHECKMULTISIGVERIFY:
          # OP_CHECKMULTISIG procedure ported directly from Satoshi client code
-         # Location:  bitcoin-0.4.0-linux/src/src/script.cpp:775
+         # Location:  peercoin-0.4.0-linux/src/src/script.cpp:775
          i=1
          if len(stack) < i:
             return TX_INVALID
@@ -691,4 +691,4 @@ class PyScriptProcessor(object):
 
 
 # Putting this at the end because of the circular dependency
-from armoryengine.PyBtcAddress import PyBtcAddress
+from armoryengine.PyPPCAddress import PyPPCAddress

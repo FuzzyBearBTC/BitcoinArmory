@@ -10,7 +10,7 @@
     <ClCompile Include="..\BlockUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\BtcUtils.cpp">
+    <ClCompile Include="..\PPCUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\EncryptionUtils.cpp">
@@ -42,7 +42,7 @@
     <ClInclude Include="..\BlockUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\BtcUtils.h">
+    <ClInclude Include="..\PPCUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\EncryptionUtils.h">

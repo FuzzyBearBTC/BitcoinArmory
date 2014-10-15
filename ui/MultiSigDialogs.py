@@ -2,7 +2,7 @@ from PyQt4.Qt import *
 from PyQt4.QtGui import *
 from PyQt4.QtNetwork import *
 from qtdefines import *
-from qtdialogs import createAddrBookButton, DlgSetComment, DlgSendBitcoins, \
+from qtdialogs import createAddrBookButton, DlgSetComment, DlgSendPeercoins, \
                       DlgUnlockWallet, DlgQRCodeDisplay, DlgRequestPayment,\
                       DlgDispTxInfo
 from armoryengine.ALL import *
@@ -36,7 +36,7 @@ class DlgLockboxEditor(ArmoryDialog):
 
       lblDescr3 = QRichLabel(tr("""
          <b><u>NOTE:</u> Multi-sig "lockboxes" require <u>public keys</u>, not 
-         the address strings most Bitcoin users are familiar with.</b>
+         the address strings most Peercoin users are familiar with.</b>
          <a href="None">Click for more info</a>."""))
 
       def openMoreInfo(*args): 
@@ -567,17 +567,17 @@ class DlgLockboxEditor(ArmoryDialog):
       
       if not USE_TESTNET and isMofNNonStandardToSpend(currM, currN):
          reply = QMessageBox.warning(self, tr('Non-Standard to Spend'), tr("""
-            Due to limits imposed by Bitcoin Core nodes running versions 
+            Due to limits imposed by Peercoin Core nodes running versions 
             earlier than 0.10, all spending transactions from this lockbox
-            will be rejected by default on the main Bitcoin network 
+            will be rejected by default on the main Peercoin network 
             (non-standard).  There will be no problem sending coins  
             <u>to</u> the lockbox, but subsequent spends <u>from</u> the 
             lockbox will require an explicit agreement with a mining pool.  
             <br><br>
             Do you wish to continue creating the lockbox, anyway?  Any coins
-            sent to will be difficult to spend until Bitcoin Core 0.10
+            sent to will be difficult to spend until Peercoin Core 0.10
             has been released and used by a significant portion of the 
-            Bitcoin network."""), QMessageBox.Yes | QMessageBox.No)
+            Peercoin network."""), QMessageBox.Yes | QMessageBox.No)
 
          if not reply==QMessageBox.Yes:
             return
@@ -688,7 +688,7 @@ class DlgLockboxManager(ArmoryDialog):
       self.txtLockboxInfo.setFont(GETFONT('Fixed', 9))
 
 
-      lbGuideURL = "https://bitcoinarmory.com/about/using-lockboxes/"
+      lbGuideURL = "https://peercoinarmory.com/about/using-lockboxes/"
       lblLinkToMSWebpage = QRichLabel(tr("""Consult our 
          <a href="%s">lockbox documentation</a> for lockbox usage 
          examples and info""") % lbGuideURL, doWrap=False)
@@ -955,8 +955,8 @@ class DlgLockboxManager(ArmoryDialog):
                'button':  tr('Create Spending Tx'),
                'callbk':  self.doSpend,
                'organiz': True,
-               'lbltxt':  tr('Send bitcoins from lockbox'),
-               'tiptxt':  tr("""Create a proposed transaction sending bitcoins
+               'lbltxt':  tr('Send peercoins from lockbox'),
+               'tiptxt':  tr("""Create a proposed transaction sending peercoins
                                 to an address, wallet or another lockbox.  
                                 The transaction will not be final until enough
                                 signatures have been collected and then 
@@ -1189,7 +1189,7 @@ class DlgLockboxManager(ArmoryDialog):
             self.lblDispAddr.setEnabled(True)
             self.lblDispAddr.setText(tr("""
                Anyone can send funds to this lockbox using this
-               Bitcoin address: <br><b>%s</b>""") % p2shAddr)
+               Peercoin address: <br><b>%s</b>""") % p2shAddr)
 
       self.updateDashFuncs.append(updateRegFundCell)
 
@@ -1451,7 +1451,7 @@ class DlgLockboxManager(ArmoryDialog):
                reply = MsgBoxWithDNAA(MSGBOX.Warning, tr('Compatibility Warning'), 
                   tr("""You are about to request payment to a "P2SH" address 
                   which is the format used for receiving to multi-signature
-                  addresses/lockboxes.  "P2SH" are like regular Bitcoin 
+                  addresses/lockboxes.  "P2SH" are like regular Peercoin 
                   addresses but start with %s instead of %s.
                   <br><br>
                   Unfortunately, not all software and services support sending 
@@ -1752,7 +1752,7 @@ class DlgLockboxManager(ArmoryDialog):
       prefillMap = {'lockbox': lbID, 
                     'message': tr('Funding %d-of-%d') % (lb.M, lb.N) }
       
-      DlgSendBitcoins(None, self, self.main, prefillMap).exec_()
+      DlgSendPeercoins(None, self, self.main, prefillMap).exec_()
       self.updateButtonDisable()
 
    #############################################################################
@@ -1791,7 +1791,7 @@ class DlgLockboxManager(ArmoryDialog):
    #############################################################################
    def doSpend(self):
       lbID = self.getSelectedLBID()
-      dlg = DlgSendBitcoins(None, self, self.main, spendFromLockboxID=lbID)
+      dlg = DlgSendPeercoins(None, self, self.main, spendFromLockboxID=lbID)
       dlg.exec_()
       self.updateButtonDisable()
       
@@ -2130,9 +2130,9 @@ class DlgSelectPublicKey(ArmoryDialog):
          <center><font size=4><b><u>Select Public Key for Lockbox 
          Creation</u></b></font></center>
          <br>
-         Lockbox creation requires <b>public keys</b> not the regular Bitcoin
+         Lockbox creation requires <b>public keys</b> not the regular Peercoin
          addresses most users are accustomed to.  A public key is much longer
-         than a regular bitcoin address, usually starting with "02", "03" or
+         than a regular peercoin address, usually starting with "02", "03" or
          "04".  Once you have selected a public key, send it to the lockbox 
          organizer (person or device).  The organizer will create the lockbox 
          which then must be imported by all devices that will track the funds
@@ -2235,8 +2235,8 @@ class DlgSelectPublicKey(ArmoryDialog):
          LOGEXCEPT('Invalid public key entered')
          QMessageBox.warning(self, tr('Invalid Public Key'), tr("""
             You must enter a public key into the box, <b>not</b> a regular 
-            Bitcoin address that most users are accustomed to.  A public key 
-            is much longer than a Bitcoin address, and always starts with 
+            Peercoin address that most users are accustomed to.  A public key 
+            is much longer than a Peercoin address, and always starts with 
             "02", "03" or "04"."""), QMessageBox.Ok)
          return None
 
@@ -3112,7 +3112,7 @@ class DlgCreatePromNote(ArmoryDialog):
          will review and sign it.  
          <br><br>
          If this lockbox is being funded by only one party, using this
-         interface is unnecessary.  Have the funding party send Bitcoins 
+         interface is unnecessary.  Have the funding party send Peercoins 
          to the destination address or lockbox in the normal way."""))
 
       lblNoteSrc = QRichLabel(tr("""
@@ -3139,8 +3139,8 @@ class DlgCreatePromNote(ArmoryDialog):
       lblAddress = QRichLabel(tr('Address:'))
       lblAmount  = QRichLabel(tr('Amount:'))
       lblFee     = QRichLabel(tr('Add fee:'))
-      lblBTC1    = QRichLabel(tr('BTC'))
-      lblBTC2    = QRichLabel(tr('BTC'))
+      lblPPC1    = QRichLabel(tr('PPC'))
+      lblPPC2    = QRichLabel(tr('PPC'))
 
       startStr = ''
       if defaultIDorAddr:
@@ -3158,16 +3158,16 @@ class DlgCreatePromNote(ArmoryDialog):
                                           
       self.lblAutoDetect.setWordWrap(False)
 
-      self.edtAmountBTC = QLineEdit()
-      self.edtAmountBTC.setFont(GETFONT('Fixed'))
-      self.edtAmountBTC.setMinimumWidth(tightSizeNChar(GETFONT('Fixed'), 16)[0])
-      self.edtAmountBTC.setAlignment(Qt.AlignLeft)
+      self.edtAmountPPC = QLineEdit()
+      self.edtAmountPPC.setFont(GETFONT('Fixed'))
+      self.edtAmountPPC.setMinimumWidth(tightSizeNChar(GETFONT('Fixed'), 16)[0])
+      self.edtAmountPPC.setAlignment(Qt.AlignLeft)
 
-      self.edtFeeBTC = QLineEdit()
-      self.edtFeeBTC.setFont(GETFONT('Fixed'))
-      self.edtFeeBTC.setMinimumWidth(tightSizeNChar(GETFONT('Fixed'), 16)[0])
-      self.edtFeeBTC.setAlignment(Qt.AlignLeft)
-      self.edtFeeBTC.setText('0.0')
+      self.edtFeePPC = QLineEdit()
+      self.edtFeePPC.setFont(GETFONT('Fixed'))
+      self.edtFeePPC.setMinimumWidth(tightSizeNChar(GETFONT('Fixed'), 16)[0])
+      self.edtFeePPC.setAlignment(Qt.AlignLeft)
+      self.edtFeePPC.setText('0.0')
 
 
       lblComment  = QRichLabel('Funder Label (optional):')
@@ -3197,12 +3197,12 @@ class DlgCreatePromNote(ArmoryDialog):
       gboxOutLayout.addWidget(self.lblAutoDetect,    1,1, 1,5)
 
       gboxOutLayout.addWidget(lblAmount,             3,0)
-      gboxOutLayout.addWidget(self.edtAmountBTC,     3,1)
-      gboxOutLayout.addWidget(lblBTC1,               3,2)
+      gboxOutLayout.addWidget(self.edtAmountPPC,     3,1)
+      gboxOutLayout.addWidget(lblPPC1,               3,2)
 
       gboxOutLayout.addWidget(lblFee,                3,4)
-      gboxOutLayout.addWidget(self.edtFeeBTC,        3,5)
-      gboxOutLayout.addWidget(lblBTC2,               3,6)
+      gboxOutLayout.addWidget(self.edtFeePPC,        3,5)
+      gboxOutLayout.addWidget(lblPPC2,               3,6)
 
       gboxOutLayout.setColumnStretch(0, 0)
       gboxOutLayout.setColumnStretch(1, 0)
@@ -3301,13 +3301,13 @@ class DlgCreatePromNote(ArmoryDialog):
             QMessageBox.Ok)
          return False
 
-      # Read the user-supplied BTC value to contribute
+      # Read the user-supplied PPC value to contribute
       try:
-         valueStr = str(self.edtAmountBTC.text())
+         valueStr = str(self.edtAmountPPC.text())
          valueAmt = str2coin(valueStr)
          if valueAmt == 0:
             QMessageBox.critical(self, tr('Zero Amount'), tr("""
-               You cannot promise 0 BTC.   <br>Please enter 
+               You cannot promise 0 PPC.   <br>Please enter 
                a positive amount."""), QMessageBox.Ok)
             return False
       except NegativeValueError:
@@ -3317,8 +3317,8 @@ class DlgCreatePromNote(ArmoryDialog):
          return False
       except TooMuchPrecisionError:
          QMessageBox.critical(self, tr('Too much precision'), tr("""
-            Bitcoins can only be specified down to 8 decimal places. 
-            The smallest value that can be sent is  0.0000 0001 BTC. 
+            Peercoins can only be specified down to 8 decimal places. 
+            The smallest value that can be sent is  0.0000 0001 PPC. 
             Please enter a new amount"""), QMessageBox.Ok)
          return False
       except ValueError:
@@ -3334,7 +3334,7 @@ class DlgCreatePromNote(ArmoryDialog):
       
       # Read the fee string
       try:
-         feeStr = str(self.edtFeeBTC.text())
+         feeStr = str(self.edtFeePPC.text())
          feeAmt = str2coin(feeStr)
       except NegativeValueError:
          QMessageBox.critical(self, tr('Negative Fee'), tr("""
@@ -3343,8 +3343,8 @@ class DlgCreatePromNote(ArmoryDialog):
          return False
       except TooMuchPrecisionError:
          QMessageBox.critical(self, tr('Too much precision'), tr("""
-            Bitcoins can only be specified down to 8 decimal places. 
-            The smallest value that can be sent is  0.0000 0001 BTC. 
+            Peercoins can only be specified down to 8 decimal places. 
+            The smallest value that can be sent is  0.0000 0001 PPC. 
             Please enter a new amount"""), QMessageBox.Ok)
          return False
       except ValueError:
@@ -3363,8 +3363,8 @@ class DlgCreatePromNote(ArmoryDialog):
       availBal = wlt.getBalance('Spendable')
       if totalAmt > availBal:
          QMessageBox.critical(self, tr('Not enough funds!'), tr("""
-            You specified <b>%s</b> BTC (amount + fee), but the selected wallet
-            only has <b>%s</b> BTC spendable.""") % (coin2strNZS(totalAmt), 
+            You specified <b>%s</b> PPC (amount + fee), but the selected wallet
+            only has <b>%s</b> PPC spendable.""") % (coin2strNZS(totalAmt), 
             coin2strNZS(availBal)), QMessageBox.Ok)
          return False
 
@@ -3374,8 +3374,8 @@ class DlgCreatePromNote(ArmoryDialog):
       if len(utxoSelect) == 0:
          QMessageBox.critical(self, tr('Coin Selection Error'), tr("""
             There was an error constructing your transaction, due to a 
-            quirk in the way Bitcoin transactions work.  If you see this
-            error more than once, try sending your BTC in two or more 
+            quirk in the way Peercoin transactions work.  If you see this
+            error more than once, try sending your PPC in two or more 
             separate transactions."""), QMessageBox.Ok)
          return False
 
@@ -3437,7 +3437,7 @@ class DlgCreatePromNote(ArmoryDialog):
             transaction before signing.""")
          
          ftypes = ['Promissory Notes (*.promnote)']
-         defaultFN = 'Contrib_%s_%sBTC.promnote' % \
+         defaultFN = 'Contrib_%s_%sPPC.promnote' % \
                (self.finalPromNote.promID, coin2strNZS(valueAmt))
             
    
@@ -3502,8 +3502,8 @@ class DlgMergePromNotes(ArmoryDialog):
       lblFeeText = QRichLabel('Total Fee:', doWrap=False)
       self.lblCurrPay = QMoneyLabel(0, maxZeros=2)
       self.lblCurrFee = QMoneyLabel(0, maxZeros=2)
-      self.lblPayUnits = QRichLabel('BTC')
-      self.lblFeeUnits = QRichLabel('BTC')
+      self.lblPayUnits = QRichLabel('PPC')
+      self.lblFeeUnits = QRichLabel('PPC')
 
       
 
@@ -3832,7 +3832,7 @@ class DlgSelectMultiSigOption(ArmoryDialog):
          create, fund and spend from multi-sig "lockboxes."  This 
          includes turning multiple wallets into a multi-factor lock-box
          for your personal coins, or can be used for escrow between
-         multiple parties, using the Bitcoin network itself to hold the
+         multiple parties, using the Peercoin network itself to hold the
          escrow.
          <br><br>
          <b><u>IMPORTANT:</u></b>  If you are using an lockbox that requires
@@ -3842,7 +3842,7 @@ class DlgSelectMultiSigOption(ArmoryDialog):
          to collect funding promises into a single transaction, to limit 
          the ability of any party to scam you.  Read more about it by
          clicking [NO LINK YET]  (if the above doesn't hold, you can use
-         the regular "Send Bitcoins" dialog to fund the lockbox)."""))
+         the regular "Send Peercoins" dialog to fund the lockbox)."""))
 
 
       self.lblCreate = QRichLabel(tr("""

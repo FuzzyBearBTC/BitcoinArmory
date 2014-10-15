@@ -6,8 +6,8 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 
-BinaryData BtcUtils::BadAddress_ = BinaryData::CreateFromHex("0000000000000000000000000000000000000000");
-BinaryData BtcUtils::EmptyHash_  = BinaryData::CreateFromHex("0000000000000000000000000000000000000000000000000000000000000000");
+BinaryData PPCUtils::BadAddress_ = BinaryData::CreateFromHex("0000000000000000000000000000000000000000");
+BinaryData PPCUtils::EmptyHash_  = BinaryData::CreateFromHex("0000000000000000000000000000000000000000000000000000000000000000");
 

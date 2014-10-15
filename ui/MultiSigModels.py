@@ -156,9 +156,9 @@ class LockboxDisplayProxy(QSortFilterProxyModel):
             return (ntxLeft < ntxRight)
       elif thisCol==COL.Balance:
          if TheBDM.getBDMState()=='BlockchainReady':
-            btcLeft  = getDouble(idxLeft,  COL.Balance)
-            btcRight = getDouble(idxRight, COL.Balance)
-            return (abs(btcLeft) < abs(btcRight))
+            ppcLeft  = getDouble(idxLeft,  COL.Balance)
+            ppcRight = getDouble(idxRight, COL.Balance)
+            return (abs(ppcLeft) < abs(ppcRight))
 
       return super(LockboxDisplayProxy, self).lessThan(idxLeft, idxRight)
 

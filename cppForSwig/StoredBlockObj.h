@@ -12,7 +12,7 @@
 #include <list>
 #include <map>
 #include "BinaryData.h"
-#include "BtcUtils.h"
+#include "PPCUtils.h"
 #include "BlockObj.h"
 
 #define ARMORY_DB_VERSION   0x00
