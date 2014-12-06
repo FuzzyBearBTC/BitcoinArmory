@@ -52,7 +52,7 @@ class SendBitcoinsFrame(ArmoryFrame):
 
       feetip = self.main.createToolTipWidget(\
             'Transaction fees go to users who contribute computing power to '
-            'keep the Bitcoin network secure, and in return they get your transaction '
+            'keep the Peercoin network secure, and in return they get your transaction '
             'included in the blockchain faster.  <b>Most transactions '
             'do not require a fee</b> but it is recommended anyway '
             'since it guarantees quick processing and helps the network.')
@@ -99,7 +99,7 @@ class SendBitcoinsFrame(ArmoryFrame):
             'created this wallet solely for managing imported addresses, '
             'and want to keep all funds within existing addresses.')
       self.ttipSpecify = self.main.createToolTipWidget(\
-            'You can specify any valid Bitcoin address for the change.  '
+            'You can specify any valid Peercoin address for the change.  '
             '<b>NOTE:</b> If the address you specify is not in this wallet, '
             'Armory will not be able to distinguish the outputs when it shows '
             'up in your ledger.  The change will look like a second recipient, '
@@ -146,7 +146,7 @@ class SendBitcoinsFrame(ArmoryFrame):
          
       txFrm = makeHorizFrame(componentList, condenseMargins=True)
 
-      btnEnterURI = QPushButton('Manually Enter "bitcoin:" Link')
+      btnEnterURI = QPushButton('Manually Enter "ppcoin:" Link')
       ttipEnterURI = self.main.createToolTipWidget( tr("""
          Armory does not always succeed at registering itself to handle 
          URL links from webpages and email.  
@@ -236,7 +236,7 @@ class SendBitcoinsFrame(ArmoryFrame):
       self.setLayout(layout)
 
       self.makeRecipFrame(1)
-      self.setWindowTitle('Send Bitcoins')
+      self.setWindowTitle('Send Peercoins')
       self.setMinimumHeight(self.maxHeight * 20)
       # self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
 
@@ -319,7 +319,7 @@ class SendBitcoinsFrame(ArmoryFrame):
          self.btnSend.setToolTip('Click to create an unsigned transaction!')
       else:
          self.btnSend.setText('Send!')
-         self.btnSend.setToolTip('Click to send bitcoins!')
+         self.btnSend.setToolTip('Click to send peercoins!')
       
 
    #############################################################################
@@ -488,7 +488,7 @@ class SendBitcoinsFrame(ArmoryFrame):
             return False
          except TooMuchPrecisionError:
             QMessageBox.critical(self, 'Too much precision', \
-               'Bitcoins can only be specified down to 8 decimal places. '
+               'Peercoins can only be specified down to 8 decimal places. '
                'The smallest value that can be sent is  0.0000 0001 BTC. '
                'Please enter a new amount for recipient %d.' % (row + 1), QMessageBox.Ok)
             return False
@@ -1304,7 +1304,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
          'If the transaction is unsigned and you have the correct wallet, '
          'you will have the opportunity to sign it.  If it is already signed '
          'you will have the opportunity to broadcast it to '
-         'the Bitcoin network to make it final.')
+         'the PEercoin network to make it final.')
 
       self.txtUSTX = QTextEdit()
       self.txtUSTX.setFont(GETFONT('Fixed', 8))
@@ -1350,7 +1350,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
       # ##
       self.infoLbls.append([])
       self.infoLbls[-1].append(self.main.createToolTipWidget(\
-            'This is wallet from which the offline transaction spends bitcoins'))
+            'This is wallet from which the offline transaction spends peercoins'))
       self.infoLbls[-1].append(QRichLabel('<b>Wallet:</b>'))
       self.infoLbls[-1].append(QRichLabel(''))
 
@@ -1469,7 +1469,7 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
             self.btnBroadcast.setEnabled(True)
          else:
             self.btnBroadcast.setEnabled(False)
-            self.btnBroadcast.setToolTip('No connection to Bitcoin network!')
+            self.btnBroadcast.setToolTip('No connection to Peercoin network!')
 
       self.btnSave.setEnabled(True)
       self.btnCopyHex.setEnabled(False)
@@ -1706,15 +1706,15 @@ class SignBroadcastOfflineTxFrame(ArmoryFrame):
    def broadTx(self):
       if self.main.netMode == NETWORKMODE.Disconnected:
          QMessageBox.warning(self, 'No Internet!', \
-            'Armory lost its connection to Bitcoin-Qt, and cannot '
+            'Armory lost its connection to Peercoin-Core, and cannot '
             'broadcast any transactions until it is reconnected. '
-            'Please verify that Bitcoin-Qt (or bitcoind) is open '
+            'Please verify that Peercoin-Core () is open '
             'and synchronized with the network.', QMessageBox.Ok)
          return
       elif self.main.netMode == NETWORKMODE.Offline:
          QMessageBox.warning(self, 'No Internet!', \
-            'You do not currently have a connection to the Bitcoin network. '
-            'If this does not seem correct, verify that Bitcoin-Qt is open '
+            'You do not currently have a connection to the Peercoin network. '
+            'If this does not seem correct, verify that Peercoin-Core is open '
             'and synchronized with the network.', QMessageBox.Ok)
          return
 

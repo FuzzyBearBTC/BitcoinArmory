@@ -950,7 +950,7 @@ class BlockDataManagerThread(threading.Thread):
       if os.path.exists(bfile):
          os.remove(bfile)
 
-      # Check for the existence of the Bitcoin-Qt directory
+      # Check for the existence of the Peercoin-Core directory
       if not os.path.exists(self.btcdir):
          raise FileExistsError, ('Directory does not exist: %s' % self.btcdir)
 

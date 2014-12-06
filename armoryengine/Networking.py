@@ -477,7 +477,7 @@ class PyMessage(object):
    def pprint(self, nIndent=0):
       indstr = indent*nIndent
       print ''
-      print indstr + 'Bitcoin-Network-Message -- ' + self.cmd.upper()
+      print indstr + 'Peercoin-Network-Message -- ' + self.cmd.upper()
       print indstr + indent + 'Magic:   ' + binary_to_hex(self.magic)
       print indstr + indent + 'Command: ' + self.cmd
       print indstr + indent + 'Payload: ' + str(len(self.payload.serialize())) + ' bytes'

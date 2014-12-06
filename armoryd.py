@@ -172,7 +172,7 @@ def onlineModeIsPossible(internetAvail, forceOnline):
       canGoOnline = internetAvail and satoshiIsAvailableResult and hasBlockFiles
       
       LOGINFO('Internet connection is Available: %s', str(internetAvail))
-      LOGINFO('Bitcoin-Qt/bitcoind is Available: %s', satoshiIsAvailableResult)
+      LOGINFO('Peercoin-Core is Available: %s', satoshiIsAvailableResult)
       LOGINFO('The first blk*.dat was Available: %s', str(hasBlockFiles))
       LOGINFO('Online mode currently possible:   %s', canGoOnline)
    return canGoOnline
@@ -2687,9 +2687,9 @@ class Armory_Daemon(object):
             LOGWARN('* Please note that armoryd v%s is beta software and is still in ' % \
                   getVersionString(BTCARMORY_VERSION))
             LOGWARN('* development. Whenever applicable, the interface is designed to match ')
-            LOGWARN('* that of bitcoind, with function parameters and return values closely ')
-            LOGWARN('* matching those of bitcoind. Despite this, the function parameters and ')
-            LOGWARN('* return values may change, both for ported bitcoind function and ')
+            LOGWARN('* that of Peercoin-Core, with function parameters and return values closely ')
+            LOGWARN('* matching those of Peercoin-Core. Despite this, the function parameters and ')
+            LOGWARN('* return values may change, both for ported Peercoin-Core function and ')
             LOGWARN('* Armory-specific functions.')
             LOGWARN('************************************************************************')
             LOGWARN('')
@@ -2806,7 +2806,7 @@ class Armory_Daemon(object):
             reactor.callLater(3, self.Heartbeat)
          else:
             errStr = 'armoryd is not ready to run! Please check to see if ' \
-                     'bitcoind is running and the Blockchain files ' \
+                     'Peercoin-Core is running and the Blockchain files ' \
                      '(blk*.dat) are available.'
             LOGERROR(errStr)
             os._exit(0)
@@ -2873,8 +2873,8 @@ class Armory_Daemon(object):
                  len(vectMissingBlks))
          if len(vectMissingBlks) > 0:
             LOGERROR('Armory has detected an error in the blockchain ' \
-                     'database maintained by the third-party Bitcoin ' \
-                     'software (Bitcoin-Qt or bitcoind). This error is not ' \
+                     'database maintained by the third-party Peercoin ' \
+                     'software (Peercoin-Core). This error is not ' \
                      'fatal, but may lead to incorrect balances, inability ' \
                      'to send coins, or application instability. It is ' \
                      'unlikely that the error affects your wallets, but it ' \
@@ -2887,7 +2887,7 @@ class Armory_Daemon(object):
                  coin2str(self.curWlt.getBalance('Spendable')))
 
          # This is CONNECT call for armoryd to talk to bitcoind
-         LOGINFO('Set up connection to bitcoind')
+         LOGINFO('Set up connection to Peercoin-Core')
          self.NetworkingFactory = ArmoryClientFactory( \
                         TheBDM,
                         func_loseConnect = self.showOfflineMsg, \

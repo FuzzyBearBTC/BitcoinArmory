@@ -172,7 +172,7 @@ class UpgradeDownloader:
             <br><br>
             If you modified your settings to run Bitcoin Core manually, 
             click "No" then extract the downloaded file and manually start
-            bitcoin-qt or bitcoind in from the extracted "bin/%d" 
+            Peercoin-Core  in from the extracted "bin/%d" 
             directory.""") % (64 if SystemSpecs.IsX64 else 32), \
             QMessageBox.Yes | QMessageBox.No)
 

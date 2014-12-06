@@ -38,7 +38,7 @@ VERSION 0.88
         Installation."
 
    - Auto-Management of Bitcoin Software (with version notification)
-        This version now requires you to _not_ run Bitcoin-Qt in the 
+        This version now requires you to _not_ run Peercoin-Core in the 
         background.  Armory will run it for you.  You can change its 
         behavior in the "File"->"Settings" menu, including reverting
         to the previous, user-managed method.
@@ -115,7 +115,7 @@ VERSION 0.87
         The "Transactions" ledger and address lists have new options,
         including links to view the data on blockchain.info.  
 
-   - Real support for Bitcoin-Qt/bitcoind 0.8+
+   - Real support for Peercoin-Core/bitcoind 0.8+
         Prior attempt at supporting 0.8 Satoshi client was broken due to 
         incomplete information about the changes.  Support has finally 
         been implemented and tested.
@@ -197,8 +197,8 @@ VERSION 0.85
         the "Send Bitcoins" window that gives you a space to copy the URL 
         and prefill the transaction for you.
 
-   - Preparation for Bitcoin-Qt 0.8+
-        Bitcoin-Qt 0.8+ will change up the datadir file organization that
+   - Preparation for Peercoin-Core 0.8+
+        Peercoin-Core 0.8+ will change up the datadir file organization that
         Armory depends on.  Added code to auto-detect this condition and
         switch to it automatically.
 
@@ -261,7 +261,7 @@ VERSION 0.82.2
         the master branch of Armory on github.  It will then notify you if
         your version is older than the latest one.
 
-   - Removed Bitcoin-Qt Wallet Migration
+   - Removed Peercoin-Core Wallet Migration
         This was causing more confusion than it was helping.  Given that 
         very few users will benefit from it anymore, it has been removed
         until the new wallet format is finished.
