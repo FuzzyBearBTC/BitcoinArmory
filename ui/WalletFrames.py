@@ -547,7 +547,7 @@ class VerifyPassphraseFrame(ArmoryFrame):
          '<font color="red"><b>!!! DO NOT FORGET YOUR PASSPHRASE !!!</b></font>', size=4)
       lblWarnTxt1.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
       lblWarnTxt2 = QRichLabel(\
-         '<b>No one can help you recover you bitcoins if you forget the '
+         '<b>No one can help you recover you peercoins if you forget the '
          'passphrase and don\'t have a paper backup!</b> Your wallet and '
          'any <u>digital</u> backups are useless if you forget it.  '
          '<br><br>'

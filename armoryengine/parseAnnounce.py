@@ -18,8 +18,8 @@ from copy import deepcopy
 #        of text WITH OR WITHOUT the signature block data (either pass it 
 #        the signed block, or just whats inside the block).
 
-SIGNED_BLOCK_HEAD = '-----BEGIN BITCOIN SIGNED MESSAGE-----'
-SIGNED_BLOCK_TAIL = '-----BEGIN BITCOIN SIGNATURE-----'
+SIGNED_BLOCK_HEAD = '-----BEGIN PEERCOIN SIGNED MESSAGE-----'
+SIGNED_BLOCK_TAIL = '-----BEGIN PEERCOIN SIGNATURE-----'
 
 ################################################################################
 ################################################################################
@@ -159,7 +159,7 @@ class downloadLinkParser(object):
    ArmoryOffline 0.88 Ubuntu 10.04  32  http://url/offbundle-32.tar.gz   641382c93b9
    ArmoryOffline 0.88 Ubuntu 12.10  32  http://url/offbundle-64.tar.gz   5541af39c84
 
-   # Windows 32-bit Satoshi (Bitcoin-Qt/bitcoind)
+   # Windows 32-bit Satoshi (Peercoin-Core/bitcoind)
    Satoshi 0.9.0 Windows XP,Vista,7,8 32,64 http://btc.org/win0.9.0.exe  118372a9ff3
    Satoshi 0.9.0 Ubuntu  10.04              http://btc.org/win0.9.0.deb  2aa3f763c3b
 

@@ -27,7 +27,7 @@
 *             it has turned out to be an inconvenience worth having. 
 *             Reimplementing all the networking code would be fraught with bugs,
 *             security holes, and possible blockchain forking.  The reliance
-*             on Bitcoin-Qt right now is actually making Armory more secure!
+*             on Peercoin-Core right now is actually making Armory more secure!
 *
 *             armoryd is a command-line program comparable to Bitcoin Core's
 *             bitcoind. armoryd allows users to use Armory functionality solely

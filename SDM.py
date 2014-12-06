@@ -310,10 +310,10 @@ class SatoshiDaemonManager(object):
       if pathToBitcoindExe==None:
          pathToBitcoindExe = self.findBitcoind(extraExeSearch)
          if len(pathToBitcoindExe)==0:
-            LOGDEBUG('Failed to find bitcoind')
+            LOGDEBUG('Failed to find peercoind')
             self.failedFindExe = True
          else:
-            LOGINFO('Found bitcoind in the following places:')
+            LOGINFO('Found peercoind in the following places:')
             for p in pathToBitcoindExe:
                LOGINFO('   %s', p)
             pathToBitcoindExe = pathToBitcoindExe[0]
@@ -336,13 +336,13 @@ class SatoshiDaemonManager(object):
       # Give it a default BTC_HOME_DIR if not.
       if not os.path.exists(self.satoshiHome):
          if createHomeIfDNE:
-            LOGINFO('Making satoshi home dir')
+            LOGINFO('Making peercoin home dir')
             os.makedirs(self.satoshiHome)
          else:
             LOGINFO('No home dir, makedir not requested')
             self.failedFindHome = True
 
-      if self.failedFindExe:  raise self.BitcoindError, 'bitcoind not found'
+      if self.failedFindExe:  raise self.BitcoindError, 'peercoind not found'
       if self.failedFindHome: raise self.BitcoindError, 'homedir not found'
 
       self.disabled = False
@@ -382,7 +382,7 @@ class SatoshiDaemonManager(object):
       if OS_WINDOWS:
          # Making sure the search path argument comes with /daemon and /Bitcoin on Windows
 
-         searchPaths.extend([os.path.join(sp, 'Bitcoin') for sp in searchPaths])
+         searchPaths.extend([os.path.join(sp, 'Peercoin') for sp in searchPaths])
          searchPaths.extend([os.path.join(sp, 'daemon') for sp in searchPaths])
 
          possBaseDir = []         
@@ -402,12 +402,12 @@ class SatoshiDaemonManager(object):
          if os.path.exists(desktop):
             dtopfiles = os.listdir(desktop)
             for path in [os.path.join(desktop, fn) for fn in dtopfiles]:
-               if 'bitcoin' in path.lower() and path.lower().endswith('.lnk'):
+               if 'peercoin' in path.lower() and path.lower().endswith('.lnk'):
                   import win32com.client
                   shell = win32com.client.Dispatch('WScript.Shell')
                   targ = shell.CreateShortCut(path).Targetpath
                   targDir = os.path.dirname(targ)
-                  LOGINFO('Found Bitcoin-Qt link on desktop: %s', targDir)
+                  LOGINFO('Found Peercoin-Qt link on desktop: %s', targDir)
                   possBaseDir.append( targDir )
 
          # Also look in default place in ProgramFiles dirs
@@ -417,12 +417,12 @@ class SatoshiDaemonManager(object):
 
          # Now look at a few subdirs of the
          searchPaths.extend(possBaseDir)
-         searchPaths.extend([os.path.join(p, 'Bitcoin', 'daemon') for p in possBaseDir])
+         searchPaths.extend([os.path.join(p, 'Peercoin', 'daemon') for p in possBaseDir])
          searchPaths.extend([os.path.join(p, 'daemon') for p in possBaseDir])
-         searchPaths.extend([os.path.join(p, 'Bitcoin') for p in possBaseDir])
+         searchPaths.extend([os.path.join(p, 'Peercoin') for p in possBaseDir])
 
          for p in searchPaths:
-            testPath = os.path.join(p, 'bitcoind.exe')
+            testPath = os.path.join(p, 'peercoind.exe')
             if os.path.exists(testPath):
                self.foundExe.append(testPath)
 
@@ -436,14 +436,14 @@ class SatoshiDaemonManager(object):
          searchPaths.extend(['/usr/bin/', '/usr/lib/bitcoin/'])
 
          for p in searchPaths:
-            testPath = os.path.join(p, 'bitcoind')
+            testPath = os.path.join(p, 'peercoind')
             if os.path.exists(testPath):
                self.foundExe.append(testPath)
 
          try:
-            locs = subprocess_check_output(['whereis','bitcoind']).split()
+            locs = subprocess_check_output(['whereis','peercoind']).split()
             if len(locs)>1:
-               locs = filter(lambda x: os.path.basename(x)=='bitcoind', locs)
+               locs = filter(lambda x: os.path.basename(x)=='peercoind', locs)
                LOGINFO('"whereis" returned: %s', str(locs))
                self.foundExe.extend(locs)
          except:
@@ -460,10 +460,10 @@ class SatoshiDaemonManager(object):
                foundIt=True
 
          if not foundIt:
-            LOGERROR('Bitcoind could not be found in the specified installation:')
+            LOGERROR('Peercoind could not be found in the specified installation:')
             for p in extraSearchPaths:
                LOGERROR('   %s', p)
-            LOGERROR('Bitcoind is being started from:')
+            LOGERROR('Peercoind is being started from:')
             LOGERROR('   %s', self.foundExe[0])
 
       return self.foundExe
@@ -487,13 +487,13 @@ class SatoshiDaemonManager(object):
 
    #############################################################################
    def readBitcoinConf(self, makeIfDNE=False):
-      LOGINFO('Reading bitcoin.conf file')
-      bitconf = os.path.join( self.satoshiHome, 'bitcoin.conf' )
+      LOGINFO('Reading peercoin.conf file')
+      bitconf = os.path.join( self.satoshiHome, 'peercoin.conf' )
       if not os.path.exists(bitconf):
          if not makeIfDNE:
-            raise self.BitcoinDotConfError, 'Could not find bitcoin.conf'
+            raise self.BitcoinDotConfError, 'Could not find peercoin.conf'
          else:
-            LOGINFO('No bitcoin.conf available.  Creating it...')
+            LOGINFO('No peercoin.conf available.  Creating it...')
             touchFile(bitconf)
 
       # Guarantee that bitcoin.conf file has very strict permissions
@@ -506,7 +506,7 @@ class SatoshiDaemonManager(object):
             LOGERROR('on XP systems):')
             LOGERROR('    %s', bitconf)
          else:
-            LOGINFO('Setting permissions on bitcoin.conf')
+            LOGINFO('Setting permissions on peercoin.conf')
             import ctypes
             username_u16 = ctypes.create_unicode_buffer(u'\0', 512)
             str_length = ctypes.c_int(512)
@@ -514,15 +514,15 @@ class SatoshiDaemonManager(object):
                                                 ctypes.byref(str_length))
             
             if not CLI_OPTIONS.disableConfPermis:
-               LOGINFO('Setting permissions on bitcoin.conf')
+               LOGINFO('Setting permissions on peercoin.conf')
                cmd_icacls = [u'icacls',bitconf,u'/inheritance:r',u'/grant:r', u'%s:F' % username_u16.value]
                icacls_out = subprocess_check_output(cmd_icacls, shell=True)
                LOGINFO('icacls returned: %s', icacls_out)
             else:
-               LOGWARN('Skipped setting permissions on bitcoin.conf file')
+               LOGWARN('Skipped setting permissions on peercoin.conf file')
             
       else:
-         LOGINFO('Setting permissions on bitcoin.conf')
+         LOGINFO('Setting permissions on peercoin.conf')
          os.chmod(bitconf, stat.S_IRUSR | stat.S_IWUSR)
 
 
@@ -562,9 +562,9 @@ class SatoshiDaemonManager(object):
 
 
       if not isASCII(self.bitconf['rpcuser']):
-         LOGERROR('Non-ASCII character in bitcoin.conf (rpcuser)!')
+         LOGERROR('Non-ASCII character in peercoin.conf (rpcuser)!')
       if not isASCII(self.bitconf['rpcpassword']):
-         LOGERROR('Non-ASCII character in bitcoin.conf (rpcpassword)!')
+         LOGERROR('Non-ASCII character in peercoin.conf (rpcpassword)!')
 
       self.bitconf['host'] = '127.0.0.1'
 
@@ -587,7 +587,7 @@ class SatoshiDaemonManager(object):
          raise self.BitcoindError, 'Looks like we have already started theSDM'
 
       if not os.path.exists(self.executable):
-         raise self.BitcoindError, 'Could not find bitcoind'
+         raise self.BitcoindError, 'Could not find peercoind'
 
       
       chk1 = os.path.exists(self.useTorrentFile)
@@ -641,7 +641,7 @@ class SatoshiDaemonManager(object):
       self.btcdpid  = self.bitcoind.pid
       self.selfpid  = os.getpid()
 
-      LOGINFO('PID of bitcoind: %d',  self.btcdpid)
+      LOGINFO('PID of peercoind: %d',  self.btcdpid)
       LOGINFO('PID of armory:   %d',  self.selfpid)
 
       # Startup guardian process -- it will watch Armory's PID
@@ -657,7 +657,7 @@ class SatoshiDaemonManager(object):
    def stopBitcoind(self):
       LOGINFO('Called stopBitcoind')
       if not self.isRunningBitcoind():
-         LOGINFO('...but bitcoind is not running, to be able to stop')
+         LOGINFO('...but peercoind is not running, to be able to stop')
          return
 
       killProcessTree(self.bitcoind.pid)
@@ -681,13 +681,13 @@ class SatoshiDaemonManager(object):
          return False
       else:
          if not self.bitcoind.poll()==None:
-            LOGDEBUG('Bitcoind is no more')
+            LOGDEBUG('Peercoind is no more')
             if self.btcOut==None:
                self.btcOut, self.btcErr = self.bitcoind.communicate()
-               LOGWARN('bitcoind exited, bitcoind STDOUT:')
+               LOGWARN('peercoind exited, peercoind STDOUT:')
                for line in self.btcOut.split('\n'):
                   LOGWARN(line)
-               LOGWARN('bitcoind exited, bitcoind STDERR:')
+               LOGWARN('peercoind exited, peercoind STDERR:')
                for line in self.btcErr.split('\n'):
                   LOGWARN(line)
          return self.bitcoind.poll()==None
@@ -817,7 +817,7 @@ class SatoshiDaemonManager(object):
       try:
          numblks = self.proxy.getinfo()['blocks']
          blkhash = self.proxy.getblockhash(numblks)
-         toptime = self.proxy.getblock(blkhash)['time']
+         toptime = time.mktime(time.strptime(self.proxy.getblock(blkhash)['time'], "%Y-%m-%d %H:%M:%S %Z"))
          #LOGDEBUG('RPC Call: numBlks=%d, toptime=%d', numblks, toptime)
          # Only overwrite once all outputs are retrieved
          self.lastTopBlockInfo['numblks'] = numblks

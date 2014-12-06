@@ -88,13 +88,13 @@ class ArmoryMainWindow(QMainWindow):
       # SETUP THE WINDOWS DECORATIONS
       self.lblLogoIcon = QLabel()
       if USE_TESTNET:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management [TESTNET]')
+         self.setWindowTitle('Armory - Peercoin Wallet Management [TESTNET]')
          self.iconfile = ':/armory_icon_green_32x32.png'
          self.lblLogoIcon.setPixmap(QPixmap(':/armory_logo_green_h56.png'))
          if Colors.isDarkBkgd:
             self.lblLogoIcon.setPixmap(QPixmap(':/armory_logo_white_text_green_h56.png'))
       else:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management')
+         self.setWindowTitle('Armory - Peercoin Wallet Management')
          self.iconfile = ':/armory_icon_32x32.png'
          self.lblLogoIcon.setPixmap(QPixmap(':/armory_logo_h44.png'))
          if Colors.isDarkBkgd:
@@ -498,8 +498,8 @@ class ArmoryMainWindow(QMainWindow):
       ##########################################################################
 
 
-      btnSendBtc   = QPushButton(tr("Send Bitcoins"))
-      btnRecvBtc   = QPushButton(tr("Receive Bitcoins"))
+      btnSendBtc   = QPushButton(tr("Send Peercoins"))
+      btnRecvBtc   = QPushButton(tr("Receive Peercoins"))
       btnWltProps  = QPushButton(tr("Wallet Properties"))
       btnOfflineTx = QPushButton(tr("Offline Transactions"))
       btnMultisig  = QPushButton(tr("Lockboxes (Multi-Sig)"))
@@ -632,7 +632,7 @@ class ArmoryMainWindow(QMainWindow):
       def openBlindBroad():
          if not satoshiIsAvailable():
             QMessageBox.warning(self, tr("Not Online"), tr("""
-               Bitcoin Core is not available, so Armory will not be able
+               Peercoin-Core is not available, so Armory will not be able
                to broadcast any transactions for you."""), QMessageBox.Ok)
             return
          DlgBroadcastBlindTx(self,self).exec_()
@@ -1011,8 +1011,8 @@ class ArmoryMainWindow(QMainWindow):
          be cleared allowing you to retry any stuck transactions.""")
       if not self.doAutoBitcoind:
          msg += tr("""
-         <br><br>Make sure you also restart Bitcoin-Qt
-         (or bitcoind) and let it synchronize again before you restart
+         <br><br>Make sure you also restart Peercoin-Core
+         () and let it synchronize again before you restart
          Armory.  Doing so will clear its memory pool, as well""")
       QMessageBox.information(self, tr('Memory Pool'), msg, QMessageBox.Ok)
 
@@ -1281,8 +1281,8 @@ class ArmoryMainWindow(QMainWindow):
          self.clickReceiveCoins()
 
       actShowArmory = self.createAction('Show Armory', self.bringArmoryToFront)
-      actSendBtc    = self.createAction('Send Bitcoins', traySend)
-      actRcvBtc     = self.createAction('Receive Bitcoins', trayRecv)
+      actSendBtc    = self.createAction('Send Peercoins', traySend)
+      actRcvBtc     = self.createAction('Receive Peercoins', trayRecv)
       actClose      = self.createAction('Quit Armory', self.closeForReal)
       # Create a short menu of options
       menu.addAction(actShowArmory)
@@ -1298,9 +1298,9 @@ class ArmoryMainWindow(QMainWindow):
    @AllowAsync
    def registerBitcoinWithFF(self):
       #the 3 nodes needed to add to register bitcoin as a protocol in FF
-      rdfschemehandler = 'about=\"urn:scheme:handler:bitcoin\"'
-      rdfscheme = 'about=\"urn:scheme:bitcoin\"'
-      rdfexternalApp = 'about=\"urn:scheme:externalApplication:bitcoin\"'
+      rdfschemehandler = 'about=\"urn:scheme:handler:ppcoin\"'
+      rdfscheme = 'about=\"urn:scheme:ppcoin\"'
+      rdfexternalApp = 'about=\"urn:scheme:externalApplication:ppcoin\"'
 
       #find mimeTypes.rdf file
       home = os.getenv('HOME')
@@ -1334,22 +1334,22 @@ class ArmoryMainWindow(QMainWindow):
 
             #add the missing nodes
             if rdfsch == -1:
-               FFrdf.write(' <RDF:Description RDF:about=\"urn:scheme:handler:bitcoin\"\n')
+               FFrdf.write(' <RDF:Description RDF:about=\"urn:scheme:handler:ppcoin\"\n')
                FFrdf.write('                  NC:alwaysAsk=\"false\">\n')
-               FFrdf.write('    <NC:externalApplication RDF:resource=\"urn:scheme:externalApplication:bitcoin\"/>\n')
+               FFrdf.write('    <NC:externalApplication RDF:resource=\"urn:scheme:externalApplication:ppcoin\"/>\n')
                FFrdf.write('    <NC:possibleApplication RDF:resource=\"urn:handler:local:/usr/bin/xdg-open\"/>\n')
                FFrdf.write(' </RDF:Description>\n')
                i+=1
 
             if rdfsc == -1:
-               FFrdf.write(' <RDF:Description RDF:about=\"urn:scheme:bitcoin\"\n')
-               FFrdf.write('                  NC:value=\"bitcoin\">\n')
-               FFrdf.write('    <NC:handlerProp RDF:resource=\"urn:scheme:handler:bitcoin\"/>\n')
+               FFrdf.write(' <RDF:Description RDF:about=\"urn:scheme:ppcoin\"\n')
+               FFrdf.write('                  NC:value=\"ppcoin\">\n')
+               FFrdf.write('    <NC:handlerProp RDF:resource=\"urn:scheme:handler:ppcoin\"/>\n')
                FFrdf.write(' </RDF:Description>\n')
                i+=1
 
             if rdfea == -1:
-               FFrdf.write(' <RDF:Description RDF:about=\"urn:scheme:externalApplication:bitcoin\"\n')
+               FFrdf.write(' <RDF:Description RDF:about=\"urn:scheme:externalApplication:ppcoin\"\n')
                FFrdf.write('                  NC:prettyName=\"xdg-open\"\n')
                FFrdf.write('                  NC:path=\"/usr/bin/xdg-open\" />\n')
                i+=1
@@ -1370,8 +1370,8 @@ class ArmoryMainWindow(QMainWindow):
          return
 
       if OS_LINUX:
-         out,err = execAndWait('gconftool-2 --get /desktop/gnome/url-handlers/bitcoin/command')
-         out2,err = execAndWait('xdg-mime query default x-scheme-handler/bitcoin')
+         out,err = execAndWait('gconftool-2 --get /desktop/gnome/url-handlers/ppcoin/command')
+         out2,err = execAndWait('xdg-mime query default x-scheme-handler/ppcoin')
 
          #check FF protocol association
          #checkFF_thread = threading.Thread(target=self.registerBitcoinWithFF)
@@ -1380,10 +1380,10 @@ class ArmoryMainWindow(QMainWindow):
 
          def setAsDefault():
             LOGINFO('Setting up Armory as default URI handler...')
-            execAndWait('gconftool-2 -t string -s /desktop/gnome/url-handlers/bitcoin/command "python /usr/lib/armory/ArmoryQt.py \"%s\""')
-            execAndWait('gconftool-2 -s /desktop/gnome/url-handlers/bitcoin/needs_terminal false -t bool')
-            execAndWait('gconftool-2 -t bool -s /desktop/gnome/url-handlers/bitcoin/enabled true')
-            execAndWait('xdg-mime default armory.desktop x-scheme-handler/bitcoin')
+            execAndWait('gconftool-2 -t string -s /desktop/gnome/url-handlers/ppcoin/command "python /usr/lib/armory/ArmoryQt.py \"%s\""')
+            execAndWait('gconftool-2 -s /desktop/gnome/url-handlers/ppcoin/needs_terminal false -t bool')
+            execAndWait('gconftool-2 -t bool -s /desktop/gnome/url-handlers/ppcoin/enabled true')
+            execAndWait('xdg-mime default armory.desktop x-scheme-handler/ppcoin')
 
 
          if ('no value' in out.lower() or 'no value' in err.lower()) and not 'armory.desktop' in out2.lower():
@@ -1396,7 +1396,7 @@ class ArmoryMainWindow(QMainWindow):
             if not self.getSettingOrSetDefault('DNAA_DefaultApp', False):
                reply = MsgBoxWithDNAA(MSGBOX.Question, 'Default URL Handler', \
                   'Armory is not set as your default application for handling '
-                  '"bitcoin:" links.  Would you like to use Armory as the '
+                  '"ppcoin:" links.  Would you like to use Armory as the '
                   'default?', 'Do not ask this question again')
                if reply[0]==True:
                   setAsDefault()
@@ -1425,7 +1425,7 @@ class ArmoryMainWindow(QMainWindow):
          modulepathname += unicode(passstr[0:(rtlength*2)], encoding='utf16') + u'" "%1"'
          modulepathname = modulepathname.encode('utf8')
 
-         rootKey = 'bitcoin\\shell\\open\\command'
+         rootKey = 'ppcoin\\shell\\open\\command'
          try:
             userKey = 'Software\\Classes\\' + rootKey
             registryKey = OpenKey(HKEY_CURRENT_USER, userKey, 0, KEY_READ)
@@ -1467,7 +1467,7 @@ class ArmoryMainWindow(QMainWindow):
             # needed.  They have enough to worry about with this weird new program...
             reply = MsgBoxWithDNAA(MSGBOX.Question, 'Default URL Handler', \
                'Armory is not set as your default application for handling '
-               '"bitcoin:" links.  Would you like to use Armory as the '
+               '"ppcoin:" links.  Would you like to use Armory as the '
                'default?', 'Do not ask this question again')
 
             if reply[1]==True:
@@ -1488,10 +1488,10 @@ class ArmoryMainWindow(QMainWindow):
             LOGINFO('Registering Armory  for current user')
             baseDir = os.path.dirname(unicode(passstr[0:(rtlength*2)], encoding='utf16'))
             regKeys = []
-            regKeys.append(['Software\\Classes\\bitcoin', '', 'URL:bitcoin Protocol'])
-            regKeys.append(['Software\\Classes\\bitcoin', 'URL Protocol', ""])
-            regKeys.append(['Software\\Classes\\bitcoin\\shell', '', None])
-            regKeys.append(['Software\\Classes\\bitcoin\\shell\\open', '',  None])
+            regKeys.append(['Software\\Classes\\ppcoin', '', 'URL:ppcoin Protocol'])
+            regKeys.append(['Software\\Classes\\ppcoin', 'URL Protocol', ""])
+            regKeys.append(['Software\\Classes\\ppcoin\\shell', '', None])
+            regKeys.append(['Software\\Classes\\ppcoin\\shell\\open', '',  None])
 
             for key,name,val in regKeys:
                dkey = '%s\\%s' % (key,name)
@@ -1501,9 +1501,9 @@ class ArmoryMainWindow(QMainWindow):
                CloseKey(registryKey)
 
             regKeysU = []
-            regKeysU.append(['Software\\Classes\\bitcoin\\shell\\open\\command',  '', \
+            regKeysU.append(['Software\\Classes\\ppcoin\\shell\\open\\command',  '', \
                            modulepathname])
-            regKeysU.append(['Software\\Classes\\bitcoin\\DefaultIcon', '',  \
+            regKeysU.append(['Software\\Classes\\ppcoin\\DefaultIcon', '',  \
                           '"%s\\armory48x48.ico"' % baseDir])
             for key,name,val in regKeysU:
                dkey = '%s\\%s' % (key,name)
@@ -1707,17 +1707,40 @@ class ArmoryMainWindow(QMainWindow):
 
    #############################################################################
    def setupAnnouncementFetcher(self):
-      skipChk1 = self.getSettingOrSetDefault('SkipAnnounceCheck', False)
-      skipChk2 = CLI_OPTIONS.skipAnnounceCheck
-      skipChk3 = CLI_OPTIONS.offline and not CLI_OPTIONS.testAnnounceCode
-      self.skipAnnounceCheck = skipChk1 or skipChk2 or skipChk3
+      # Decide if disable OS/version reporting sent with announce fetches
+      skipStats1 = self.getSettingOrSetDefault('SkipStatsReport', False)
+      skipStats2 = CLI_OPTIONS.skipStatsReport
+      self.skipStatsReport = skipStats1 or skipStats2
+
+      # This determines if we should disable all of it
+      skipChk1  = self.getSettingOrSetDefault('SkipAnnounceCheck', False)
+      skipChk2  = CLI_OPTIONS.skipAnnounceCheck
+      skipChk3  = CLI_OPTIONS.offline and not CLI_OPTIONS.testAnnounceCode
+      skipChk4  = CLI_OPTIONS.useTorSettings 
+      skipChk5  = self.getSettingOrSetDefault('UseTorSettings', False)
+      self.skipAnnounceCheck = \
+                  skipChk1 or skipChk2 or skipChk3 or skipChk4 or skipChk5
+
 
       url1 = ANNOUNCE_URL
       url2 = ANNOUNCE_URL_BACKUP
       fetchPath = os.path.join(ARMORY_HOME_DIR, 'atisignedannounce')
       if self.announceFetcher is None:
-         self.announceFetcher = AnnounceDataFetcher(url1, url2, fetchPath)
-         self.announceFetcher.setDisabled(self.skipAnnounceCheck)
+
+         # We keep an ID in the settings file that can be used by ATI's
+         # statistics aggregator to remove duplicate reports.  We store
+         # the month&year that the ID was generated, so that we can change
+         # it every month for privacy reasons
+         idData = self.getSettingOrSetDefault('MonthlyID', '0000_00000000')
+         storedYM,currID = idData.split('_')
+         monthyear = unixTimeToFormatStr(RightNow(), '%m%y')
+         if not storedYM == monthyear:
+            currID = SecureBinaryData().GenerateRandom(4).toHexStr()
+            self.settings.set('MonthlyID', '%s_%s' % (monthyear, currID))
+            
+         self.announceFetcher = AnnounceDataFetcher(url1, url2, fetchPath, currID)
+         self.announceFetcher.setStatsDisable(self.skipStatsReport)
+         self.announceFetcher.setFullyDisabled(self.skipAnnounceCheck)
          self.announceFetcher.start()
 
          # Set last-updated vals to zero to force processing at startup
@@ -1726,11 +1749,11 @@ class ArmoryMainWindow(QMainWindow):
 
       # If we recently updated the settings to enable or disable checking...
       if not self.announceFetcher.isRunning() and not self.skipAnnounceCheck:
-         self.announceFetcher.setDisabled(False)
+         self.announceFetcher.setFullyDisabled(False)
          self.announceFetcher.setFetchInterval(DEFAULT_FETCH_INTERVAL)
          self.announceFetcher.start()
       elif self.announceFetcher.isRunning() and self.skipAnnounceCheck:
-         self.announceFetcher.setDisabled(True)
+         self.announceFetcher.setFullyDisabled(True)
          self.announceFetcher.shutdown()
 
 
@@ -1863,7 +1886,7 @@ class ArmoryMainWindow(QMainWindow):
                if not self.NetworkingFactory:
                   return
 
-               # This is to detect the running versions of Bitcoin-Qt/bitcoind
+               # This is to detect the running versions of Peercoin-Core/bitcoind
                thisVerStr = self.NetworkingFactory.proto.peerInfo['subver']
                thisVerStr = thisVerStr.strip('/').split(':')[-1]
 
@@ -2105,13 +2128,14 @@ class ArmoryMainWindow(QMainWindow):
 
 
       settingSkipCheck = self.getSettingOrSetDefault('SkipOnlineCheck', False)
-      self.forceOnline = CLI_OPTIONS.forceOnline or settingSkipCheck
-      if self.forceOnline:
-         LOGINFO('Forced online mode: True')
+      useTor = self.getSettingOrSetDefault('UseTorSettings', False)
+      self.forceOnline = CLI_OPTIONS.forceOnline or settingSkipCheck or useTor
 
       # Check general internet connection
       self.internetAvail = False
-      if not self.forceOnline:
+      if self.forceOnline:
+         LOGINFO('Skipping online check, forcing online mode')
+      else:
          try:
             import urllib2
             response=urllib2.urlopen('http://google.com', timeout=CLI_OPTIONS.nettimeout)
@@ -2133,7 +2157,7 @@ class ArmoryMainWindow(QMainWindow):
 
 
       LOGINFO('Internet connection is Available: %s', self.internetAvail)
-      LOGINFO('Bitcoin-Qt/bitcoind is Available: %s', satoshiIsAvailable())
+      LOGINFO('Peercoin-Core is Available: %s', satoshiIsAvailable())
       LOGINFO('The first blk*.dat was Available: %s', str(self.checkHaveBlockfiles()))
       LOGINFO('Online mode currently possible:   %s', self.onlineModeIsPossible())
 
@@ -2147,7 +2171,7 @@ class ArmoryMainWindow(QMainWindow):
       if not satoshiIsAvailable():
          reply = MsgBoxCustom(MSGBOX.Question, tr('BitTorrent Option'), tr("""
             You are currently configured to run the core Bitcoin software
-            yourself (Bitcoin-Qt or bitcoind).  <u>Normally</u>, you should
+            yourself (Peercoin-Core ).  <u>Normally</u>, you should
             start the Bitcoin software first and wait for it to synchronize
             with the network before starting Armory.
             <br><br>
@@ -2162,16 +2186,16 @@ class ArmoryMainWindow(QMainWindow):
             software until after it is complete.
             <br><br>
             <u>To synchronize using Bitcoin P2P (fallback):</u>
-            Click "Cancel" below, then close Armory and start Bitcoin-Qt
-            (or bitcoind).  Do not start Armory until you see a green checkmark
-            in the bottom-right corner of the Bitcoin-Qt window."""), \
+            Click "Cancel" below, then close Armory and start Peercoin-Core
+            ().  Do not start Armory until you see a green checkmark
+            in the bottom-right corner of the Peercoin-Core window."""), \
             wCancel=True, yesStr='Use BitTorrent')
 
          if not reply:
             QMessageBox.warning(self, tr('Synchronize'), tr("""
                When you are ready to start synchronization, close Armory and
-               start Bitcoin-Qt or bitcoind.  Restart Armory only when
-               synchronization is complete.  If using Bitcoin-Qt, you will see
+               start Peercoin-Core .  Restart Armory only when
+               synchronization is complete.  If using Peercoin-Core, you will see
                a green checkmark in the bottom-right corner"""), QMessageBox.Ok)
             return False
 
@@ -2179,7 +2203,7 @@ class ArmoryMainWindow(QMainWindow):
          reply = MsgBoxCustom(MSGBOX.Question, tr('BitTorrent Option'), tr("""
             You are currently running the core Bitcoin software, but it
             is not fully synchronized with the network, yet.  <u>Normally</u>,
-            you should close Armory until Bitcoin-Qt (or bitcoind) is
+            you should close Armory until Peercoin-Core () is
             finished
             <br><br>
             <b><u>However</u></b>, Armory can speed up this initial
@@ -2195,7 +2219,7 @@ class ArmoryMainWindow(QMainWindow):
             <br><br>
             <u>To synchronize using Bitcoin P2P (fallback):</u>
             Click "Cancel" below, and then close Armory until the Bitcoin
-            software is finished synchronizing.  If using Bitcoin-Qt, you
+            software is finished synchronizing.  If using Peercoin-Core, you
             will see a green checkmark in the bottom-right corner of the
             main window."""), QMessageBox.Ok)
 
@@ -2210,7 +2234,7 @@ class ArmoryMainWindow(QMainWindow):
             QMessageBox.warning(self, tr('Synchronize'), tr("""
                You chose to finish synchronizing with the network using
                the Bitcoin software which is already running.  Please close
-               Armory until it is finished.  If you are running Bitcoin-Qt,
+               Armory until it is finished.  If you are running Peercoin-Core,
                you will see a green checkmark in the bottom-right corner,
                when it is time to open Armory again."""), QMessageBox.Ok)
             return False
@@ -2256,15 +2280,15 @@ class ArmoryMainWindow(QMainWindow):
    def startBitcoindIfNecessary(self):
       LOGINFO('startBitcoindIfNecessary')
       if not (self.forceOnline or self.internetAvail) or CLI_OPTIONS.offline:
-         LOGWARN('Not online, will not start bitcoind')
+         LOGWARN('Not online, will not start Peercoin-Core')
          return False
 
       if not self.doAutoBitcoind:
-         LOGWARN('Tried to start bitcoind, but ManageSatoshi==False')
+         LOGWARN('Tried to start Peercoin-Core, but ManageSatoshi==False')
          return False
 
       if satoshiIsAvailable():
-         LOGWARN('Tried to start bitcoind, but satoshi already running')
+         LOGWARN('Tried to start Peercoin-Core, but satoshi already running')
          return False
 
       self.setSatoshiPaths()
@@ -2283,10 +2307,10 @@ class ArmoryMainWindow(QMainWindow):
 
       try:
          # "satexe" is actually just the install directory, not the direct
-         # path the executable.  That dir tree will be searched for bitcoind
+         # path the executable.  That dir tree will be searched f
          TheSDM.setupSDM(extraExeSearch=self.satoshiExeSearchPath)
          TheSDM.startBitcoind()
-         LOGDEBUG('Bitcoind started without error')
+         LOGDEBUG('Peercoin-Core started without error')
          return True
       except:
          LOGEXCEPT('Failed to setup SDM')
@@ -2301,7 +2325,7 @@ class ArmoryMainWindow(QMainWindow):
       # it if it doesn't exist
       if self.settings.hasSetting('SatoshiExe'):
          if not os.path.exists(self.settings.get('SatoshiExe')):
-            LOGERROR('Bitcoin installation setting is a non-existent directory')
+            LOGERROR('Peercoin installation setting is a non-existent directory')
          self.satoshiExeSearchPath = [self.settings.get('SatoshiExe')]
       else:
          self.satoshiExeSearchPath = []
@@ -2379,8 +2403,8 @@ class ArmoryMainWindow(QMainWindow):
 
             try:
                self.sysTray.showMessage('Disconnected', \
-                     'Connection to Bitcoin-Qt client lost!  Armory cannot send \n'
-                     'or receive bitcoins until connection is re-established.', \
+                     'Connection to Peercoin-Core client lost!  Armory cannot send \n'
+                     'or receive peercoins until connection is re-established.', \
                      QSystemTrayIcon.Critical, 10000)
             except:
                LOGEXCEPT('Failed to show disconnect notification')
@@ -2399,7 +2423,7 @@ class ArmoryMainWindow(QMainWindow):
             try:
                if self.connectCount>0:
                   self.sysTray.showMessage('Connected', \
-                     'Connection to Bitcoin-Qt re-established', \
+                     'Connection to Peercoin-Core re-established', \
                      QSystemTrayIcon.Information, 10000)
                self.connectCount += 1
             except:
@@ -2448,18 +2472,18 @@ class ArmoryMainWindow(QMainWindow):
 
       uriDict = parseBitcoinURI(uriStr)
       if TheBDM.getBDMState() in ('Offline','Uninitialized'):
-         LOGERROR('%sed "bitcoin:" link in offline mode.' % ClickOrEnter)
+         LOGERROR('%sed "ppcoin:" link in offline mode.' % ClickOrEnter)
          self.bringArmoryToFront()
          QMessageBox.warning(self, 'Offline Mode',
-            'You %sed on a "bitcoin:" link, but Armory is in '
+            'You %sed on a "ppcoin:" link, but Armory is in '
             'offline mode, and is not capable of creating transactions. '
             '%sing links will only work if Armory is connected '
-            'to the Bitcoin network!' % (clickOrEnter, ClickOrEnter), \
+            'to the Peercoin network!' % (clickOrEnter, ClickOrEnter), \
              QMessageBox.Ok)
          return {}
 
       if len(uriDict)==0:
-         warnMsg = ('It looks like you just %sed a "bitcoin:" link, but '
+         warnMsg = ('It looks like you just %sed a "ppcoin:" link, but '
                     'that link is malformed.  ' % clickOrEnter)
          if self.usermode == USERMODE.Standard:
             warnMsg += ('Please check the source of the link and enter the '
@@ -2471,10 +2495,10 @@ class ArmoryMainWindow(QMainWindow):
          return {}
 
       if not uriDict.has_key('address'):
-         QMessageBox.warning(self, 'The "bitcoin:" link you just %sed '
+         QMessageBox.warning(self, 'The "ppcoin:" link you just %sed '
             'does not even contain an address!  There is nothing that '
             'Armory can do with this link!' % clickOrEnter, QMessageBox.Ok)
-         LOGERROR('No address in "bitcoin:" link!  Nothing to do!')
+         LOGERROR('No address in "ppcoin:" link!  Nothing to do!')
          return {}
 
       # Verify the URI is for the same network as this Armory instnance
@@ -2484,7 +2508,7 @@ class ArmoryMainWindow(QMainWindow):
          if NETWORKS.has_key(theAddrByte):
             net = NETWORKS[theAddrByte]
          QMessageBox.warning(self, 'Wrong Network!', \
-            'The address for the "bitcoin:" link you just %sed is '
+            'The address for the "ppcoin:" link you just %sed is '
             'for the wrong network!  You are on the <b>%s</b> '
             'and the address you supplied is for the the '
             '<b>%s</b>!' % (clickOrEnter, NETWORKS[ADDRBYTE], net), \
@@ -2496,7 +2520,7 @@ class ArmoryMainWindow(QMainWindow):
       recognized = ['address','version','amount','label','message']
       for key,value in uriDict.iteritems():
          if key.startswith('req-') and not key[4:] in recognized:
-            QMessageBox.warning(self,'Unsupported URI', 'The "bitcoin:" link '
+            QMessageBox.warning(self,'Unsupported URI', 'The "ppcoin:" link '
                'you just %sed contains fields that are required but not '
                'recognized by Armory.  This may be an older version of Armory, '
                'or the link you %sed on uses an exotic, unsupported format.'
@@ -2514,7 +2538,7 @@ class ArmoryMainWindow(QMainWindow):
       LOGINFO('uriLinkClicked')
       if TheBDM.getBDMState()=='Offline':
          QMessageBox.warning(self, 'Offline', \
-            'You just clicked on a "bitcoin:" link, but Armory is offline '
+            'You just clicked on a "ppcoin:" link, but Armory is offline '
             'and cannot send transactions.  Please click the link '
             'again when Armory is online.', \
             QMessageBox.Ok)
@@ -3022,8 +3046,8 @@ class ArmoryMainWindow(QMainWindow):
             LOGINFO('Missing blocks: %d', len(vectMissingBlks))
             QMessageBox.critical(self, tr('Blockdata Error'), tr("""
                Armory has detected an error in the blockchain database
-               maintained by the third-party Bitcoin software (Bitcoin-Qt
-               or bitcoind).  This error is not fatal, but may lead to
+               maintained by the third-party Bitcoin software (Peercoin-Core
+               ).  This error is not fatal, but may lead to
                incorrect balances, inability to send coins, or application
                instability.
                <br><br>
@@ -3040,7 +3064,7 @@ class ArmoryMainWindow(QMainWindow):
                'Blockchain Loaded!', 'Blockchain loading is complete.  '
                'Your balances and transaction history are now available '
                'under the "Transactions" tab.  You can also send and '
-               'receive bitcoins.', \
+               'receive peercoins.', \
                dnaaMsg='Do not show me this notification again ', yesStr='OK')
 
             if remember==True:
@@ -3624,7 +3648,7 @@ class ArmoryMainWindow(QMainWindow):
       else:
          msgConfirm = ( \
             'Armory must scan the global transaction history in order to '
-            'find any bitcoins associated with the %s you supplied. '
+            'find any peercoins associated with the %s you supplied. '
             'Armory will go into offline mode temporarily while the scan '
             'is performed, and you will not have access to balances or be '
             'able to create transactions.  The scan may take several minutes.'
@@ -3719,9 +3743,9 @@ class ArmoryMainWindow(QMainWindow):
          if modified and withOldSigWarning:
             reply = QMessageBox.warning(self, 'Old signature format detected', \
                  'The transaction that you are about to execute '
-                 'has been signed with an older version Bitcoin Armory '
+                 'has been signed with an older version Peercoin Armory '
                  'that has added unnecessary padding to the signature. '
-                 'If you are running version Bitcoin 0.8.2 or later the unnecessary '
+                 'If you are running version Peercoin-Core 0.8.2 or later the unnecessary '
                  'the unnecessary signature padding will not be broadcast. '
                  'Note that removing the unnecessary padding will change the hash value '
                  'of the transaction. Do you want to remove the unnecessary padding?', QMessageBox.Yes | QMessageBox.No)
@@ -4162,7 +4186,7 @@ class ArmoryMainWindow(QMainWindow):
       selectionMade = True
       if len(self.walletMap)==0:
          reply = QMessageBox.information(self, 'No Wallets!', \
-            'You cannot send any bitcoins until you create a wallet and '
+            'You cannot send any peercoins until you create a wallet and '
             'receive some coins.  Would you like to create a wallet?', \
             QMessageBox.Yes | QMessageBox.No)
          if reply==QMessageBox.Yes:
@@ -4173,7 +4197,7 @@ class ArmoryMainWindow(QMainWindow):
 
    #############################################################################
    def uriSendBitcoins(self, uriDict):
-      # Because Bitcoin-Qt doesn't store the message= field we have to assume
+      # Because Peercoin-Core doesn't store the message= field we have to assume
       # that the label field holds the Tx-info.  So we concatenate them for
       # the display message
       uri_has = lambda s: uriDict.has_key(s)
@@ -4190,7 +4214,7 @@ class ArmoryMainWindow(QMainWindow):
          newMsg = uriDict['label']
 
       descrStr = ''
-      descrStr = ('You just clicked on a "bitcoin:" link requesting bitcoins '
+      descrStr = ('You just clicked on a "ppcoin:" link requesting peercoins '
                 'to be sent to the following address:<br> ')
 
       descrStr += '<br>--<b>Address</b>:\t%s ' % uriDict['address']
@@ -4228,7 +4252,7 @@ class ArmoryMainWindow(QMainWindow):
       selectedWalletID = None
       if len(self.walletMap)==0:
          reply = QMessageBox.information(self, 'No Wallets!', \
-            'You just clicked on a "bitcoin:" link to send money, but you '
+            'You just clicked on a "ppcoin:" link to send money, but you '
             'currently have no wallets!  Would you like to create a wallet '
             'now?', QMessageBox.Yes | QMessageBox.No)
          if reply==QMessageBox.Yes:
@@ -4241,13 +4265,13 @@ class ArmoryMainWindow(QMainWindow):
 
    #############################################################################
    def clickReceiveCoins(self):
-      LOGDEBUG('Clicked "Receive Bitcoins Button"')
+      LOGDEBUG('Clicked "Receive Peercoins Button"')
       wltID = None
       selectionMade = True
       if len(self.walletMap)==0:
          reply = QMessageBox.information(self, 'No Wallets!', \
             'You have not created any wallets which means there is nowhere to '
-            'store you bitcoins!  Would you like to create a wallet now?', \
+            'store you peercoins!  Would you like to create a wallet now?', \
             QMessageBox.Yes | QMessageBox.No)
          if reply==QMessageBox.Yes:
             self.startWalletWizard()
@@ -4469,7 +4493,7 @@ class ArmoryMainWindow(QMainWindow):
       elif self.doAutoBitcoind and not TheSDM.isRunningBitcoind():
          if satoshiIsAvailable():
             result = QMessageBox.warning(self, tr('Still Running'), tr("""
-               'Bitcoin-Qt is still running.  Armory cannot start until
+               'Peercoin-Core is still running.  Armory cannot start until
                'it is closed.  Do you want Armory to close it for you?"""), \
                QMessageBox.Yes | QMessageBox.No)
             if result==QMessageBox.Yes:
@@ -4613,9 +4637,9 @@ class ArmoryMainWindow(QMainWindow):
       self.lblDashBtnDescr.setOpenExternalLinks(True)
       BTN,LBL,TTIP = range(3)
       self.dashBtns = [[None]*3 for i in range(5)]
-      self.dashBtns[DASHBTNS.Close   ][BTN] = QPushButton('Close Bitcoin Process')
-      self.dashBtns[DASHBTNS.Install ][BTN] = QPushButton('Download Bitcoin')
-      self.dashBtns[DASHBTNS.Browse  ][BTN] = QPushButton('Open www.bitcoin.org')
+      self.dashBtns[DASHBTNS.Close   ][BTN] = QPushButton('Close Peercoin Process')
+      self.dashBtns[DASHBTNS.Install ][BTN] = QPushButton('Download Peercoin-Core')
+      self.dashBtns[DASHBTNS.Browse  ][BTN] = QPushButton('Open www.peercoin.net')
       self.dashBtns[DASHBTNS.Instruct][BTN] = QPushButton('Installation Instructions')
       self.dashBtns[DASHBTNS.Settings][BTN] = QPushButton('Change Settings')
 
@@ -4651,27 +4675,27 @@ class ArmoryMainWindow(QMainWindow):
                                                      #self.openInstructWindow)
 
       self.dashBtns[DASHBTNS.Close][LBL] = QRichLabel( \
-           'Stop existing Bitcoin processes so that Armory can open its own')
+           'Stop existing Peercoin-Core processes so that Armory can open its own')
       self.dashBtns[DASHBTNS.Browse][LBL]     = QRichLabel( \
-           'Open browser to Bitcoin webpage to download and install Bitcoin software')
+           'Open browser to Peercoin-Core webpage to download and install Peercoin-Core software')
       self.dashBtns[DASHBTNS.Instruct][LBL] = QRichLabel( \
-           'Instructions for manually installing Bitcoin for operating system')
+           'Instructions for manually installing Peercoin-Core for operating system')
       self.dashBtns[DASHBTNS.Settings][LBL]  = QRichLabel( \
-           'Open Armory settings window to change Bitcoin software management')
+           'Open Armory settings window to change Peercoin-Core software management')
 
 
       self.dashBtns[DASHBTNS.Browse][TTIP] = self.createToolTipWidget( \
            'Will open your default browser to http://www.bitcoin.org where you can '
-           'download the latest version of Bitcoin-Qt, and get other information '
-           'and links about Bitcoin, in general.')
+           'download the latest version of Peercoin-Core, and get other information '
+           'and links about Peercoin, in general.')
       self.dashBtns[DASHBTNS.Instruct][TTIP] = self.createToolTipWidget( \
            'Instructions are specific to your operating system and include '
            'information to help you verify you are installing the correct software')
       self.dashBtns[DASHBTNS.Settings][TTIP] = self.createToolTipWidget(
-           'Change Bitcoin-Qt/bitcoind management settings or point Armory to '
-           'a non-standard Bitcoin installation')
+           'Change Peercoin-Core management settings or point Armory to '
+           'a non-standard Peercoin installation')
       self.dashBtns[DASHBTNS.Close][TTIP] = self.createToolTipWidget( \
-           'Armory has detected a running Bitcoin-Qt or bitcoind instance and '
+           'Armory has detected a running Peercoin-Core  instance and '
            'will force it to exit')
 
       self.dashBtns[DASHBTNS.Install][BTN].setEnabled(False)
@@ -4685,7 +4709,7 @@ class ArmoryMainWindow(QMainWindow):
          self.dashBtns[DASHBTNS.Install][BTN].setEnabled(True)
          self.dashBtns[DASHBTNS.Install][LBL] = QRichLabel('')
          self.dashBtns[DASHBTNS.Install][LBL].setText( \
-            'Securely download Bitcoin software for Windows %s' % OS_VARIANT[0])
+            'Securely download Peercoin software for Windows %s' % OS_VARIANT[0])
          self.dashBtns[DASHBTNS.Install][TTIP] = self.createToolTipWidget( \
             'The downloaded files are cryptographically verified.  '
             'Using this option will start the installer, you will '
@@ -4703,9 +4727,9 @@ class ArmoryMainWindow(QMainWindow):
          if dist[0] in ['Ubuntu','LinuxMint'] or 'debian' in dist:
             self.dashBtns[DASHBTNS.Install][BTN].setEnabled(True)
             self.dashBtns[DASHBTNS.Install][LBL] = QRichLabel( tr("""
-               Download and Install Bitcoin Core for Ubuntu/Debian"""))
+               Download and Install Peercoin-Core for Ubuntu/Debian"""))
             self.dashBtns[DASHBTNS.Install][TTIP] = self.createToolTipWidget( tr("""
-               'Will download and Bitcoin software and cryptographically verify it"""))
+               'Will download and Peercoin-Core software and cryptographically verify it"""))
       elif OS_MACOSX:
          pass
       else:
@@ -5101,15 +5125,15 @@ class ArmoryMainWindow(QMainWindow):
    #############################################################################
    def closeExistingBitcoin(self):
       for proc in psutil.process_iter():
-         if proc.name.lower() in ['bitcoind.exe','bitcoin-qt.exe',\
-                                     'bitcoind','bitcoin-qt']:
+         if proc.name.lower() in ['peercoind.exe','Peercoin-Core.exe',\
+                                     'peercoind','Peercoin-Core']:
             killProcess(proc.pid)
             time.sleep(2)
             return
 
       # If got here, never found it
       QMessageBox.warning(self, 'Not Found', \
-         'Attempted to kill the running Bitcoin-Qt/bitcoind instance, '
+         'Attempted to kill the running Peercoin-Core instance, '
          'but it was not found.  ', QMessageBox.Ok)
 
    #############################################################################
@@ -5279,8 +5303,8 @@ class ArmoryMainWindow(QMainWindow):
             lastBlkTime = info['toptime']
 
          # Use a reference point if we are starting from scratch
-         refBlock = max(290746,      lastBlkNum)
-         refTime  = max(1394922889,  lastBlkTime)
+         refBlock = max(144800,      lastBlkNum)
+         refTime  = max(1416700000,  lastBlkTime)
 
 
          # Ten min/block is pretty accurate, even from genesis (about 1% slow)
@@ -5369,7 +5393,7 @@ class ArmoryMainWindow(QMainWindow):
          '<li>Sign transactions created from an online system</li>'
          '<li>Sign messages</li>'
          '</ul>'
-         '<br><br><b>NOTE:</b>  The Bitcoin network <u>will</u> process transactions '
+         '<br><br><b>NOTE:</b>  The Peercoin network <u>will</u> process transactions '
          'to your addresses, even if you are offline.  It is perfectly '
          'okay to create and distribute payment addresses while Armory is offline, '
          'you just won\'t be able to verify those payments until the next time '
@@ -5386,7 +5410,7 @@ class ArmoryMainWindow(QMainWindow):
          '<li>Sign messages</li>'
          '<li><b>Sign transactions created from an online system</b></li>'
          '</ul>'
-         '<br><br><b>NOTE:</b>  The Bitcoin network <u>will</u> process transactions '
+         '<br><br><b>NOTE:</b>  The Peercoin network <u>will</u> process transactions '
          'to your addresses, regardless of whether you are online.  It is perfectly '
          'okay to create and distribute payment addresses while Armory is offline, '
          'you just won\'t be able to verify those payments until the next time '
@@ -5396,9 +5420,9 @@ class ArmoryMainWindow(QMainWindow):
          '<ul>'
          '<li>Create, import or recover Armory wallets</li>'
          '<li>Generate new addresses to receive coins</li>'
-         '<li>Send bitcoins to other people</li>'
+         '<li>Send ppercoins to other people</li>'
          '<li>Create one-time backups of your wallets (in printed or digital form)</li>'
-         '<li>Click on "bitcoin:" links in your web browser '
+         '<li>Click on "ppcoin:" links in your web browser '
             '(not supported on all operating systems)</li>'
          '<li>Import private keys to wallets</li>'
          '<li>Monitor payments to watching-only wallets and create '
@@ -5420,7 +5444,7 @@ class ArmoryMainWindow(QMainWindow):
       # A few states don't care which mgmtMode you are in...
       if state == 'NewUserInfo':
          return tr("""
-         For more information about Armory, and even Bitcoin itself, you should
+         For more information about Armory, and even Peercoin itself, you should
          visit the <a href="https://bitcoinarmory.com/faqs/">frequently
          asked questions page</a>.  If
          you are experiencing problems using this software, please visit the
@@ -5433,7 +5457,7 @@ class ArmoryMainWindow(QMainWindow):
          hard-drive failure, and make it easy for your family to recover
          your funds if something terrible happens to you.  <i>Each wallet
          only needs to be backed up once, ever!</i>  Without it, you are at
-         risk of losing all of your Bitcoins!  For more information,
+         risk of losing all of your Peercoins!  For more information,
          visit the <a href="https://bitcoinarmory.com/armory-backups-are-forever/">Armory
          Backups page</a>.
          <br><br>
@@ -5448,15 +5472,15 @@ class ArmoryMainWindow(QMainWindow):
          '<p><b>You now have access to all the features Armory has to offer!</b><br>'
          'To see your balances and transaction history, please click '
          'on the "Transactions" tab above this text.  <br>'
-         'Here\'s some things you can do with Armory Bitcoin Client:'
+         'Here\'s some things you can do with Armory Peercoin Client:'
          '<br>')
       elif state == 'OnlineFull2':
          return ( \
          ('If you experience any performance issues with Armory, '
-         'please confirm that Bitcoin-Qt is running and <i>fully '
-         'synchronized with the Bitcoin network</i>.  You will see '
+         'please confirm that Peercoin-Core is running and <i>fully '
+         'synchronized with the Peercoin network</i>.  You will see '
          'a green checkmark in the bottom right corner of the '
-         'Bitcoin-Qt window if it is synchronized.  If not, it is '
+         'Peercoin-Core window if it is synchronized.  If not, it is '
          'recommended you close Armory and restart it only when you '
          'see that checkmark.'
          '<br><br>'  if not self.doAutoBitcoind else '') + (
@@ -5493,7 +5517,7 @@ class ArmoryMainWindow(QMainWindow):
       elif state == 'OfflineNoSatoshiNoInternet':
          return ( \
          'There is no connection to the internet, and there is no other '
-         'Bitcoin software running.  Most likely '
+         'Peercoin software running.  Most likely '
          'you are here because this is a system dedicated '
          'to manage offline wallets! '
          '<br><br>'
@@ -5504,7 +5528,7 @@ class ArmoryMainWindow(QMainWindow):
          'then you can restart Armory with the "--skip-online-check" '
          'option, or change it in the Armory settings.'
          '<br><br>'
-         'If you do not have Bitcoin-Qt installed, you can '
+         'If you do not have Peercoin-Core installed, you can '
          'download it from <a href="http://www.bitcoin.org">'
          'http://www.bitcoin.org</a>.')
 
@@ -5518,22 +5542,22 @@ class ArmoryMainWindow(QMainWindow):
             'You are currently in offline mode, but can '
             'switch to online mode by pressing the button above.  However, '
             'it is not recommended that you switch until '
-            'Bitcoin-Qt/bitcoind is fully synchronized with the bitcoin network.  '
+            'Peercoin-Coreis fully synchronized with the peercoin network.  '
             'You will see a green checkmark in the bottom-right corner of '
-            'the Bitcoin-Qt window when it is finished.'
+            'the Peercoin-Core window when it is finished.'
             '<br><br>'
             'Switching to online mode will give you access '
             'to more Armory functionality, including sending and receiving '
-            'bitcoins and viewing the balances and transaction histories '
+            'peercoins and viewing the balances and transaction histories '
             'of each of your wallets.<br><br>')
          elif state == 'OfflineNoSatoshi':
-            bitconf = os.path.join(BTC_HOME_DIR, 'bitcoin.conf')
+            bitconf = os.path.join(BTC_HOME_DIR, 'peercoin.conf')
             return ( \
             'You are currently in offline mode because '
-            'Bitcoin-Qt is not running.  To switch to online '
-            'mode, start Bitcoin-Qt and let it synchronize with the network '
+            'Peercoin-Core is not running.  To switch to online '
+            'mode, start Peercoin-Core and let it synchronize with the network '
             '-- you will see a green checkmark in the bottom-right corner when '
-            'it is complete.  If Bitcoin-Qt is already running and you believe '
+            'it is complete.  If Peercoin-Core is already running and you believe '
             'the lack of connection is an error (especially if using proxies), '
             'please see <a href="'
             'https://bitcointalk.org/index.php?topic=155717.msg1719077#msg1719077">'
@@ -5541,17 +5565,17 @@ class ArmoryMainWindow(QMainWindow):
             '<br><br>'
             '<b>If you prefer to have Armory do this for you</b>, '
             'then please check "Let Armory run '
-            'Bitcoin-Qt in the background" under "File"->"Settings."'
+            'Peercoin-Core in the background" under "File"->"Settings."'
             '<br><br>'
-            'If you are new to Armory and/or Bitcoin-Qt, '
+            'If you are new to Armory and/or Peercoin-Core, '
             'please visit the Armory '
             'webpage for more information.  Start at '
-            '<a href="https://bitcoinarmory.com/armory-and-bitcoin-qt">'
-            'Why Armory needs Bitcoin-Qt</a> or go straight to our <a '
+            '<a href="https://bitcoinarmory.com/armory-and-Peercoin-Core">'
+            'Why Armory needs Peercoin-Core</a> or go straight to our <a '
             'href="https://bitcoinarmory.com/faqs/">'
             'frequently asked questions</a> page for more general information.  '
             'If you already know what you\'re doing and simply need '
-            'to fetch the latest version of Bitcoin-Qt, you can download it from '
+            'to fetch the latest version of Peercoin-Core, you can download it from '
             '<a href="http://www.bitcoin.org">http://www.bitcoin.org</a>.')
          elif state == 'OfflineNoInternet':
             return ( \
@@ -5562,13 +5586,13 @@ class ArmoryMainWindow(QMainWindow):
             'or adjust the Armory settings.  Then restart Armory.'
             '<br><br>'
             'If this is intended to be an offline computer, note '
-            'that it is not necessary to have Bitcoin-Qt or bitcoind '
+            'that it is not necessary to have Peercoin-Core  '
             'running.' )
          elif state == 'OfflineNoBlkFiles':
             return ( \
             'You are currently in offline mode because '
             'Armory could not find the blockchain files produced '
-            'by Bitcoin-Qt.  Do you run Bitcoin-Qt (or bitcoind) '
+            'by Peercoin-Core.  Do you run Peercoin-Core () '
             'from a non-standard directory?   Armory expects to '
             'find the blkXXXX.dat files in <br><br>%s<br><br> '
             'If you know where they are located, please restart '
@@ -5576,13 +5600,13 @@ class ArmoryMainWindow(QMainWindow):
             'to notify Armory where to find them.') % BLKFILE_DIR
          elif state == 'Disconnected':
             return ( \
-            'Armory was previously online, but the connection to Bitcoin-Qt/'
-            'bitcoind was interrupted.  You will not be able to send bitcoins '
-            'or confirm receipt of bitcoins until the connection is '
-            'reestablished.  br><br>Please check that Bitcoin-Qt is open '
+            'Armory was previously online, but the connection to Peercoin-Core '
+            'was interrupted.  You will not be able to send peercoins '
+            'or confirm receipt of peercoins until the connection is '
+            'reestablished.  br><br>Please check that Peercoin-Core is open '
             'and synchronized with the network.  Armory will <i>try to '
             'reconnect</i> automatically when the connection is available '
-            'again.  If Bitcoin-Qt is available again, and reconnection does '
+            'again.  If Peercoin-Core is available again, and reconnection does '
             'not happen, please restart Armory.<br><br>')
          elif state == 'ScanNoWallets':
             return ( \
@@ -5602,19 +5626,19 @@ class ArmoryMainWindow(QMainWindow):
       elif mgmtMode.lower()=='auto':
          if state == 'OfflineBitcoindRunning':
             return ( \
-            'It appears you are already running Bitcoin software '
-            '(Bitcoin-Qt or bitcoind). '
+            'It appears you are already running Peercoin software '
+            '(Peercoin-Core ). '
             'Unlike previous versions of Armory, you should <u>not</u> run '
             'this software yourself --  Armory '
             'will run it in the background for you.  Either close the '
-            'Bitcoin application or adjust your settings.  If you change '
+            'Peercoin application or adjust your settings.  If you change '
             'your settings, then please restart Armory.')
          if state == 'OfflineNeedBitcoinInst':
             return ( \
             '<b>Only one more step to getting online with Armory!</b>   You '
-            'must install the Bitcoin software from www.bitcoin.org in order '
-            'for Armory to communicate with the Bitcoin network.  If the '
-            'Bitcoin software is already installed and/or you would prefer '
+            'must install the Peercoin software from www.bitcoin.org in order '
+            'for Armory to communicate with the Peercoin network.  If the '
+            'Peercoin software is already installed and/or you would prefer '
             'to manage it yourself, please adjust your settings and '
             'restart Armory.')
          if state == 'InitializingLongTime':
@@ -5647,25 +5671,25 @@ class ArmoryMainWindow(QMainWindow):
             'your wallet%s if you have not done so already!  You are protected '
             '<i>forever</i> from hard-drive loss, or forgetting you password. '
             'If you do not have a backup, you could lose all of your '
-            'Bitcoins forever!  See the <a href="https://bitcoinarmory.com/">'
+            'Peercoins forever!  See the <a href="https://bitcoinarmory.com/">'
             'Armory Backups page</a> for more info.' % \
             (('' if len(self.walletMap)==1 else 's',)*2))
          if state == 'OnlineDisconnected':
             return ( \
-            'Armory\'s communication with the Bitcoin network was interrupted. '
+            'Armory\'s communication with the Peercoin network was interrupted. '
             'This usually does not happen unless you closed the process that '
             'Armory was using to communicate with the network. Armory requires '
             '%s to be running in the background, and this error pops up if it '
             'disappears.'
             '<br><br>You may continue in offline mode, or you can close '
-            'all Bitcoin processes and restart Armory.' \
+            'all Peercoin processes and restart Armory.' \
             % os.path.basename(TheSDM.executable))
          if state == 'OfflineBadConnection':
             return ( \
             'Armory has experienced an issue trying to communicate with the '
-            'Bitcoin software.  The software is running in the background, '
+            'Peercoin software.  The software is running in the background, '
             'but Armory cannot communicate with it through RPC as it expects '
-            'to be able to.  If you changed any settings in the Bitcoin home '
+            'to be able to.  If you changed any settings in the Peercoin home '
             'directory, please make sure that RPC is enabled and that it is '
             'accepting connections from localhost.  '
             '<br><br>'
@@ -5674,9 +5698,9 @@ class ArmoryMainWindow(QMainWindow):
          if state == 'OfflineSatoshiAvail':
             return ( \
             'Armory does not detect internet access, but it does detect '
-            'running Bitcoin software.  Armory is in offline-mode. <br><br>'
+            'running Peercoin software.  Armory is in offline-mode. <br><br>'
             'If you are intending to run an offline system, you will not '
-            'need to have the Bitcoin software installed on the offline '
+            'need to have the Peercoin software installed on the offline '
             'computer.  It is only needed for the online computer. '
             'If you expected to be online and '
             'the absence of internet is an error, please restart Armory '
@@ -5684,24 +5708,24 @@ class ArmoryMainWindow(QMainWindow):
          if state == 'OfflineForcedButSatoshiAvail':
             return ( \
             'Armory was started in offline-mode, but detected you are '
-            'running Bitcoin software.  If you are intending to run an '
-            'offline system, you will <u>not</u> need to have the Bitcoin '
+            'running Peercoin software.  If you are intending to run an '
+            'offline system, you will <u>not</u> need to have the Peercoin '
             'software installed or running on the offline '
             'computer.  It is only required for being online. ')
          if state == 'OfflineBadDBEnv':
             return ( \
-            'The Bitcoin software indicates there '
+            'The Peercoin software indicates there '
             'is a problem with its databases.  This can occur when '
-            'Bitcoin-Qt/bitcoind is upgraded or downgraded, or sometimes '
+            'Peercoin-Core is upgraded or downgraded, or sometimes '
             'just by chance after an unclean shutdown.'
             '<br><br>'
-            'You can either revert your installed Bitcoin software to the '
+            'You can either revert your installed Peercoin software to the '
             'last known working version (but not earlier than version 0.8.1) '
-            'or delete everything <b>except</b> "wallet.dat" from the your Bitcoin '
+            'or delete everything <b>except</b> "wallet.dat" from the your Peercoin '
             'home directory:<br><br>'
             '<font face="courier"><b>%s</b></font>'
             '<br><br>'
-            'If you choose to delete the contents of the Bitcoin home '
+            'If you choose to delete the contents of the Peercoin home '
             'directory, you will have to do a fresh download of the blockchain '
             'again, which will require a few hours the first '
             'time.' % self.satoshiHomePath)
@@ -5716,8 +5740,8 @@ class ArmoryMainWindow(QMainWindow):
                return  (tr("""
                There was an error starting the underlying Bitcoin engine.
                This should not normally happen.  Usually it occurs when you
-               have been using Bitcoin-Qt prior to using Armory, especially
-               if you have upgraded or downgraded Bitcoin-Qt recently.
+               have been using Peercoin-Core prior to using Armory, especially
+               if you have upgraded or downgraded Peercoin-Core recently.
                Output from bitcoind:<br>""") + \
                (soutDisp if len(sout)>0 else '') + \
                (serrDisp if len(serr)>0 else '') )
@@ -5725,8 +5749,8 @@ class ArmoryMainWindow(QMainWindow):
                return ( tr("""
                   There was an error starting the underlying Bitcoin engine.
                   This should not normally happen.  Usually it occurs when you
-                  have been using Bitcoin-Qt prior to using Armory, especially
-                  if you have upgraded or downgraded Bitcoin-Qt recently.
+                  have been using Peercoin-Core prior to using Armory, especially
+                  if you have upgraded or downgraded Peercoin-Core recently.
                   <br><br>
                   Unfortunately, this error is so strange, Armory does not
                   recognize it.  Please go to "Export Log File" from the "File"
@@ -5868,7 +5892,7 @@ class ArmoryMainWindow(QMainWindow):
                if satoshiIsAvailable() or sdmState=='BitcoindAlreadyRunning':
                   # But bitcoind/-qt is already running
                   LOGINFO('Dashboard switched to auto-butSatoshiRunning')
-                  self.lblDashModeSync.setText(' Please close Bitcoin-Qt', \
+                  self.lblDashModeSync.setText(' Please close Peercoin-Core', \
                                                          size=4, bold=True)
                   setBtnFrameVisible(True, '')
                   setBtnRowVisible(DASHBTNS.Close, True)
@@ -5884,10 +5908,10 @@ class ArmoryMainWindow(QMainWindow):
                elif sdmState in ['BitcoindExeMissing', 'BitcoindHomeMissing']:
                   LOGINFO('Dashboard switched to auto-cannotFindExeHome')
                   if sdmState=='BitcoindExeMissing':
-                     self.lblDashModeSync.setText('Cannot find Bitcoin Installation', \
+                     self.lblDashModeSync.setText('Cannot find Peercoin Installation', \
                                                          size=4, bold=True)
                   else:
-                     self.lblDashModeSync.setText('Cannot find Bitcoin Home Directory', \
+                     self.lblDashModeSync.setText('Cannot find Peercoin Home Directory', \
                                                          size=4, bold=True)
                   setBtnRowVisible(DASHBTNS.Close, satoshiIsAvailable())
                   setBtnRowVisible(DASHBTNS.Install, True)
@@ -5919,7 +5943,7 @@ class ArmoryMainWindow(QMainWindow):
                   LOGERROR('Should not usually get here')
                   setOnlyDashModeVisible()
                   setBtnFrameVisible(True, \
-                     'Try reinstalling the Bitcoin '
+                     'Try reinstalling the Peercoin '
                      'software then restart Armory.  If you continue to have '
                      'problems, please contact Armory\'s core developer at '
                      '<a href="mailto:support@bitcoinarmory.com?Subject=Bitcoind%20Crash"'
@@ -6001,7 +6025,7 @@ class ArmoryMainWindow(QMainWindow):
                   elif sdmState=='BitcoindInitializing':
                      self.lblDashModeTorrent.setText('Download via Armory CDN', \
                                           size=4, bold=True, color='DisableFG')
-                     self.lblDashModeSync.setText( 'Initializing Bitcoin Engine', \
+                     self.lblDashModeSync.setText( 'Initializing Peercoin Engine', \
                                               size=4, bold=True, color='Foreground')
                      self.lblTorrentStats.setVisible(False)
                   else:
@@ -6027,7 +6051,7 @@ class ArmoryMainWindow(QMainWindow):
 
                   setBtnRowVisible(DASHBTNS.Settings, True)
                   setBtnFrameVisible(True, \
-                     'Since version 0.88, Armory runs bitcoind in the '
+                     'Since version 0.88, Armory runs Peercoin-Core in the '
                      'background.  You can switch back to '
                      'the old way in the Settings dialog. ')
 
@@ -6035,7 +6059,7 @@ class ArmoryMainWindow(QMainWindow):
                   self.lblDashDescr1.setText(descr1)
                   self.lblDashDescr2.setText(descr2)
       else:
-         # User is managing satoshi client, or bitcoind is already sync'd
+         # User is managing satoshi client,  is already sync'd
          self.frmDashMidButtons.setVisible(False)
          if bdmState in ('Offline', 'Uninitialized'):
             if onlineAvail and not self.lastBDMState[1]==onlineAvail:
@@ -6064,8 +6088,8 @@ class ArmoryMainWindow(QMainWindow):
                      descr = self.GetDashStateText('User','OfflineNoSatoshi')
                      setBtnRowVisible(DASHBTNS.Settings, True)
                      setBtnFrameVisible(True, \
-                        'If you would like Armory to manage the Bitcoin software '
-                        'for you (Bitcoin-Qt or bitcoind), then adjust your '
+                        'If you would like Armory to manage the Peercoin software '
+                        'for you (Peercoin-Core), then adjust your '
                         'Armory settings, then restart Armory.')
                   else:
                      descr = self.GetDashStateText('User','OfflineNoSatoshiNoInternet')
@@ -6437,7 +6461,7 @@ class ArmoryMainWindow(QMainWindow):
                   LOGINFO('Starting load blockchain')
                   self.loadBlockchainIfNecessary()
                elif bdmState == 'Offline':
-                  LOGERROR('Bitcoind is ready, but we are offline... ?')
+                  LOGERROR('Peercoin-Core is ready, but we are offline... ?')
                elif bdmState=='Scanning':
                   self.updateSyncProgress()
 
@@ -6447,7 +6471,7 @@ class ArmoryMainWindow(QMainWindow):
          else:
             if bdmState in ('Offline','Uninitialized'):
                # This call seems out of place, but it's because if you are in offline
-               # mode, it needs to check periodically for the existence of Bitcoin-Qt
+               # mode, it needs to check periodically for the existence of Peercoin-Core
                # so that it can enable the "Go Online" button
                self.setDashboardDetails()
                return
@@ -6626,13 +6650,13 @@ class ArmoryMainWindow(QMainWindow):
       # Collected everything we need to display, now construct it and do it.
       if ledgerAmt > 0:
          # Received!
-         title = 'Bitcoins Received!'
-         dispLines.append('Amount:  %s BTC' % totalStr)
+         title = 'Peercoins Received!'
+         dispLines.append('Amount:  %s PPC' % totalStr)
          dispLines.append('Recipient:  %s' % dispName)
       elif ledgerAmt < 0:
          # Sent!
-         title = 'Bitcoins Sent!'
-         dispLines.append('Amount:  %s BTC' % totalStr)
+         title = 'Peercoins Sent!'
+         dispLines.append('Amount:  %s PPC' % totalStr)
          dispLines.append('Sender:  %s' % dispName)
 
       self.sysTray.showMessage(title, \
@@ -6707,8 +6731,8 @@ class ArmoryMainWindow(QMainWindow):
             # self.sysTray.showMessage('Your bitcoins just did a lap!', \
             #                  'Wallet "%s" (%s) just sent %s BTC to itself!' % \
             #         (wlt.labelName, moneyID, coin2str(amt,maxZeros=1).strip()),
-            self.sysTray.showMessage('Your bitcoins just did a lap!', \
-                              '%s just sent some BTC to itself!' % wltName, 
+            self.sysTray.showMessage('Your peercoins just did a lap!', \
+                              '%s just sent some PPC to itself!' % wltName, 
                               QSystemTrayIcon.Information, 10000)
             return
 
@@ -6717,8 +6741,8 @@ class ArmoryMainWindow(QMainWindow):
          dispLines = []
          totalStr = coin2strNZS(abs(le.getValue()))
          if le.getValue() > 0:
-            title = 'Bitcoins Received!'
-            dispLines.append('Amount:  %s BTC' % totalStr)
+            title = 'Peercoins Received!'
+            dispLines.append('Amount:  %s PPC' % totalStr)
             dispLines.append('Recipient:  %s' % wltName)
          elif le.getValue() < 0:
             # Also display the address of where they went
@@ -6734,8 +6758,8 @@ class ArmoryMainWindow(QMainWindow):
                else:
                   recipStr = '<Multiple Recipients>'
             
-            title = 'Bitcoins Sent!'
-            dispLines.append('Amount:  %s BTC' % totalStr)
+            title = 'Peercoins Sent!'
+            dispLines.append('Amount:  %s PPC' % totalStr)
             dispLines.append('From:    %s' % wltName)
             dispLines.append('To:      %s' % recipStr)
    
@@ -6813,7 +6837,7 @@ class ArmoryMainWindow(QMainWindow):
          return None
 
       finalDir = os.path.abspath(unpackDirChild)
-      LOGWARN('Bitcoin Core unpacked into: %s', finalDir)
+      LOGWARN('Peercoin-Core unpacked into: %s', finalDir)
 
       if changeSettings:
          self.settings.set('SatoshiExe', finalDir)
@@ -7129,13 +7153,13 @@ def checkForAlreadyOpenError():
    armoryExists = []
    bitcoindExists = []
    aexe = os.path.basename(sys.argv[0])
-   bexe = 'bitcoind.exe' if OS_WINDOWS else 'bitcoind'
+   bexe = 'peercoind.exe' if OS_WINDOWS else 'peercoind'
    for proc in psutil.process_iter():
       if aexe in proc.name:
          LOGINFO('Found armory PID: %d', proc.pid)
          armoryExists.append(proc.pid)
       if bexe in proc.name:
-         LOGINFO('Found bitcoind PID: %d', proc.pid)
+         LOGINFO('Found peercoind PID: %d', proc.pid)
          if ('testnet' in proc.name) == USE_TESTNET:
             bitcoindExists.append(proc.pid)
 
@@ -7145,7 +7169,7 @@ def checkForAlreadyOpenError():
    elif len(bitcoindExists)>0:
       # Strange condition where bitcoind doesn't get killed by Armory/guardian
       # (I've only seen this happen on windows, though)
-      LOGERROR('Found zombie bitcoind process...killing it')
+      LOGERROR('Found zombie peercoind process...killing it')
       for pid in bitcoindExists:
          killProcess(pid)
       time.sleep(0.5)

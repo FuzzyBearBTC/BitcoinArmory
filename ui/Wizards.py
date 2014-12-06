@@ -33,10 +33,10 @@ class ArmoryWizard(QWizard):
       # Need to adjust the wizard frame size whenever the page changes.
       self.connect(self, SIGNAL('currentIdChanged(int)'), self.fitContents)
       if USE_TESTNET:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management [TESTNET]')
+         self.setWindowTitle('Armory - Peercoin Wallet Management [TESTNET]')
          self.setWindowIcon(QIcon(':/armory_icon_green_32x32.png'))
       else:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management')
+         self.setWindowTitle('Armory - Peercoin Wallet Management')
          self.setWindowIcon(QIcon(':/armory_icon_32x32.png'))
    
    def fitContents(self):

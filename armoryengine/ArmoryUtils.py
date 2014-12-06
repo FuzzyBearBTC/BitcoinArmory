@@ -50,10 +50,10 @@ from qrcodenative import QRCode, QRErrorCorrectLevel
 
 
 # Version Numbers
-BTCARMORY_VERSION    = (0, 92,  1, 0)  # (Major, Minor, Bugfix, AutoIncrement)
+BTCARMORY_VERSION    = (0, 92,  3, 0)  # (Major, Minor, Bugfix, AutoIncrement)
 PYBTCWALLET_VERSION  = (1, 35,  0, 0)  # (Major, Minor, Bugfix, AutoIncrement)
 
-ARMORY_DONATION_ADDR = '1ArmoryXcfq7TnCSuZa9fQjRYwJ4bkRKfv'
+ARMORY_DONATION_ADDR = 'PBT8CBNg19JLQpEx6iJvx29HZ6NLudLDjM'
 ARMORY_DONATION_PUBKEY = ( '04'
       '11d14f8498d11c33d08b0cd7b312fb2e6fc9aebd479f8e9ab62b5333b2c395c5'
       'f7437cab5633b5894c4a5c2132716bc36b7571cbe492a7222442b75df75b9a84')
@@ -72,9 +72,9 @@ haveGUI = [False, None]
 parser = optparse.OptionParser(usage="%prog [options]\n")
 parser.add_option("--settings",        dest="settingsPath",default='DEFAULT', type="str",          help="load Armory with a specific settings file")
 parser.add_option("--datadir",         dest="datadir",     default='DEFAULT', type="str",          help="Change the directory that Armory calls home")
-parser.add_option("--satoshi-datadir", dest="satoshiHome", default='DEFAULT', type='str',          help="The Bitcoin-Qt/bitcoind home directory")
-parser.add_option("--satoshi-port",    dest="satoshiPort", default='DEFAULT', type="str",          help="For Bitcoin-Qt instances operating on a non-standard port")
-parser.add_option("--satoshi-rpcport", dest="satoshiRpcport",default='DEFAULT',type="str",         help="RPC port Bitcoin-Qt instances operating on a non-standard port")
+parser.add_option("--satoshi-datadir", dest="satoshiHome", default='DEFAULT', type='str',          help="The Peercoin-Core/bitcoind home directory")
+parser.add_option("--satoshi-port",    dest="satoshiPort", default='DEFAULT', type="str",          help="For Peercoin-Core instances operating on a non-standard port")
+parser.add_option("--satoshi-rpcport", dest="satoshiRpcport",default='DEFAULT',type="str",         help="RPC port Peercoin-Core instances operating on a non-standard port")
 #parser.add_option("--bitcoind-path",   dest="bitcoindPath",default='DEFAULT', type="str",         help="Path to the location of bitcoind on your system")
 parser.add_option("--dbdir",           dest="leveldbDir",  default='DEFAULT', type='str',          help="Location to store blocks database (defaults to --datadir)")
 parser.add_option("--rpcport",         dest="rpcport",     default='DEFAULT', type="str",          help="RPC port for running armoryd.py")
@@ -87,17 +87,17 @@ parser.add_option("--nologging",       dest="logDisable",  default=False,     ac
 parser.add_option("--netlog",          dest="netlog",      default=False,     action="store_true", help="Log networking messages sent and received by Armory")
 parser.add_option("--logfile",         dest="logFile",     default='DEFAULT', type='str',          help="Specify a non-default location to send logging information")
 parser.add_option("--mtdebug",         dest="mtdebug",     default=False,     action="store_true", help="Log multi-threaded call sequences")
-parser.add_option("--skip-online-check", dest="forceOnline", default=False,   action="store_true", help="Go into online mode, even if internet connection isn't detected")
-parser.add_option("--skip-version-check", dest="skipVerCheck", default=False, action="store_true", help="Do not contact bitcoinarmory.com to check for new versions")
-parser.add_option("--skip-announce-check", dest="skipAnnounceCheck", default=False, action="store_true", help="Do not query for Armory announcements")
+parser.add_option("--skip-online-check",dest="forceOnline", default=False,   action="store_true", help="Go into online mode, even if internet connection isn't detected")
+parser.add_option("--skip-stats-report", dest="skipStatsReport", default=False, action="store_true", help="Does announcement checking without any OS/version reporting (for ATI statistics)")
+parser.add_option("--skip-announce-check",dest="skipAnnounceCheck", default=False, action="store_true", help="Do not query for Armory announcements")
+parser.add_option("--tor",             dest="useTorSettings", default=False, action="store_true", help="Enable common settings for when Armory connects through Tor")
 parser.add_option("--keypool",         dest="keypool",     default=100, type="int",                help="Default number of addresses to lookahead in Armory wallets")
-parser.add_option("--redownload",      dest="redownload",  default=False,     action="store_true", help="Delete Bitcoin-Qt/bitcoind databases; redownload")
+parser.add_option("--redownload",      dest="redownload",  default=False,     action="store_true", help="Delete Peercoin-Core/bitcoind databases; redownload")
 parser.add_option("--rebuild",         dest="rebuild",     default=False,     action="store_true", help="Rebuild blockchain database and rescan")
 parser.add_option("--rescan",          dest="rescan",      default=False,     action="store_true", help="Rescan existing blockchain DB")
 parser.add_option("--maxfiles",        dest="maxOpenFiles",default=0,         type="int",          help="Set maximum allowed open files for LevelDB databases")
 parser.add_option("--disable-torrent", dest="disableTorrent", default=False,     action="store_true", help="Only download blockchain data via P2P network (slow)")
 parser.add_option("--test-announce", dest="testAnnounceCode", default=False,     action="store_true", help="Only used for developers needing to test announcement code with non-offline keys")
-#parser.add_option("--rebuildwithblocksize", dest="newBlockSize",default='32kB', type="str",          help="Rebuild databases with new blocksize")
 parser.add_option("--nospendzeroconfchange",dest="ignoreAllZC",default=False, action="store_true", help="All zero-conf funds will be unspendable, including sent-to-self coins")
 parser.add_option("--multisigfile",  dest="multisigFile",  default='DEFAULT', type='str',          help="File to store information about multi-signature transactions")
 parser.add_option("--force-wallet-check", dest="forceWalletCheck", default=False, action="store_true", help="Force the wallet sanity check on startup")
@@ -264,16 +264,16 @@ if OS_WINDOWS:
    rt = ctypes.windll.shell32.SHGetFolderPathW(0, 26, 0, 0, ctypes.byref(buffer))
    USER_HOME_DIR = unicode(buffer.value)
                
-   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Bitcoin', SUBDIR)
-   ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'Armory', SUBDIR)
+   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Peercoin', SUBDIR)
+   ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'PeercoinArmory', SUBDIR)
    BLKFILE_DIR     = os.path.join(BTC_HOME_DIR, 'blocks')
    BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
 elif OS_LINUX:
    OS_NAME         = 'Linux'
    OS_VARIANT      = platform.linux_distribution()
    USER_HOME_DIR   = os.getenv('HOME')
-   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, '.bitcoin', SUBDIR)
-   ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, '.armory', SUBDIR)
+   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, '.peercoin', SUBDIR)
+   ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, '.peercoinarmory', SUBDIR)
    BLKFILE_DIR     = os.path.join(BTC_HOME_DIR, 'blocks')
    BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
 elif OS_MACOSX:
@@ -281,8 +281,8 @@ elif OS_MACOSX:
    OS_NAME         = 'MacOSX'
    OS_VARIANT      = platform.mac_ver()
    USER_HOME_DIR   = os.path.expanduser('~/Library/Application Support')
-   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Bitcoin', SUBDIR)
-   ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'Armory', SUBDIR)
+   BTC_HOME_DIR    = os.path.join(USER_HOME_DIR, 'Peercoin', SUBDIR)
+   ARMORY_HOME_DIR = os.path.join(USER_HOME_DIR, 'PeercoinArmory', SUBDIR)
    BLKFILE_DIR     = os.path.join(BTC_HOME_DIR, 'blocks')
    BLKFILE_1stFILE = os.path.join(BLKFILE_DIR, 'blk00000.dat')
 else:
@@ -296,12 +296,12 @@ OS_LINUX   = 'nix'    in opsys.lower() or 'nux'     in opsys.lower()
 OS_MACOSX  = 'darwin' in opsys.lower() or 'osx'     in opsys.lower()
 
 BLOCKCHAINS = {}
-BLOCKCHAINS['\xf9\xbe\xb4\xd9'] = "Main Network"
-BLOCKCHAINS['\xfa\xbf\xb5\xda'] = "Old Test Network"
-BLOCKCHAINS['\x0b\x11\x09\x07'] = "Test Network (testnet3)"
+BLOCKCHAINS['\xe6\xe8\xe9\xe5'] = "Main Network"
+BLOCKCHAINS['\xdb\xe1\xf2\xf6'] = "Old Test Network"
+BLOCKCHAINS['\xcb\xf2\xc0\xef'] = "Test Network (testnet3)"
 
 NETWORKS = {}
-NETWORKS['\x00'] = "Main Network"
+NETWORKS['\x37'] = "Main Network"
 NETWORKS['\x05'] = "Main Network"
 NETWORKS['\x6f'] = "Test Network"
 NETWORKS['\xc4'] = "Test Network"
@@ -344,7 +344,7 @@ def readVersionInt(verInt):
    verList.append( int(verStr[:-7       ]) )
    return tuple(verList[::-1])
 
-# Allow user to override default bitcoin-qt/bitcoind home directory
+# Allow user to override default Peercoin-Core/bitcoind home directory
 if not CLI_OPTIONS.satoshiHome.lower()=='default':
    success = True
    if USE_TESTNET:
@@ -425,33 +425,36 @@ if ARMORY_HOME_DIR and not os.path.exists(ARMORY_HOME_DIR):
 if not os.path.exists(LEVELDB_DIR):
    os.makedirs(LEVELDB_DIR)
 
+
+
+
 ##### MAIN NETWORK IS DEFAULT #####
 if not USE_TESTNET:
    # TODO:  The testnet genesis tx hash can't be the same...?
-   BITCOIN_PORT = 8333
-   BITCOIN_RPC_PORT = 8332
-   ARMORY_RPC_PORT = 8225
-   MAGIC_BYTES = '\xf9\xbe\xb4\xd9'
-   GENESIS_BLOCK_HASH_HEX  = '6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000'
-   GENESIS_BLOCK_HASH      = 'o\xe2\x8c\n\xb6\xf1\xb3r\xc1\xa6\xa2F\xaec\xf7O\x93\x1e\x83e\xe1Z\x08\x9ch\xd6\x19\x00\x00\x00\x00\x00'
-   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a'
+   BITCOIN_PORT = 9901
+   BITCOIN_RPC_PORT = 9902
+   ARMORY_RPC_PORT = 9910
+   MAGIC_BYTES = '\xe6\xe8\xe9\xe5'
+   GENESIS_BLOCK_HASH_HEX  = 'e327cd80c8b17efda4ea08c5877e95d877462ab66349d5667167fe3200000000'
+   GENESIS_BLOCK_HASH      = 'e3\x27\xcd\x80\xc8\xb1\x7e\xfd\xa4\xea\x08\xc5\x87\x7e\x95\xd8\x77\x46\x2a\xb6\x63\x49\xd5\x66\x71\x67\xfe\x32\x00\x00\x00\x00'
+   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a' # Can't Find (Sigmund)
    GENESIS_TX_HASH         = ';\xa3\xed\xfdz{\x12\xb2z\xc7,>gv\x8fa\x7f\xc8\x1b\xc3\x88\x8aQ2:\x9f\xb8\xaaK\x1e^J'
-   ADDRBYTE = '\x00'
+   ADDRBYTE = '\x37'
    P2SHBYTE = '\x05'
-   PRIVKEYBYTE = '\x80'
+   PRIVKEYBYTE = '\xb7'
 
    # This will usually just be used in the GUI to make links for the user
-   BLOCKEXPLORE_NAME     = 'blockchain.info'
-   BLOCKEXPLORE_URL_TX   = 'https://blockchain.info/tx/%s'
-   BLOCKEXPLORE_URL_ADDR = 'https://blockchain.info/address/%s'
+   BLOCKEXPLORE_NAME     = 'ppc.blockr.io'
+   BLOCKEXPLORE_URL_TX   = 'https://ppc.blockr.io/tx/info/%s'
+   BLOCKEXPLORE_URL_ADDR = 'https://ppc.blockr.io/address/info/%s'
 else:
-   BITCOIN_PORT = 18333
-   BITCOIN_RPC_PORT = 18332
-   ARMORY_RPC_PORT     = 18225
-   MAGIC_BYTES  = '\x0b\x11\x09\x07'
-   GENESIS_BLOCK_HASH_HEX  = '43497fd7f826957108f4a30fd9cec3aeba79972084e90ead01ea330900000000'
-   GENESIS_BLOCK_HASH      = 'CI\x7f\xd7\xf8&\x95q\x08\xf4\xa3\x0f\xd9\xce\xc3\xae\xbay\x97 \x84\xe9\x0e\xad\x01\xea3\t\x00\x00\x00\x00'
-   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a'
+   BITCOIN_PORT = 9903
+   BITCOIN_RPC_PORT = 9904
+   ARMORY_RPC_PORT     = 9920
+   MAGIC_BYTES  = '\xcb\xf2\xc0\xef'
+   GENESIS_BLOCK_HASH_HEX  = '069f7cc4ae81ca0c7c72cc30e68c65b017cd173e5096657f73bb57f701000000'
+   GENESIS_BLOCK_HASH      = '06\x9f\x7c\xc4\xae\x81\xca\x0c\x7c\x72\xcc\x30\xe6\x8c\x65\xb0\x17\xcd\x17\x3e\x50\x96\x65\x7f\x73\xbb\x57\xf7\x01\x00\x00\x00'
+   GENESIS_TX_HASH_HEX     = '3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a' # Can't Find (Sigmund)
    GENESIS_TX_HASH         = ';\xa3\xed\xfdz{\x12\xb2z\xc7,>gv\x8fa\x7f\xc8\x1b\xc3\x88\x8aQ2:\x9f\xb8\xaaK\x1e^J'
    ADDRBYTE = '\x6f'
    P2SHBYTE = '\xc4'
@@ -522,14 +525,16 @@ if not CLI_OPTIONS.satoshiPort == 'DEFAULT':
    try:
       BITCOIN_PORT = int(CLI_OPTIONS.satoshiPort)
    except:
-      raise TypeError('Invalid port for Bitcoin-Qt, using ' + str(BITCOIN_PORT))
+      raise TypeError('Invalid port for Peercoin-Core, using ' + str(BITCOIN_PORT))
 
+################################################################################
 if not CLI_OPTIONS.satoshiRpcport == 'DEFAULT':
    try:
       BITCOIN_RPC_PORT = int(CLI_OPTIONS.satoshiRpcport)
    except:
-      raise TypeError('Invalid rpc port for Bitcoin-Qt, using ' + str(BITCOIN_RPC_PORT))
+      raise TypeError('Invalid rpc port for Peercoin-Core, using ' + str(BITCOIN_RPC_PORT))
 
+################################################################################
 if not CLI_OPTIONS.rpcport == 'DEFAULT':
    try:
       ARMORY_RPC_PORT = int(CLI_OPTIONS.rpcport)
@@ -864,8 +869,8 @@ fileDelSettings = os.path.join(ARMORY_HOME_DIR, 'delsettings.flag')
 
 # Flag to remove everything in Bitcoin dir except wallet.dat (if requested)
 if os.path.exists(fileRedownload):
-   # Flag to remove *BITCOIN-QT* databases so it will have to re-download
-   LOGINFO('Found %s, will delete Bitcoin DBs & redownload' % fileRedownload)
+   # Flag to remove *Peercoin-Core* databases so it will have to re-download
+   LOGINFO('Found %s, will delete Peercoin DBs & redownload' % fileRedownload)
 
    os.remove(fileRedownload)
 
@@ -907,10 +912,10 @@ if os.path.exists(fileDelSettings):
 ################################################################################
 def deleteBitcoindDBs():
    if not os.path.exists(BTC_HOME_DIR):
-      LOGERROR('Could not find Bitcoin-Qt/bitcoind home dir to remove blk data')
+      LOGERROR('Could not find Peercoin-Core home dir to remove blk data')
       LOGERROR('  Does not exist: %s' % BTC_HOME_DIR)
    else:
-      LOGINFO('Found bitcoin home dir, removing blocks and databases')
+      LOGINFO('Found percoin home dir, removing blocks and databases')
 
       # Remove directories
       for btcDir in ['blocks', 'chainstate', 'database']:
@@ -953,6 +958,18 @@ if CLI_OPTIONS.testAnnounceCode:
    ARMORY_INFO_SIGN_PUBLICKEY = ('04'
       '601c891a2cbc14a7b2bb1ecc9b6e42e166639ea4c2790703f8e2ed126fce432c'
       '62fe30376497ad3efcd2964aa0be366010c11b8d7fc8209f586eac00bb763015')
+
+
+
+####
+if CLI_OPTIONS.useTorSettings:
+   LOGWARN('Option --tor was supplied, forcing --skip-announce-check,')
+   LOGWARN('--skip-online-check, --skip-stats-report and --disable-torrent')
+   CLI_OPTIONS.skipAnnounceCheck = True
+   CLI_OPTIONS.skipStatsReport = True
+   CLI_OPTIONS.forceOnline = True
+   CLI_OPTIONS.disableTorrent = True
+
 
 
 ################################################################################
@@ -2780,19 +2797,19 @@ def parseBitcoinURI(theStr):
    """ Takes a URI string, returns the pieces of it, in a dictionary """
 
    # Start by splitting it into pieces on any separator
-   seplist = ':;?&'
+   seplist = ';?&'
    for c in seplist:
       theStr = theStr.replace(c,' ')
    parts = theStr.split()
 
    # Now start walking through the parts and get the info out of it
-   if not parts[0] == 'bitcoin':
+   if not parts[0].startswith('ppcoin:'):
       return {}
-
+   
    uriData = {}
 
    try:
-      uriData['address'] = parts[1]
+      uriData['address'] = parts[0][parts[0].index(':')+1:]
       for p in parts[2:]:
          if not '=' in p:
             raise BadURIError('Unrecognized URI field: "%s"'%p)
@@ -2842,7 +2859,7 @@ def uriPercentToReserved(theStr):
 
 ################################################################################
 def createBitcoinURI(addr, amt=None, msg=None):
-   uriStr = 'bitcoin:%s' % addr
+   uriStr = 'ppcoin:%s' % addr
    if amt or msg:
       uriStr += '?'
 
@@ -3173,6 +3190,7 @@ def EstimateCumulativeBlockchainSize(blkNum):
          271827 12968787968
          286296 15619588096
          290715 16626221056
+         323285 24216006308
       """
    strList = [line.strip().split() for line in blksizefile.strip().split('\n')]
    BLK_SIZE_LIST = [[int(x[0]), int(x[1])] for x in strList]

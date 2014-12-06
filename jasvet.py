@@ -35,22 +35,21 @@ END_MARKER = '-----END '
 DASHX5 = '-----'
 RN = '\r\n'
 RNRN = '\r\n\r\n'
-CLEARSIGN_MSG_TYPE_MARKER = 'BITCOIN SIGNED MESSAGE'
-BITCOIN_SIG_TYPE_MARKER = 'BITCOIN SIGNATURE'
-BASE64_MSG_TYPE_MARKER = 'BITCOIN MESSAGE'
-BITCOIN_ARMORY_COMMENT = 'Comment: Signed by Bitcoin Armory v' +\
+CLEARSIGN_MSG_TYPE_MARKER = 'PEERCOIN SIGNED MESSAGE'
+BITCOIN_SIG_TYPE_MARKER = 'PEERCOIN SIGNATURE'
+BASE64_MSG_TYPE_MARKER = 'PEERCOIN MESSAGE'
+BITCOIN_ARMORY_COMMENT = 'Comment: Signed by Peercoin Armory v' +\
    getVersionString(BTCARMORY_VERSION, 3)
 class UnknownSigBlockType(Exception): pass
    
-def randomk():  #better make it stronger
-   # return CppBlockUtils.SecureBinaryData.GenerateRandom(32)
-   rk=0
-   for i in range(8):
-      rk = rk | long(random.random()*0xffffffff)<<(32*i)
-   return rk
+def randomk():  
+   # Using Crypto++ CSPRNG instead of python's
+   sbdRandK = CppBlockUtils.SecureBinaryData().GenerateRandom(32)
+   hexRandK = sbdRandK.toBinStr().encode('hex_codec')
+   return int(hexRandK, 16)
+
 
 # Common constants/functions for Bitcoin
-
 def hash_160_to_bc_address(h160, addrtype=0):
    vh160 = chr(addrtype) + h160
    h = Hash(vh160)

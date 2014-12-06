@@ -744,10 +744,10 @@ class ArmoryDialog(QDialog):
       self.setWindowFlags(Qt.Window)
 
       if USE_TESTNET:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management [TESTNET]')
+         self.setWindowTitle('Armory - Peercoin Wallet Management [TESTNET]')
          self.setWindowIcon(QIcon(':/armory_icon_green_32x32.png'))
       else:
-         self.setWindowTitle('Armory - Bitcoin Wallet Management')
+         self.setWindowTitle('Armory - Peercoin Wallet Management')
          self.setWindowIcon(QIcon(':/armory_icon_32x32.png'))
    
    @AddToRunningDialogsList
